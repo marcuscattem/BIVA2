@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aiBIVA - Bioelectrical Impedance Vector Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .method-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .icon-container {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        
+        .language-selector {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 50;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        html.dark body { background: #0f172a !important; color: #e5e7eb !important; }
+        html.dark .bg-white { background-color: #111827 !important; }
+        html.dark .bg-gray-50 { background-color: #1f2937 !important; }
+        html.dark .bg-gray-100 { background-color: #0f172a !important; }
+        html.dark .text-gray-900, html.dark .text-gray-800, html.dark .text-gray-700 { color: #e5e7eb !important; }
+        html.dark .text-gray-600, html.dark .text-gray-500 { color: #cbd5e1 !important; }
+        html.dark .border-gray-100, html.dark .border-gray-200, html.dark .border-gray-300 { border-color: #374151 !important; }
+        html.dark input, html.dark select { background-color: #111827 !important; color: #e5e7eb !important; border-color: #4b5563 !important; }
+        html.dark .shadow-sm, html.dark .shadow-lg { box-shadow: 0 10px 30px rgba(0,0,0,0.35) !important; }
+        html.dark canvas { background: #ffffff; }
+    </style>
+</head>
+<body>
+
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <div class="flex gap-2">
+            <select id="languageSelect" onchange="changeLanguage(this.value)" class="px-4 py-2 rounded-lg border-2 border-white text-gray-800 font-semibold bg-white hover:bg-gray-50 transition">
+                <option value="pt-BR">Português (BR)</option>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+            </select>
+            <button onclick="toggleTheme()" class="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-white text-gray-800 font-semibold bg-white hover:bg-gray-50 transition">
+                <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i> <span id="themeLabel">Escuro</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+        
+        <!-- Header -->
+        <div class="text-center mb-16 fade-in">
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <div class="bg-white p-4 rounded-2xl shadow-lg">
+                    <i data-lucide="activity" class="w-12 h-12 text-purple-600"></i>
+                </div>
+                <div>
+                    <h1 class="text-5xl font-bold text-white mb-2">aiBIVA</h1>
+                    <p class="text-xl text-purple-100" data-i18n="header.subtitle">Análise Vetorial de Bioimpedância Elétrica</p>
+                </div>
+            </div>
+            <p class="text-lg text-purple-100 max-w-2xl mx-auto" data-i18n="header.description">
+                Selecione o método de análise para começar sua avaliação de composição corporal
+            </p>
+        </div>
+
+        <!-- Methods Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full mb-12 fade-in">
+            
+            <!-- Tolerance Card -->
+            <div class="method-card card-hover" onclick="selectMethod('tolerance')">
+                <div class="icon-container bg-blue-100">
+                    <i data-lucide="target" class="w-10 h-10 text-blue-600"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-3" data-i18n="methods.tolerance">Tolerância</h2>
+                <p class="text-gray-600 text-sm mb-6" data-i18n="methods.toleranceDesc">
+                    Analisa a variabilidade populacional através de elipses de tolerância (50%, 75%, 95%)
+                </p>
+                <div class="bg-blue-50 rounded-lg p-4 text-left">
+                    <p class="text-xs font-semibold text-blue-900 mb-2" data-i18n="cards.features">Características:</p>
+                    <ul class="text-xs text-blue-800 space-y-1">
+                        <li data-i18n="cards.tolerance1">✓ 3 elipses de referência</li>
+                        <li data-i18n="cards.tolerance2">✓ Distribuição populacional</li>
+                        <li data-i18n="cards.tolerance3">✓ Análise individual vs grupo</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Confidence Card -->
+            <div class="method-card card-hover" onclick="selectMethod('confidence')">
+                <div class="icon-container bg-green-100">
+                    <i data-lucide="check-circle" class="w-10 h-10 text-green-600"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-3" data-i18n="methods.confidence">Confiança</h2>
+                <p class="text-gray-600 text-sm mb-6" data-i18n="methods.confidenceDesc">
+                    Adiciona e compara elipses de confiança Classic ou Specific
+                </p>
+                <div class="bg-green-50 rounded-lg p-4 text-left">
+                    <p class="text-xs font-semibold text-green-900 mb-2" data-i18n="cards.features">Características:</p>
+                    <ul class="text-xs text-green-800 space-y-1">
+                        <li data-i18n="cards.confidence1">✓ Elipses por média, DP, r e N</li>
+                        <li data-i18n="cards.confidence2">✓ Classic ou Specific</li>
+                        <li data-i18n="cards.confidence3">✓ Hotelling T² e p-value</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Combined Card -->
+            <div class="method-card card-hover" onclick="selectMethod('combined')">
+                <div class="icon-container bg-purple-100">
+                    <i data-lucide="layers" class="w-10 h-10 text-purple-600"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-3" data-i18n="methods.combined">Mista</h2>
+                <p class="text-gray-600 text-sm mb-6" data-i18n="methods.combinedDesc">
+                    Combina tolerância e confiança para análise completa e comparativa
+                </p>
+                <div class="bg-purple-50 rounded-lg p-4 text-left">
+                    <p class="text-xs font-semibold text-purple-900 mb-2" data-i18n="cards.features">Características:</p>
+                    <ul class="text-xs text-purple-800 space-y-1">
+                        <li data-i18n="cards.combined1">✓ Tolerância + Confiança</li>
+                        <li data-i18n="cards.combined2">✓ Análise dupla</li>
+                        <li data-i18n="cards.combined3">✓ Visão completa</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-purple-100 text-sm fade-in">
+            <p data-i18n="footer.info">Desenvolvido com base em metodologia científica de Bioimpedância Elétrica</p>
+            <p class="mt-2" data-i18n="footer.rights">© 2024 aiBIVA - Todos os direitos reservados</p>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const translations = {
+            'pt-BR': {
+                'header.subtitle': 'Análise Vetorial de Bioimpedância Elétrica',
+                'header.description': 'Selecione o método de análise para começar sua avaliação de composição corporal',
+                'methods.tolerance': 'Tolerância',
+                'methods.toleranceDesc': 'Analisa a variabilidade populacional através de elipses de tolerância (50%, 75%, 95%)',
+                'methods.confidence': 'Confiança',
+                'methods.confidenceDesc': 'Adiciona e compara elipses de confiança Classic ou Specific',
+                'methods.combined': 'Mista',
+                'methods.combinedDesc': 'Combina tolerância e confiança para análise completa e comparativa',
+                'cards.features': 'Características:',
+                'cards.tolerance1': '✓ 3 elipses de referência',
+                'cards.tolerance2': '✓ Distribuição populacional',
+                'cards.tolerance3': '✓ Análise individual vs grupo',
+                'cards.confidence1': '✓ Elipses por média, DP, r e N',
+                'cards.confidence2': '✓ Classic ou Specific',
+                'cards.confidence3': '✓ Hotelling T² e p-value',
+                'cards.combined1': '✓ Tolerância + Confiança',
+                'cards.combined2': '✓ Análise dupla',
+                'cards.combined3': '✓ Visão completa',
+                'theme.light': 'Claro',
+                'theme.dark': 'Escuro',
+                'footer.info': 'Desenvolvido com base em metodologia científica de Bioimpedância Elétrica',
+                'footer.rights': '© 2024 aiBIVA - Todos os direitos reservados'
+            },
+            'en': {
+                'header.subtitle': 'Bioelectrical Impedance Vector Analysis',
+                'header.description': 'Select the analysis method to begin your body composition assessment',
+                'methods.tolerance': 'Tolerance',
+                'methods.toleranceDesc': 'Analyzes population variability through tolerance ellipses (50%, 75%, 95%)',
+                'methods.confidence': 'Confidence',
+                'methods.confidenceDesc': 'Adds and compares Classic or Specific confidence ellipses',
+                'methods.combined': 'Combined',
+                'methods.combinedDesc': 'Combines tolerance and confidence for complete and comparative analysis',
+                'cards.features': 'Features:',
+                'cards.tolerance1': '✓ 3 reference ellipses',
+                'cards.tolerance2': '✓ Population distribution',
+                'cards.tolerance3': '✓ Individual vs group analysis',
+                'cards.confidence1': '✓ Ellipses by mean, SD, r and N',
+                'cards.confidence2': '✓ Classic or Specific',
+                'cards.confidence3': '✓ Hotelling T² and p-value',
+                'cards.combined1': '✓ Tolerance + Confidence',
+                'cards.combined2': '✓ Dual analysis',
+                'cards.combined3': '✓ Complete view',
+                'theme.light': 'Light',
+                'theme.dark': 'Dark',
+                'footer.info': 'Developed based on scientific Bioelectrical Impedance methodology',
+                'footer.rights': '© 2024 aiBIVA - All rights reserved'
+            },
+            'es': {
+                'header.subtitle': 'Análisis Vectorial de Impedancia Bioeléctrica',
+                'header.description': 'Selecciona el método de análisis para comenzar tu evaluación de composición corporal',
+                'methods.tolerance': 'Tolerancia',
+                'methods.toleranceDesc': 'Analiza la variabilidad poblacional a través de elipses de tolerancia (50%, 75%, 95%)',
+                'methods.confidence': 'Confianza',
+                'methods.confidenceDesc': 'Agrega y compara elipses de confianza Classic o Specific',
+                'methods.combined': 'Mixto',
+                'methods.combinedDesc': 'Combina tolerancia y confianza para análisis completo y comparativo',
+                'cards.features': 'Características:',
+                'cards.tolerance1': '✓ 3 elipses de referencia',
+                'cards.tolerance2': '✓ Distribución poblacional',
+                'cards.tolerance3': '✓ Análisis individual vs grupo',
+                'cards.confidence1': '✓ Elipses por media, DE, r y N',
+                'cards.confidence2': '✓ Classic o Specific',
+                'cards.confidence3': '✓ Hotelling T² y p-value',
+                'cards.combined1': '✓ Tolerancia + Confianza',
+                'cards.combined2': '✓ Análisis doble',
+                'cards.combined3': '✓ Vista completa',
+                'theme.light': 'Claro',
+                'theme.dark': 'Oscuro',
+                'footer.info': 'Desarrollado en base a metodología científica de Impedancia Bioeléctrica',
+                'footer.rights': '© 2024 aiBIVA - Todos los derechos reservados'
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('selectedLanguage') || 'pt-BR';
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('selectedLanguage', lang);
+            document.documentElement.lang = lang;
+            updateTranslations();
+        }
+
+        function updateTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.textContent = translations[currentLanguage][key] || key;
+            });
+            applyTheme();
+        }
+
+        function applyTheme(theme = localStorage.getItem('aibivaTheme') || 'light') {
+            const normalized = theme === 'dark' ? 'dark' : 'light';
+            localStorage.setItem('aibivaTheme', normalized);
+            document.documentElement.classList.toggle('dark', normalized === 'dark');
+            document.getElementById('themeLabel').textContent = normalized === 'dark'
+                ? translations[currentLanguage]['theme.light']
+                : translations[currentLanguage]['theme.dark'];
+            document.getElementById('themeIcon').setAttribute('data-lucide', normalized === 'dark' ? 'sun' : 'moon');
+            lucide.createIcons();
+        }
+
+        function toggleTheme() {
+            applyTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+        }
+
+        function selectMethod(method) {
+            // Armazenar método selecionado no localStorage
+            localStorage.setItem('selectedMethod', method);
+            localStorage.setItem('selectedLanguage', currentLanguage);
+            
+            // Redirecionar para página específica do método
+            window.location.href = `aiBIVA-${method}.html`;
+        }
+
+        // Initialize
+        document.getElementById('languageSelect').value = currentLanguage;
+        updateTranslations();
+        applyTheme();
+    </script>
+
+</body>
+</html>

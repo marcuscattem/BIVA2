@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aiBIVA - Confidence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        html.dark body { background: #0f172a !important; color: #e5e7eb !important; }
+        html.dark .bg-white { background-color: #111827 !important; }
+        html.dark .bg-gray-50 { background-color: #1f2937 !important; }
+        html.dark .bg-gray-100 { background-color: #0f172a !important; }
+        html.dark .text-gray-900, html.dark .text-gray-800, html.dark .text-gray-700 { color: #e5e7eb !important; }
+        html.dark .text-gray-600, html.dark .text-gray-500 { color: #cbd5e1 !important; }
+        html.dark .border-gray-100, html.dark .border-gray-200, html.dark .border-gray-300 { border-color: #374151 !important; }
+        html.dark input, html.dark select { background-color: #111827 !important; color: #e5e7eb !important; border-color: #4b5563 !important; }
+        html.dark .shadow-sm, html.dark .shadow-lg { box-shadow: 0 10px 30px rgba(0,0,0,0.35) !important; }
+        html.dark canvas { background: #ffffff; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 shadow-sm z-10 shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button onclick="goHome()" class="text-gray-600 hover:text-gray-900 transition" data-i18n-title="nav.back" title="Voltar">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </button>
+                <div class="bg-blue-600 p-2 rounded-lg text-white">
+                    <i data-lucide="activity"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">aiBIVA</h1>
+                    <p class="text-xs text-gray-500" data-i18n="method.title">Confidence</p>
+                </div>
+            </div>
+            <div class="flex gap-3 items-center">
+                <select id="languageSelect" onchange="changeLanguage(this.value)" class="px-3 py-2 text-sm border border-gray-300 rounded-lg">
+                    <option value="pt-BR">Português (BR)</option>
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                </select>
+                <button onclick="toggleTheme()" class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i> <span id="themeLabel">Escuro</span>
+                </button>
+                <div id="ellipseExportButtons" class="flex gap-2">
+                    <button onclick="exportEllipsePNG()" data-i18n-title="export.ellipsePngTitle" title="Baixar elipse como imagem" class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100">
+                        <i data-lucide="image" class="w-4 h-4"></i> <span data-i18n="export.ellipsePng">Elipse PNG</span>
+                    </button>
+                    <button onclick="exportExcel()" data-i18n-title="export.excelTitle" title="Baixar Excel editável" class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md hover:bg-emerald-100">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> <span data-i18n="export.excel">Excel</span>
+                    </button>
+                </div>
+                <div id="exportButtons" style="display: none;" class="flex gap-2">
+                    <button onclick="exportCSV()" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> <span data-i18n="export.csv">CSV</span>
+                    </button>
+                    <button onclick="exportPNG()" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                        <i data-lucide="download" class="w-4 h-4"></i> <span data-i18n="export.chartPng">Gráfico PNG</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row gap-6 overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-full lg:w-80 flex flex-col gap-6 overflow-y-auto no-scrollbar shrink-0">
+            
+            <!-- População de Referência -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <i data-lucide="database" class="w-5 h-5 text-blue-500"></i> 
+                    <span data-i18n="sidebar.population">População de Referência</span>
+                </h2>
+                
+                <!-- Filtros -->
+                <div class="space-y-3 mb-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="filters.sex">Sexo</label>
+                        <select id="filterSex" onchange="applyFilters()" class="w-full bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
+                            <option value="" data-i18n="filters.all">Todos</option>
+                            <option value="M" data-i18n="filters.male">Masculino</option>
+                            <option value="F" data-i18n="filters.female">Feminino</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="filters.country">País</label>
+                        <select id="filterCountry" onchange="applyFilters()" class="w-full bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="filters.age">Faixa Etária</label>
+                        <select id="filterAge" onchange="applyFilters()" class="w-full bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
+                            <option value="" data-i18n="filters.allFem">Todas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <input type="text" id="searchPop" data-i18n-placeholder="filters.search" placeholder="Buscar..." onkeyup="applyFilters()" class="w-full bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
+                    </div>
+                </div>
+                
+                <select id="referenceGroup" onchange="updateEllipses()" class="w-full bg-gray-50 border border-gray-300 text-sm rounded-lg p-2 mb-3">
+                    <option value="" data-i18n="filters.loading">Carregando...</option>
+                </select>
+                
+                <div id="refStats" class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm hidden">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><span class="text-xs text-gray-600">R/H:</span><br><strong id="refRHMean">-</strong></div>
+                        <div><span class="text-xs text-gray-600" data-i18n="stats.sd">DP:</span><br><strong id="refRHSD">-</strong></div>
+                        <div><span class="text-xs text-gray-600">Xc/H:</span><br><strong id="refXcHMean">-</strong></div>
+                        <div><span class="text-xs text-gray-600" data-i18n="stats.sd">DP:</span><br><strong id="refXcHSD">-</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nova Elipse -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <i data-lucide="circle-plus" class="w-5 h-5 text-green-500"></i>
+                    <span data-i18n="ellipseInput.title">Nova elipse</span>
+                </h2>
+                <form id="measurementForm" onsubmit="addConfidenceEllipse(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700" data-i18n="ellipseInput.name">Nome da elipse</label>
+                        <input type="text" id="ellipseName" value="Elipse 1" required class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" data-i18n="ellipseInput.type">Tipo</label>
+                            <select id="ellipseType" onchange="updateConfidenceInputMode()" class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                                <option value="classic" data-i18n="ellipseInput.classic">Classic</option>
+                                <option value="specific" data-i18n="ellipseInput.specific">Specific</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" data-i18n="input.moment">Momento</label>
+                            <input type="text" id="ellipseMoment" value="T1" class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700" data-i18n="ellipseInput.pairId">ID pareado</label>
+                        <input type="text" id="ellipsePairId" data-i18n-placeholder="ellipseInput.pairPlaceholder" placeholder="Ex: Grupo A" class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">R/H média</label>
+                            <input type="number" id="ellipseRHMean" step="0.0001" required class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">R/H DP</label>
+                            <input type="number" id="ellipseRHSD" step="0.0001" required class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Xc/H média</label>
+                            <input type="number" id="ellipseXcHMean" step="0.0001" required class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Xc/H DP</label>
+                            <input type="number" id="ellipseXcHSD" step="0.0001" required class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" data-i18n="ellipseInput.correlation">Correlação</label>
+                            <input type="number" id="ellipseCorrelation" step="0.001" min="-0.999" max="0.999" required class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">N</label>
+                            <input type="number" id="ellipseN" step="1" min="3" required class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                        </div>
+                    </div>
+                    <div id="specificFields" class="hidden rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                        <div class="grid grid-cols-1 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700" data-i18n="ellipseInput.arm">Perímetro braço direito (cm)</label>
+                                <input type="number" id="ellipseArm" step="0.1" class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700" data-i18n="ellipseInput.waist">Perímetro cintura (cm)</label>
+                                <input type="number" id="ellipseWaist" step="0.1" class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700" data-i18n="ellipseInput.calf">Perímetro panturrilha direita (cm)</label>
+                                <input type="number" id="ellipseCalf" step="0.1" class="mt-1 block w-full rounded-md border border-gray-300 p-2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="style.color">Cor</label>
+                            <input id="ellipseColor" type="color" value="#0ea5e9" class="h-10 w-full rounded-md border border-gray-300 bg-white p-1">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="ellipseStyle.line">Traço</label>
+                            <select id="ellipseDash" class="w-full bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
+                                <option value="solid" data-i18n="ellipseStyle.solid">Cheio</option>
+                                <option value="dash" data-i18n="ellipseStyle.dash">Tracejado</option>
+                                <option value="dot" data-i18n="ellipseStyle.dot">Pontilhado</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="ellipseStyle.width">Espessura</label>
+                            <input id="ellipseWidth" type="number" value="2" min="1" max="6" step="1" class="w-full bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
+                        </div>
+                    </div>
+                    <button type="submit" data-i18n="ellipseInput.add" class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition">Adicionar elipse</button>
+                </form>
+            </div>
+
+            <!-- Estatísticas -->
+            <div id="statsPanel" class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hidden">
+                <h3 class="text-sm font-semibold text-gray-700 mb-2"><span data-i18n="stats.summary">Resumo</span> (<span id="sampleCount">0</span>)</h3>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="bg-gray-50 p-2 rounded">
+                        <span class="block text-xs text-gray-500" data-i18n="stats.meanRH">Média R/H</span>
+                        <strong id="meanRH">-</strong>
+                    </div>
+                    <div class="bg-gray-50 p-2 rounded">
+                        <span class="block text-xs text-gray-500" data-i18n="stats.meanXcH">Média Xc/H</span>
+                        <strong id="meanXcH">-</strong>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div id="ellipseSelectionPanel" class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hidden">
+                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <i data-lucide="check-square" class="w-5 h-5 text-sky-500"></i>
+                    <span data-i18n="ellipseCompare.title">Elipses para comparar</span>
+                </h2>
+                <div class="space-y-3">
+                    <div class="flex gap-2">
+                        <button type="button" onclick="selectCurrentEllipseForComparison()" data-i18n="ellipseCompare.markCurrent" class="flex-1 py-2 px-3 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium rounded-md transition">Marcar atual</button>
+                        <button type="button" onclick="clearEllipseComparison()" data-i18n="ellipseCompare.clear" class="py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-md transition">Limpar</button>
+                    </div>
+                    <div id="ellipseSelectionList" class="max-h-56 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100 bg-gray-50"></div>
+                    <div id="ellipseComparisonResults" class="bg-sky-50 border border-sky-200 rounded-lg p-3 text-sm text-sky-950 hidden"></div>
+                </div>
+            </div>
+
+            <div id="confidenceAnalysisPanel" class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hidden">
+                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <i data-lucide="git-compare" class="w-5 h-5 text-indigo-500"></i>
+                    <span data-i18n="analysis.title">Comparação de Confiança</span>
+                </h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="analysis.mode">Tipo</label>
+                        <select id="analysisMode" onchange="refreshAnalysisControls()" class="w-full bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
+                            <option value="cross" data-i18n="analysis.cross">Transversal</option>
+                            <option value="longitudinal" data-i18n="analysis.longitudinal">Longitudinal</option>
+                            <option value="paired" data-i18n="analysis.pairedConfidence">Confiança pareada</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label id="analysisALabel" class="block text-xs font-medium text-gray-700 mb-1" data-i18n="analysis.groupA">Grupo A</label>
+                        <select id="analysisA" class="w-full bg-gray-50 border border-gray-300 text-sm rounded-lg p-2"></select>
+                    </div>
+                    <div>
+                        <label id="analysisBLabel" class="block text-xs font-medium text-gray-700 mb-1" data-i18n="analysis.groupB">Grupo B</label>
+                        <select id="analysisB" class="w-full bg-gray-50 border border-gray-300 text-sm rounded-lg p-2"></select>
+                    </div>
+                    <button type="button" onclick="runConfidenceAnalysis()" data-i18n="analysis.run" class="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md transition">Calcular comparação</button>
+                    <div id="analysisResults" class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-sm text-indigo-950 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Botão Limpar -->
+            <button id="clearBtn" onclick="clearAllMeasurements()" data-i18n="input.clear" class="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition hidden">Limpar</button>
+        </aside>
+
+        <!-- Chart Area -->
+        <section class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 class="font-semibold text-gray-700" data-i18n="chart.title">Nomograma BIVA (R/H vs Xc/H)</h2>
+                <span id="graphDesc" class="text-xs font-medium px-2.5 py-0.5 rounded bg-blue-100 text-blue-800">0 medições</span>
+            </div>
+            <div class="flex-1 p-4 w-full relative" style="min-height: 400px;">
+                <canvas id="bivaChart"></canvas>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="aibiva-data.js?v=20260527-1"></script>
+    <script>window.AIBIVA_METHOD = 'confidence';</script>
+    <script src="aibiva-app.js?v=20260527-1"></script>
+</body>
+</html>
