@@ -51,6 +51,13 @@
                 <button onclick="toggleTheme()" class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
                     <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i> <span id="themeLabel">Escuro</span>
                 </button>
+                <input id="projectFile" type="file" accept=".json" class="hidden" onchange="openProject(this)">
+                <button onclick="document.getElementById('projectFile').click()" data-i18n-title="project.open" title="Abrir projeto" class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-md hover:bg-indigo-100">
+                    <i data-lucide="folder-open" class="w-4 h-4"></i> <span data-i18n="project.open">Abrir projeto</span>
+                </button>
+                <button onclick="saveProject()" data-i18n-title="project.save" title="Salvar projeto" class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-md hover:bg-slate-100">
+                    <i data-lucide="save" class="w-4 h-4"></i> <span data-i18n="project.save">Salvar projeto</span>
+                </button>
                 <div id="ellipseExportButtons" class="flex gap-2">
                     <button onclick="exportEllipsePNG()" data-i18n-title="export.ellipsePngTitle" title="Baixar elipse como imagem" class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100">
                         <i data-lucide="image" class="w-4 h-4"></i> <span data-i18n="export.ellipsePng">Elipse PNG</span>
@@ -168,7 +175,7 @@
                             <input id="ellipseWidth" type="number" value="2" min="1" max="6" step="1" class="w-full bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
                         </div>
                     </div>
-                    <button type="submit" data-i18n="ellipseInput.add" class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition">Adicionar elipse</button>
+                    <button id="ellipseSubmitBtn" type="submit" data-i18n="ellipseInput.add" class="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition">Adicionar elipse</button>
                 </form>
                 <div class="mt-4 border-t border-gray-200 pt-4">
                     <input id="ellipseImportFile" type="file" accept=".xlsx,.xls,.csv,.tsv" class="hidden" onchange="importConfidenceEllipses(this)">
@@ -289,8 +296,8 @@
 
     </main>
 
-    <script src="aibiva-data.js?v=20260527-2"></script>
+    <script src="aibiva-data.js?v=20260530-1"></script>
     <script>window.AIBIVA_METHOD = 'confidence';</script>
-    <script src="aibiva-app.js?v=20260527-2"></script>
+    <script src="aibiva-app.js?v=20260530-1"></script>
 </body>
 </html>

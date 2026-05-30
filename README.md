@@ -26,8 +26,9 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) com suporte a mú
 10. Na tolerância, selecione indivíduos relacionados pelo campo Grupo/Momento para alterar cor e símbolo
 11. Em tolerância, importe participantes em lote por Excel quando necessário
 12. Exporte a elipse em PNG, o gráfico em PNG, CSV ou Excel editável
-13. Ajuste manualmente os eixos, se precisar padronizar a escala dos gráficos
-14. Use "Abrir na mista" para levar tolerance/confidence para a análise mista já carregada
+13. Salve/abra projetos em JSON para continuar a análise depois
+14. Ajuste manualmente os eixos, se precisar padronizar a escala dos gráficos
+15. Use "Abrir na mista" para levar tolerance/confidence para a análise mista já carregada
 
 ## 🎯 Métodos Disponíveis
 
@@ -71,6 +72,7 @@ Cada população contém:
 ## 📈 Funcionalidades
 
 ✅ Entrada de dados individual ou em grupo
+✅ Autosave local e salvar/abrir projeto em JSON
 ✅ Gráfico RXc com elipses e fallback Canvas local
 ✅ Tema claro/escuro em todo o software
 ✅ Tolerance tradicional deslocada ou centrada em z-score
@@ -79,15 +81,17 @@ Cada população contém:
 ✅ Linha do centro da elipse à origem com cálculo do ângulo de fase
 ✅ Confidence com entrada de elipses por média, DP, correlação e N
 ✅ Importação em lote de elipses por Excel/CSV com modelo baixável
+✅ Relatório de importação para linhas inválidas
 ✅ Importação em lote de participantes na tolerância com modelo baixável
 ✅ Modos Classic e Specific com ajuste por perímetros corporais
 ✅ Estilo editável por elipse: cor, traço e espessura
+✅ Edição de elipses customizadas já adicionadas
 ✅ Filtros avançados (sexo, país, faixa etária, equipamento e população)
 ✅ Cálculos estatísticos (distância de Mahalanobis D² e classificação por elipse)
 ✅ Export de gráficos em PNG
 ✅ Export PNG com fundo branco consistente
 ✅ Export da elipse atual em PNG
-✅ Export de planilha Excel editável com abas de elipses, medições e comparações pareadas
+✅ Export de planilha Excel editável com metadados, elipses, medições e comparações pareadas
 ✅ Export de dados em CSV
 ✅ Multi-idioma (PT-BR, EN, ES)
 ✅ Janela flutuante móvel e fechável sobre o gráfico com p-values dos testes estatísticos
@@ -124,6 +128,6 @@ Cada população contém:
 
 ---
 
-**Versão:** 8.0
+**Versão:** 8.1
 **Data:** Maio 2026
 **Desenvolvido com:** HTML5, CSS3, JavaScript, Canvas, Chart.js, Tailwind CSS
