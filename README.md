@@ -8,6 +8,8 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) com suporte a mú
 - **aiBIVA-tolerance.html** - Análise de Tolerância (42 populações)
 - **aiBIVA-confidence.html** - Análise de Confiança (141 populações)
 - **aiBIVA-combined.html** - Análise Mista (183 populações)
+- **aiBIVA-workspace.html** - Workspace avançada integrada para exploração visual
+- **support.js** - Runtime local utilizado pela Workspace avançada
 - **reference_populations_final.json** - Base de dados com 183 populações completas
 - **aibiva-data.js** - Base JSON empacotada para uso direto no navegador
 - **aibiva-app.js** - Lógica compartilhada dos métodos, filtros, gráficos e exportações
@@ -29,6 +31,7 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) com suporte a mú
 13. Salve/abra projetos em JSON para continuar a análise depois
 14. Ajuste manualmente os eixos, se precisar padronizar a escala dos gráficos
 15. Use "Abrir na mista" para levar tolerance/confidence para a análise mista já carregada
+16. Use "Workspace" na tela inicial para explorar referências e comparações em um painel integrado
 
 ## 🎯 Métodos Disponíveis
 
@@ -96,6 +99,7 @@ Cada população contém:
 ✅ Multi-idioma (PT-BR, EN, ES)
 ✅ Janela flutuante móvel e fechável sobre o gráfico com p-values dos testes estatísticos
 ✅ Interface responsiva
+✅ Workspace avançada opcional com banco visual, eixos customizáveis e temas claro/escuro
 
 ## 🧪 Análise de Confiança
 
@@ -128,6 +132,6 @@ Cada população contém:
 
 ---
 
-**Versão:** 8.1
+**Versão:** 8.2
 **Data:** Maio 2026
 **Desenvolvido com:** HTML5, CSS3, JavaScript, Canvas, Chart.js, Tailwind CSS
