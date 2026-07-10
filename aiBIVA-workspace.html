@@ -389,11 +389,26 @@
                   <div style="font-size:12.5px;font-weight:600;color:#23262e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ e.name }}</div>
                   <div class="mono" style="font-size:9.5px;color:#9a9686">{{ e.meta }}</div>
                 </div>
-                <button onClick="{{ e.onEdit }}" title="Editar estilo" style="{{ e.editBtnStyle }}">✎</button>
+                <button onClick="{{ e.onEdit }}" title="Editar elipse" style="{{ e.editBtnStyle }}">✎</button>
                 <button onClick="{{ e.onRemove }}" title="Remover" style="font-size:14px;line-height:1;color:#b9564a;background:#fbeee9;border:1px solid #f3d9cf;width:26px;height:26px;border-radius:7px;cursor:pointer" style-hover="background:#f7ddd3">×</button>
               </div>
               <!-- edit drawer -->
               <div style="{{ e.editStyle }}">
+                <div style="font-size:10px;color:#8a8676;margin-bottom:6px">{{ t.editValues }}</div>
+                <input type="text" value="{{ e.editName }}" onInput="{{ e.onEditName }}" placeholder="{{ t.namePh }}" style="width:100%;font:400 12px 'IBM Plex Sans';padding:7px 9px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none;margin-bottom:8px" style-focus="border-color:#e0662a">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px">
+                  <sc-for list="{{ e.editFields }}" as="fld" hint-placeholder-count="6">
+                    <label style="display:flex;flex-direction:column;gap:3px;font-size:9.5px;color:#8a8676">
+                      {{ fld.label }}
+                      <input type="number" step="{{ fld.step }}" value="{{ fld.value }}" onInput="{{ fld.onInput }}" class="mono" style="width:100%;font-size:11px;padding:6px 7px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none" style-focus="border-color:#e0662a">
+                    </label>
+                  </sc-for>
+                </div>
+                <div style="{{ e.editErrorStyle }}">{{ t.editInvalid }}</div>
+                <div style="display:flex;gap:7px;margin-bottom:12px">
+                  <button onClick="{{ e.onCancelEdit }}" style="font:500 11px 'IBM Plex Sans';color:#6f6b5d;background:#fff;border:1px solid #d8d3c5;padding:7px 10px;border-radius:7px;cursor:pointer">{{ t.refCancel }}</button>
+                  <button onClick="{{ e.onSaveEdit }}" style="flex:1;font:600 11.5px 'IBM Plex Sans';color:#fff;background:#e0662a;border:none;padding:7px 10px;border-radius:7px;cursor:pointer">{{ t.saveChanges }}</button>
+                </div>
                 <div style="font-size:10px;color:#8a8676;margin-bottom:6px">{{ t.colorLbl }}</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px">
                   <sc-for list="{{ e.swatches }}" as="sw" hint-placeholder-count="8">
@@ -530,6 +545,8 @@ class Component extends DCLogic {
     activeKey: null,      // for "da população ativa"
     ellipses: [],
     editingId: null,
+    editDraft: null,
+    editError: false,
     showNew: false,
     newSource: 'active',  // 'active' | 'manual'
     newName: '',
@@ -599,6 +616,7 @@ class Component extends DCLogic {
       activeNoneNote:'Nenhuma população ativa. Clique numa população à esquerda primeiro.',
       ellEmpty:'Nenhuma elipse ainda. Adicione uma da população ativa ou manualmente.',
       colorLbl:'COR', strokeLbl:'TRAÇO', widthLbl:'ESPESSURA',
+      editValues:'VALORES DA ELIPSE', saveChanges:'Salvar alterações', editInvalid:'Revise os valores: DP > 0, N > 2 e correlação entre -1 e 1.',
       indivTitle:'Indivíduo', indivHint:'Insira o vetor de um indivíduo (R/H e Xc/H) para classificá-lo contra as elipses de tolerância da população ativa.',
       indivRh:'R/H do indivíduo', indivXc:'Xc/H do indivíduo', indivPlot:'Plotar e classificar', indivClear:'Limpar',
       indivNoPop:'Selecione uma população de referência (à esquerda) para servir de base à classificação.',
@@ -651,6 +669,7 @@ class Component extends DCLogic {
       activeNoneNote:'No active population. Click a population on the left first.',
       ellEmpty:'No ellipse yet. Add one from the active population or manually.',
       colorLbl:'COLOR', strokeLbl:'STROKE', widthLbl:'WIDTH',
+      editValues:'ELLIPSE VALUES', saveChanges:'Save changes', editInvalid:'Check the values: SD > 0, N > 2 and correlation between -1 and 1.',
       indivTitle:'Individual', indivHint:'Enter an individual vector (R/H and Xc/H) to classify it against the tolerance ellipses of the active population.',
       indivRh:'Individual R/H', indivXc:'Individual Xc/H', indivPlot:'Plot & classify', indivClear:'Clear',
       indivNoPop:'Select a reference population (left) to base the classification on.',
@@ -703,6 +722,7 @@ class Component extends DCLogic {
       activeNoneNote:'Ninguna población activa. Haz clic en una población a la izquierda primero.',
       ellEmpty:'Ninguna elipse aún. Añade una desde la población activa o manualmente.',
       colorLbl:'COLOR', strokeLbl:'TRAZO', widthLbl:'GROSOR',
+      editValues:'VALORES DE LA ELIPSE', saveChanges:'Guardar cambios', editInvalid:'Revise los valores: DE > 0, N > 2 y correlación entre -1 y 1.',
       indivTitle:'Individuo', indivHint:'Introduce un vector individual (R/H y Xc/H) para clasificarlo frente a las elipses de tolerancia de la población activa.',
       indivRh:'R/H del individuo', indivXc:'Xc/H del individuo', indivPlot:'Trazar y clasificar', indivClear:'Limpiar',
       indivNoPop:'Selecciona una población de referencia (izquierda) como base de la clasificación.',
@@ -958,7 +978,7 @@ class Component extends DCLogic {
   _setF(patch){ this.setState(patch); }
   _defaultMode(){ return this.state.method==='tolerance' ? 'tolerance' : 'conf95'; }
   _enterMethod(m){
-    this.setState({ screen:'app', method:m, refKeys:[], refModes:{}, activeKey:null, ellipses:[], cmpA:'', cmpB:'', indiv:{rh:'',xc:''}, indivShown:false, bounds:null, showNew:false, showAxisWin:false, showAddRef:false, axisMode:'auto', axisNames:{x:'R/H',y:'Xc/H'}, axisUnits:{x:'Ω/m',y:'Ω/m'} });
+    this.setState({ screen:'app', method:m, refKeys:[], refModes:{}, activeKey:null, ellipses:[], editingId:null, editDraft:null, editError:false, cmpA:'', cmpB:'', indiv:{rh:'',xc:''}, indivShown:false, bounds:null, showNew:false, showAxisWin:false, showAddRef:false, axisMode:'auto', axisNames:{x:'R/H',y:'Xc/H'}, axisUnits:{x:'Ω/m',y:'Ω/m'} });
   }
   _migrateToCombined(){
     // preserve current selections; freeze each ref's current effective mode
@@ -1008,7 +1028,19 @@ class Component extends DCLogic {
     this.setState({ellipses:[...s.ellipses,e],showNew:false,newName:'',newVals:{rhMean:'',rhSd:'',xcHMean:'',xcHSd:'',r:'',n:''},bounds:null});
   }
   _updEllipse(id,patch){ this.setState({ellipses:this.state.ellipses.map((e)=>e.id===id?{...e,...patch}:e), bounds:patch.visible!==undefined?null:this.state.bounds}); }
-  _removeEllipse(id){ this.setState({ellipses:this.state.ellipses.filter((e)=>e.id!==id), editingId:this.state.editingId===id?null:this.state.editingId, bounds:null}); }
+  _startEditEllipse(e){
+    if(this.state.editingId===e.id){ this.setState({editingId:null,editDraft:null,editError:false}); return; }
+    this.setState({editingId:e.id,editError:false,editDraft:{name:e.name,rhMean:String(e.rhMean),rhSd:String(e.rhSd),xcHMean:String(e.xcHMean),xcHSd:String(e.xcHSd),r:String(e.r),n:String(e.n)}});
+  }
+  _setEditEllipse(field,value){ this.setState({editDraft:{...(this.state.editDraft||{}),[field]:value},editError:false}); }
+  _saveEditEllipse(id){
+    const d=this.state.editDraft||{};
+    const patch={name:String(d.name||'').trim(),rhMean:+d.rhMean,rhSd:+d.rhSd,xcHMean:+d.xcHMean,xcHSd:+d.xcHSd,r:+d.r,n:+d.n};
+    const valid=patch.name&&Number.isFinite(patch.rhMean)&&Number.isFinite(patch.xcHMean)&&patch.rhSd>0&&patch.xcHSd>0&&patch.n>2&&Number.isFinite(patch.r)&&Math.abs(patch.r)<1;
+    if(!valid){ this.setState({editError:true}); return; }
+    this.setState({ellipses:this.state.ellipses.map((e)=>e.id===id?{...e,...patch}:e),editingId:null,editDraft:null,editError:false,bounds:null});
+  }
+  _removeEllipse(id){ this.setState({ellipses:this.state.ellipses.filter((e)=>e.id!==id), editingId:this.state.editingId===id?null:this.state.editingId, editDraft:this.state.editingId===id?null:this.state.editDraft, editError:false, bounds:null}); }
 
   _resolveCmp(val){
     if(!val) return null;
@@ -1076,6 +1108,8 @@ class Component extends DCLogic {
     // ellipse list
     const ellipses=s.ellipses.map((e)=>{
       const editing=s.editingId===e.id;
+      const draft=editing?(s.editDraft||{}):{};
+      const editDefs=[['rhMean',t.fRhMean,'0.1'],['rhSd',t.fRhSd,'0.1'],['xcHMean',t.fXcMean,'0.1'],['xcHSd',t.fXcSd,'0.1'],['r',t.fR,'0.01'],['n',t.fN,'1']];
       return {
         id:e.id, name:e.name, color:e.color, width:e.width, widthLabel:e.width.toFixed(1),
         swatchFill:e.visible?this._hexA(e.color,0.25):'transparent',
@@ -1088,7 +1122,11 @@ class Component extends DCLogic {
         solidStyle:'font:600 11px \'IBM Plex Mono\';padding:4px 10px;border-radius:7px;cursor:pointer;'+(e.stroke==='solid'?'background:#1b1e26;color:#fff;border:1px solid #1b1e26':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5'),
         dashedStyle:'font:600 11px \'IBM Plex Mono\';padding:4px 10px;border-radius:7px;cursor:pointer;'+(e.stroke==='dashed'?'background:#1b1e26;color:#fff;border:1px solid #1b1e26':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5'),
         onToggleVisible:()=>this._updEllipse(e.id,{visible:!e.visible}),
-        onEdit:()=>this.setState({editingId:editing?null:e.id}),
+        onEdit:()=>this._startEditEllipse(e),
+        editName:draft.name||'', onEditName:(ev)=>this._setEditEllipse('name',ev.target.value),
+        editFields:editDefs.map(([field,label,step])=>({label,step,value:draft[field]??'',onInput:(ev)=>this._setEditEllipse(field,ev.target.value)})),
+        editErrorStyle:(editing&&s.editError)?'font-size:10.5px;color:#b45309;background:#fdf3e8;border:1px solid #f2ddc2;border-radius:7px;padding:7px 8px;margin-bottom:8px;line-height:1.35':'display:none',
+        onSaveEdit:()=>this._saveEditEllipse(e.id), onCancelEdit:()=>this.setState({editingId:null,editDraft:null,editError:false}),
         onRemove:()=>this._removeEllipse(e.id),
         onSolid:()=>this._updEllipse(e.id,{stroke:'solid'}),
         onDashed:()=>this._updEllipse(e.id,{stroke:'dashed'}),
