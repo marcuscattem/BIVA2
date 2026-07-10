@@ -102,11 +102,14 @@
             <div style="font-size:10px;color:#8a8f9c;letter-spacing:.4px">{{ t.hSub }}</div>
           </div>
         </div>
-        <select value="{{ lang }}" onChange="{{ onLang }}" style="background:#1e222e;color:#f4f2ec;border:1px solid #2b2f3b;border-radius:9px;padding:8px 12px;font-size:13px;cursor:pointer;outline:none">
-          <option value="pt-BR">Português (BR)</option>
-          <option value="en">English</option>
-          <option value="es">Español</option>
-        </select>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+          <a href="aiBIVA-index.html" style="color:#f4f2ec;background:#1e222e;border:1px solid #2b2f3b;border-radius:9px;padding:8px 12px;font-size:13px;font-weight:600;line-height:1">{{ t.oldVersion }}</a>
+          <select value="{{ lang }}" onChange="{{ onLang }}" style="background:#1e222e;color:#f4f2ec;border:1px solid #2b2f3b;border-radius:9px;padding:8px 12px;font-size:13px;cursor:pointer;outline:none">
+            <option value="pt-BR">Português (BR)</option>
+            <option value="en">English</option>
+            <option value="es">Español</option>
+          </select>
+        </div>
       </header>
       <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 34px 60px">
         <div style="text-align:center;max-width:640px;margin-bottom:44px">
@@ -149,6 +152,7 @@
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <button onClick="{{ onMigrate }}" style="{{ migrateStyle }}" style-hover="filter:brightness(1.05)">⇄ {{ t.migrateBtn }}</button>
+        <a href="aiBIVA-index.html" style="color:#f4f2ec;background:#1e222e;border:1px solid #2b2f3b;border-radius:8px;padding:7px 11px;font-size:12.5px;font-weight:600;line-height:1">{{ t.oldVersion }}</a>
         <span class="mono" style="font-size:11px;color:#8a8f9c;padding:5px 9px;border:1px solid #2b2e37;border-radius:7px">{{ popTotalLabel }}</span>
         <select value="{{ lang }}" onChange="{{ onLang }}" style="background:#1e222e;color:#f4f2ec;border:1px solid #2b2f3b;border-radius:8px;padding:6px 10px;font-size:12.5px;cursor:pointer;outline:none">
           <option value="pt-BR">PT-BR</option>
@@ -580,7 +584,7 @@ class Component extends DCLogic {
     'pt-BR': {
       hSub:'ANÁLISE VETORIAL DE BIOIMPEDÂNCIA', hTitle:'Escolha a técnica de análise',
       hDesc:'O aiBIVA constrói nomogramas RXc e roda os testes estatísticos. Selecione como você quer trabalhar — dá para trocar depois.',
-      open:'Abrir', back:'Voltar ao início',
+      open:'Abrir', back:'Voltar ao início', oldVersion:'Versão antiga',
       hFoot:'Baseado em 183 populações de referência publicadas. As elipses e testes seguem os métodos clássicos de Piccoli (BIVA).',
       mTolTitle:'Tolerância', mTolDesc:'Classifique um indivíduo contra as elipses de tolerância (50·75·95%) de uma população de referência.',
       mConfTitle:'Confiança', mConfDesc:'Compare a posição vetorial média de grupos com elipses de confiança 95% e teste de Hotelling T².',
@@ -633,7 +637,7 @@ class Component extends DCLogic {
     'en': {
       hSub:'BIOIMPEDANCE VECTOR ANALYSIS', hTitle:'Choose the analysis technique',
       hDesc:'aiBIVA builds RXc nomograms and runs the statistical tests. Pick how you want to work — you can switch later.',
-      open:'Open', back:'Back to start',
+      open:'Open', back:'Back to start', oldVersion:'Old version',
       hFoot:'Based on 183 published reference populations. Ellipses and tests follow the classic Piccoli (BIVA) methods.',
       mTolTitle:'Tolerance', mTolDesc:'Classify an individual against the tolerance ellipses (50·75·95%) of a reference population.',
       mConfTitle:'Confidence', mConfDesc:'Compare mean vector positions of groups with 95% confidence ellipses and Hotelling T² test.',
@@ -686,7 +690,7 @@ class Component extends DCLogic {
     'es': {
       hSub:'ANÁLISIS VECTORIAL DE BIOIMPEDANCIA', hTitle:'Elige la técnica de análisis',
       hDesc:'aiBIVA construye nomogramas RXc y ejecuta las pruebas estadísticas. Elige cómo trabajar — puedes cambiar después.',
-      open:'Abrir', back:'Volver al inicio',
+      open:'Abrir', back:'Volver al inicio', oldVersion:'Versión antigua',
       hFoot:'Basado en 183 poblaciones de referencia publicadas. Las elipses y pruebas siguen los métodos clásicos de Piccoli (BIVA).',
       mTolTitle:'Tolerancia', mTolDesc:'Clasifica a un individuo frente a las elipses de tolerancia (50·75·95%) de una población de referencia.',
       mConfTitle:'Confianza', mConfDesc:'Compara la posición vectorial media de grupos con elipses de confianza 95% y prueba de Hotelling T².',
