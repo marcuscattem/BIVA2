@@ -1,24 +1,20 @@
 # aiBIVA - Software de Análise BIVA
 
-Ferramenta web para análise de Bioimpedância Vetorial (BIVA) com suporte a múltiplos métodos e populações de referência.
+Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace integrada, com suporte a múltiplos métodos e populações de referência.
 
 ## 📋 Conteúdo
 
-- **aiBIVA-index.html** - Página inicial com seleção de método
-- **aiBIVA-tolerance.html** - Análise de Tolerância (42 populações)
-- **aiBIVA-confidence.html** - Análise de Confiança (141 populações)
-- **aiBIVA-combined.html** - Análise Mista (183 populações)
-- **aiBIVA-workspace.html** - Workspace avançada integrada para exploração visual
+- **index.html** - Entrada principal com redirecionamento para a Workspace
+- **aiBIVA-workspace.html** - Workspace integrada para tolerância, confiança e análise mista
 - **support.js** - Runtime local utilizado pela Workspace avançada
 - **reference_populations_final.json** - Base de dados com 183 populações completas
 - **aibiva-data.js** - Base JSON empacotada para uso direto no navegador
-- **aibiva-app.js** - Lógica compartilhada dos métodos, filtros, gráficos e exportações
 
 ## 🚀 Como Usar
 
 1. Extraia os arquivos do ZIP
-2. Abra **aiBIVA-index.html** em um navegador web
-3. Escolha o método de análise (Tolerância, Confiança ou Mista)
+2. Abra **index.html** ou **aiBIVA-workspace.html** em um navegador web
+3. Escolha o método de análise na Workspace (Tolerância, Confiança ou Mista)
 4. Selecione a população de referência usando os filtros quando estiver em Tolerância ou Mista
 5. Em tolerância, escolha elipse tradicional deslocada ou z-score centrado no zero
 6. Em confiança, adicione elipses manualmente ou importe várias elipses por Excel
@@ -30,8 +26,7 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) com suporte a mú
 12. Exporte a elipse em PNG, o gráfico em PNG, CSV ou Excel editável
 13. Salve/abra projetos em JSON para continuar a análise depois
 14. Ajuste manualmente os eixos, se precisar padronizar a escala dos gráficos
-15. Use "Abrir na mista" para levar tolerance/confidence para a análise mista já carregada
-16. Use "Workspace" na tela inicial para explorar referências e comparações em um painel integrado
+15. Use "Migrar para Mista" para levar tolerance/confidence para a análise mista já carregada
 
 ## 🎯 Métodos Disponíveis
 
