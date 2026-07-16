@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIVA2</title>
+<script src="./support.js"></script>
+<style>
+  [style*="background:radial-gradient"] { background:#eceae2 !important; color:#1b1e26 !important; }
+  [style*="background:radial-gradient"] [style*="background:#191c26"] { background:#fff !important; border-color:#d8d3c5 !important; }
+  [style*="background:radial-gradient"] [style*="color:#f4f2ec"],
+  [style*="background:radial-gradient"] [style*="color:#c8ccd6"] { color:#1b1e26 !important; }
+  [style*="background:radial-gradient"] [style*="color:#a6abb8"],
+  [style*="background:radial-gradient"] [style*="color:#8a8f9c"],
+  [style*="background:radial-gradient"] [style*="color:#6b7080"] { color:#667085 !important; }
+  @media (max-width: 900px) {
+    body { overflow:auto !important; }
+    #dc-root, #dc-root > div, [style*="height:100vh;overflow:hidden"] { overflow:auto !important; }
+    .home-methods{grid-template-columns:minmax(0,1fr)!important;width:min(100%,420px)}
+    .workspace-shell{min-width:0!important;height:auto!important;overflow:visible!important}
+    .workspace-topbar{height:auto!important;min-height:56px;flex-wrap:wrap;gap:8px;padding:9px 12px!important}
+    .workspace-topbar>div:last-child{flex-wrap:wrap;justify-content:flex-end}
+    .workspace-layout{flex-direction:column;overflow:visible!important}
+    .reference-panel,.analysis-panel{width:100%!important;min-height:0!important;overflow:visible!important}
+    .reference-panel{height:540px}
+    .chart-column{min-height:650px}
+    .chart-stage{height:520px!important;flex:none!important;padding:10px!important}
+    .analysis-panel{border-left:none!important;border-top:1px solid #ddd8cc}
+  }
+  @media (max-width: 560px) {
+    .workspace-topbar>div:first-child span{display:none}
+    .chart-column{min-height:570px}
+    .chart-stage{height:440px!important}
+    [style*="width:330px"],[style*="width:320px"]{width:min(330px,calc(100vw - 24px))!important;right:0!important}
+  }
+</style>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="biva2-data.js"></script>
+<style>
+  html,body{margin:0;padding:0;height:100%}
+  body{background:#eceae2;color:#1b1e26;font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  *{box-sizing:border-box}
+  a{color:#2f4fd6;text-decoration:none}
+  a:hover{color:#2039a8}
+  .scr::-webkit-scrollbar{width:9px;height:9px}
+  .scr::-webkit-scrollbar-thumb{background:#cfcabb;border-radius:6px;border:2px solid transparent;background-clip:content-box}
+  .scr::-webkit-scrollbar-thumb:hover{background:#b5af9e;background-clip:content-box}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  input[type=range]{accent-color:#2f4fd6}
+  @keyframes popin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @keyframes winin{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+
+<div style="height:100vh;overflow:hidden">
+
+  <!-- ============================= HOME ============================= -->
+  <div style="{{ homeStyle }}">
+    <div style="min-height:100vh;display:flex;flex-direction:column;background:#eceae2;color:#1b1e26">
+      <header style="display:flex;align-items:center;justify-content:space-between;padding:22px 34px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <img src="biva2-logo.png" alt="BIVA2.0" style="width:42px;height:42px;object-fit:contain;display:block">
+          <div style="line-height:1.05">
+            <div style="font-weight:600;font-size:17px">BIVA2.0</div>
+            <div style="font-size:10px;color:#8a8f9c;letter-spacing:.4px">{{ t.hSub }}</div>
+          </div>
+        </div>
+        <select value="{{ lang }}" onChange="{{ onLang }}" style="background:#fff;color:#1b1e26;border:1px solid #cfcabb;border-radius:9px;padding:8px 12px;font-size:13px;cursor:pointer;outline:none">
+          <option value="pt-BR">Português (BR)</option>
+          <option value="en">English</option>
+          <option value="es">Español</option>
+        </select>
+      </header>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 34px 60px">
+        <div style="text-align:center;max-width:640px;margin-bottom:44px">
+          <h1 style="margin:0 0 14px;font-size:38px;font-weight:600;letter-spacing:-1px;line-height:1.1">{{ t.hTitle }}</h1>
+          <p style="margin:0;font-size:15px;color:#667085;line-height:1.5">{{ t.hDesc }}</p>
+        </div>
+        <div class="home-methods" style="display:grid;grid-template-columns:repeat(3,300px);gap:20px">
+          <sc-for list="{{ methodCards }}" as="m" hint-placeholder-count="3">
+            <div onClick="{{ m.onClick }}" style="background:#fff;border:1px solid #d8d3c5;border-radius:12px;padding:26px;cursor:pointer;transition:.16s;display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(27,30,38,.06)" style-hover="border-color:#a9a392;transform:translateY(-4px)">
+              <div style="width:46px;height:46px;border-radius:12px;background:{{ m.tint }};display:flex;align-items:center;justify-content:center;margin-bottom:18px">{{ m.icon }}</div>
+              <div style="font-size:20px;font-weight:600;margin-bottom:8px">{{ m.title }}</div>
+              <div style="font-size:12.5px;color:#667085;line-height:1.5;margin-bottom:18px;flex:1">{{ m.desc }}</div>
+              <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:20px">
+                <sc-for list="{{ m.features }}" as="f" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:#3a3d46"><span style="width:5px;height:5px;border-radius:2px;background:{{ m.accent }};flex:none"></span>{{ f }}</div>
+                </sc-for>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:{{ m.accent }}">{{ t.open }} <span style="font-size:16px">→</span></div>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin:44px 0 0;font-size:11.5px;color:#6b7080;text-align:center;max-width:520px;line-height:1.5">{{ t.hFoot }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= APP ============================= -->
+  <div style="{{ appStyle }}">
+  <div class="workspace-shell" style="height:100vh;min-width:1180px;display:flex;flex-direction:column;overflow:hidden">
+
+    <!-- TOP BAR -->
+    <header class="workspace-topbar" style="height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#14161c;color:#f4f2ec;border-bottom:1px solid #000">
+      <div style="display:flex;align-items:center;gap:14px">
+        <button onClick="{{ onHome }}" title="{{ t.back }}" style="color:#c8ccd6;background:none;border:none;font-size:18px;cursor:pointer;padding:4px 6px" style-hover="color:#fff">←</button>
+        <img src="biva2-logo.png" alt="BIVA2.0" style="width:38px;height:38px;object-fit:contain;display:block">
+        <div style="display:flex;flex-direction:column;line-height:1.05">
+          <span style="font-weight:600;font-size:15px;letter-spacing:-.2px">BIVA2.0 <span style="font-weight:400;color:#8a8f9c;font-size:12px">· {{ methodName }}</span></span>
+          <span style="font-size:10.5px;color:#8a8f9c;letter-spacing:.3px">{{ t.hSub }}</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onClick="{{ onMigrate }}" style="{{ migrateStyle }}" style-hover="filter:brightness(1.05)">⇄ {{ t.migrateBtn }}</button>
+        <span class="mono" style="font-size:11px;color:#8a8f9c;padding:5px 9px;border:1px solid #2b2e37;border-radius:7px">{{ popTotalLabel }}</span>
+        <select value="{{ lang }}" onChange="{{ onLang }}" style="background:#1e222e;color:#f4f2ec;border:1px solid #2b2f3b;border-radius:8px;padding:6px 10px;font-size:12.5px;cursor:pointer;outline:none">
+          <option value="pt-BR">PT-BR</option>
+          <option value="en">EN</option>
+          <option value="es">ES</option>
+        </select>
+        <button onClick="{{ onExportExcel }}" style="display:flex;align-items:center;gap:6px;font:500 12.5px 'IBM Plex Sans';color:#d8f3dc;background:#173a2c;border:1px solid #2e5b47;padding:7px 11px;border-radius:8px;cursor:pointer">{{ t.exportExcel }}</button>
+        <button onClick="{{ onExport }}" style="display:flex;align-items:center;gap:6px;font:500 12.5px 'IBM Plex Sans';color:#14161c;background:#f4f2ec;border:none;padding:7px 13px;border-radius:8px;cursor:pointer">{{ t.exportPng }}</button>
+      </div>
+    </header>
+
+  <div class="workspace-layout" style="flex:1;display:flex;min-height:0">
+
+    <!-- ============ LEFT: REFERENCE POPULATION BROWSER ============ -->
+    <aside class="reference-panel" style="width:352px;flex:none;background:#f7f5ef;border-right:1px solid #ddd8cc;display:flex;flex-direction:column;min-height:0">
+      <div style="padding:16px 16px 12px;border-bottom:1px solid #e6e1d5">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <h2 style="margin:0;font-size:13px;font-weight:600;letter-spacing:.2px;display:flex;align-items:center;gap:7px">
+            <span style="width:7px;height:7px;border-radius:2px;background:#2f4fd6;display:inline-block"></span>
+            {{ t.popTitle }}
+          </h2>
+          <button onClick="{{ onToggleAddRef }}" style="{{ addRefBtnStyle }}" style-hover="border-color:#e0662a">{{ t.addRef }}</button>
+        </div>
+
+        <!-- add reference form -->
+        <div style="{{ addRefFormStyle }}">
+          <div style="font-size:12.5px;font-weight:600;color:#23262e;margin-bottom:6px">{{ t.addRefTitle }}</div>
+          <div style="font-size:10.5px;color:#8a6a4f;margin-bottom:10px;line-height:1.4">{{ t.addRefHint }}</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:7px">
+              <input type="text" placeholder="{{ t.refName }}" value="{{ refName }}" onInput="{{ onRefName }}" style="flex:2;min-width:0;font-size:12px;padding:7px 9px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none" style-focus="border-color:#e0662a">
+              <input type="text" placeholder="{{ t.refCountry }}" value="{{ refCountry }}" onInput="{{ onRefCountry }}" style="flex:1;min-width:0;font-size:12px;padding:7px 9px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none" style-focus="border-color:#e0662a">
+            </div>
+            <div style="display:flex;gap:6px">
+              <sc-for list="{{ refSexOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for>
+            </div>
+            <div style="display:flex;gap:6px">
+              <sc-for list="{{ refTypeOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
+              <sc-for list="{{ refFields }}" as="fld" hint-placeholder-count="6">
+                <label style="display:flex;flex-direction:column;gap:3px;font-size:9.5px;color:#8a8676">{{ fld.label }}
+                  <input type="number" step="{{ fld.step }}" value="{{ fld.value }}" onInput="{{ fld.onInput }}" class="mono" style="width:100%;font-size:12px;padding:6px 7px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none" style-focus="border-color:#e0662a">
+                </label>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:7px;margin-top:2px">
+              <button onClick="{{ onRefCancel }}" style="font:500 12px 'IBM Plex Sans';color:#6f6b5d;background:#fff;border:1px solid #d8d3c5;padding:8px 14px;border-radius:8px;cursor:pointer">{{ t.refCancel }}</button>
+              <button onClick="{{ onRefSave }}" style="flex:1;font:600 12.5px 'IBM Plex Sans';color:#fff;background:#e0662a;border:none;padding:8px;border-radius:8px;cursor:pointer" style-hover="filter:brightness(1.05)">{{ t.refSave }}</button>
+            </div>
+          </div>
+        </div>
+
+        <input type="text" placeholder="{{ t.searchPh }}" onInput="{{ onSearch }}" class="scr" style="width:100%;font:400 13px 'IBM Plex Sans';padding:9px 11px;border:1px solid #d8d3c5;border-radius:9px;background:#fff;outline:none;margin:10px 0" style-focus="border-color:#2f4fd6;box-shadow:0 0 0 3px rgba(47,79,214,.12)">
+        <!-- sex segmented -->
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <sc-for list="{{ sexFilters }}" as="f" hint-placeholder-count="3">
+            <button onClick="{{ f.onClick }}" style="{{ f.style }}" style-hover="border-color:#b9b3a2">{{ f.label }}</button>
+          </sc-for>
+        </div>
+        <!-- type chips -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <sc-for list="{{ typeFilters }}" as="f" hint-placeholder-count="4">
+            <button onClick="{{ f.onClick }}" style="{{ f.style }}" style-hover="border-color:#b9b3a2">{{ f.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div class="scr" style="flex:1;overflow-y:auto;padding:12px 12px 20px;display:flex;flex-direction:column;gap:9px">
+        <sc-for list="{{ pops }}" as="p" hint-placeholder-count="7">
+          <div onClick="{{ p.onToggle }}" title="{{ p.legend }}" style="{{ p.cardStyle }}" style-hover="border-color:#b9b3a2;box-shadow:0 2px 8px rgba(0,0,0,.05)">
+            <div style="width:4px;flex:none;border-radius:4px;align-self:stretch;background:{{ p.accent }}"></div>
+            <svg viewBox="0 0 60 44" style="width:56px;height:42px;flex:none;background:#fbfaf6;border:1px solid #ece7db;border-radius:7px">
+              <line x1="4" y1="40" x2="56" y2="40" stroke="#dcd7c9" stroke-width="1"></line>
+              <line x1="6" y1="4" x2="6" y2="40" stroke="#dcd7c9" stroke-width="1"></line>
+              <path d="{{ p.thumbPath }}" fill="{{ p.thumbFill }}" stroke="{{ p.thumbStroke }}" stroke-width="1.4"></path>
+            </svg>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+                <span class="mono" style="font-size:9.5px;font-weight:500;color:#fff;background:{{ p.sexColor }};padding:1px 5px;border-radius:4px">{{ p.sexLabel }}</span>
+                <span style="font-size:12px;font-weight:600;color:#23262e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">{{ p.country }}</span>
+                <span style="{{ p.customTagStyle }}">★</span>
+                <span class="mono" style="font-size:10px;color:#7a7666">N={{ p.n }}</span>
+              </div>
+              <div style="font-size:10.5px;color:#7f7b6d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px">{{ p.subLine }}</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap">
+                <span style="{{ p.typeChip }}">{{ p.type }}</span>
+                <span style="font-size:9.5px;color:#8a8676;background:#f0ece0;padding:1px 6px;border-radius:5px">{{ p.age }}</span>
+              </div>
+              <div style="{{ p.statRow }}">
+                <span class="mono">R/H {{ p.rhText }}</span><span style="color:#c9c3b2">·</span><span class="mono">Xc/H {{ p.xcText }}</span>
+              </div>
+              <div style="{{ p.modeRow }}">
+                <button onClick="{{ p.onConf }}" style="{{ p.confStyle }}">{{ t.modeConf }}</button>
+                <button onClick="{{ p.onTol }}" style="{{ p.tolStyle }}">{{ t.modeTol }}</button>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+        <div style="{{ emptyStyle }}">{{ t.noneFound }}</div>
+      </div>
+    </aside>
+
+    <!-- ============ CENTER: NOMOGRAM ============ -->
+    <section class="chart-column" style="flex:1;display:flex;flex-direction:column;min-width:0;background:#eceae2">
+      <div style="padding:12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ddd8cc">
+        <div style="display:flex;flex-direction:column;line-height:1.15">
+          <h2 style="margin:0;font-size:14px;font-weight:600">{{ t.chartTitle }}</h2>
+          <span style="font-size:11px;color:#8a8676">{{ chartSub }}</span>
+        </div>
+        <div style="display:flex;gap:7px;position:relative">
+          <button onClick="{{ onTogglePhase }}" style="{{ phaseBtnStyle }}" style-hover="border-color:#b9b3a2">{{ t.phase }}</button>
+          <button onClick="{{ onToggleText }}" style="{{ textBtnStyle }}" style-hover="border-color:#b9b3a2">{{ t.textBox }}</button>
+          <button onClick="{{ onToggleAxis }}" style="{{ axisBtnStyle }}" style-hover="border-color:#b9b3a2">{{ t.axes }}</button>
+
+          <!-- FLOATING TEXT WINDOW -->
+          <div style="{{ textWinStyle }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eee7d9">
+              <span style="font-size:12.5px;font-weight:600">{{ t.textTitle }}</span>
+              <button onClick="{{ onToggleText }}" style="background:none;border:none;font-size:16px;color:#9a9686;cursor:pointer;line-height:1">×</button>
+            </div>
+            <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+              <textarea value="{{ annotationText }}" onInput="{{ onAnnotationText }}" placeholder="{{ t.textPlaceholder }}" rows="3" style="width:100%;resize:vertical;font:400 12px 'IBM Plex Sans';padding:8px 9px;border:1px solid #d8d3c5;border-radius:7px;outline:none"></textarea>
+              <div style="display:grid;grid-template-columns:1fr 78px 70px;gap:7px">
+                <select value="{{ annotationFont }}" onChange="{{ onAnnotationFont }}" style="min-width:0;font-size:11.5px;padding:7px;border:1px solid #d8d3c5;border-radius:7px;background:#fff">
+                  <sc-for list="{{ fontOptions }}" as="f" hint-placeholder-count="3"><option value="{{ f.value }}">{{ f.label }}</option></sc-for>
+                </select>
+                <input type="color" value="{{ annotationColor }}" onInput="{{ onAnnotationColor }}" title="{{ t.colorLbl }}" style="width:100%;height:32px;padding:3px;border:1px solid #d8d3c5;border-radius:7px;background:#fff">
+                <input type="number" min="8" max="48" step="1" value="{{ annotationSize }}" onInput="{{ onAnnotationSize }}" title="{{ t.textSize }}" class="mono" style="width:100%;font-size:11px;padding:7px;border:1px solid #d8d3c5;border-radius:7px">
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+                <label style="font-size:9.5px;color:#8a8676">X (%)<input type="number" min="0" max="95" step="1" value="{{ annotationX }}" onInput="{{ onAnnotationX }}" class="mono" style="width:100%;font-size:11px;padding:6px;border:1px solid #d8d3c5;border-radius:6px"></label>
+                <label style="font-size:9.5px;color:#8a8676">Y (%)<input type="number" min="0" max="95" step="1" value="{{ annotationY }}" onInput="{{ onAnnotationY }}" class="mono" style="width:100%;font-size:11px;padding:6px;border:1px solid #d8d3c5;border-radius:6px"></label>
+              </div>
+              <button onClick="{{ onAddAnnotation }}" style="font:600 12px 'IBM Plex Sans';color:#fff;background:#2f4fd6;border:none;padding:8px;border-radius:8px;cursor:pointer">{{ t.textAdd }}</button>
+              <div style="display:flex;flex-direction:column;gap:6px;max-height:150px;overflow:auto">
+                <sc-for list="{{ annotations }}" as="a" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;gap:7px;padding:6px 8px;background:#f7f5ef;border:1px solid #ece7db;border-radius:7px">
+                    <span style="width:9px;height:9px;border-radius:2px;background:{{ a.color }}"></span>
+                    <span style="flex:1;min-width:0;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ a.text }}</span>
+                    <button onClick="{{ a.onRemove }}" title="{{ t.remove }}" style="border:none;background:none;color:#b9564a;font-size:14px;cursor:pointer">×</button>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size:9.5px;color:#8a8676;line-height:1.4">{{ t.textDragHint }}</div>
+            </div>
+          </div>
+
+          <!-- FLOATING AXIS WINDOW -->
+          <div style="{{ axisWinStyle }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eee7d9">
+              <span style="font-size:12.5px;font-weight:600">{{ t.axisWinTitle }}</span>
+              <button onClick="{{ onToggleAxis }}" style="background:none;border:none;font-size:16px;color:#9a9686;cursor:pointer;line-height:1">×</button>
+            </div>
+            <div class="scr" style="padding:14px;max-height:64vh;overflow-y:auto;display:flex;flex-direction:column;gap:14px">
+              <div>
+                <div style="font-size:10px;color:#8a8676;margin-bottom:6px;letter-spacing:.3px">{{ t.axisScale }}</div>
+                <div style="display:flex;gap:6px">
+                  <sc-for list="{{ axisModes }}" as="m" hint-placeholder-count="3">
+                    <button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="{{ axisManualStyle }}">
+                <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:7px;align-items:center">
+                  <span></span>
+                  <span style="font-size:9.5px;color:#8a8676;text-align:center">{{ t.axStart }}</span>
+                  <span style="font-size:9.5px;color:#8a8676;text-align:center">{{ t.axEnd }}</span>
+                  <span style="font-size:9.5px;color:#8a8676;text-align:center">{{ t.axStep }}</span>
+                  <sc-for list="{{ axisManualRows }}" as="r" hint-placeholder-count="2">
+                    <span class="mono" style="font-size:11px;font-weight:600;color:#3a3d46">{{ r.axis }}</span>
+                    <input type="number" step="{{ r.step }}" value="{{ r.min }}" onInput="{{ r.onMin }}" class="mono" style="width:100%;font-size:11px;padding:6px;border:1px solid #d8d3c5;border-radius:6px;outline:none;text-align:center" style-focus="border-color:#2f4fd6">
+                    <input type="number" step="{{ r.step }}" value="{{ r.max }}" onInput="{{ r.onMax }}" class="mono" style="width:100%;font-size:11px;padding:6px;border:1px solid #d8d3c5;border-radius:6px;outline:none;text-align:center" style-focus="border-color:#2f4fd6">
+                    <input type="number" step="{{ r.stepv }}" value="{{ r.stepval }}" onInput="{{ r.onStep }}" class="mono" style="width:100%;font-size:11px;padding:6px;border:1px solid #d8d3c5;border-radius:6px;outline:none;text-align:center" style-focus="border-color:#2f4fd6">
+                  </sc-for>
+                </div>
+              </div>
+              <div style="border-top:1px solid #eee7d9;padding-top:12px;display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ axisNameRows }}" as="a" hint-placeholder-count="2">
+                  <div>
+                    <div style="font-size:10px;color:#8a8676;margin-bottom:6px">{{ a.label }}</div>
+                    <div style="display:flex;gap:5px;margin-bottom:6px">
+                      <sc-for list="{{ a.presets }}" as="pre" hint-placeholder-count="3">
+                        <button onClick="{{ pre.onClick }}" style="{{ pre.style }}">{{ pre.label }}</button>
+                      </sc-for>
+                    </div>
+                    <input type="text" value="{{ a.value }}" onInput="{{ a.onInput }}" placeholder="{{ t.axCustom }}" style="width:100%;font-size:12px;padding:7px 9px;border:1px solid #d8d3c5;border-radius:7px;outline:none;margin-bottom:8px" style-focus="border-color:#2f4fd6">
+                    <div style="display:flex;align-items:center;gap:7px">
+                      <span style="font-size:10px;color:#8a8676;white-space:nowrap">{{ a.unitLbl }}</span>
+                      <div style="display:flex;gap:5px">
+                        <sc-for list="{{ a.unitPresets }}" as="u" hint-placeholder-count="3">
+                          <button onClick="{{ u.onClick }}" style="{{ u.style }}">{{ u.label }}</button>
+                        </sc-for>
+                      </div>
+                      <input type="text" value="{{ a.unitValue }}" onInput="{{ a.onUnit }}" style="flex:1;min-width:0;font-size:12px;padding:6px 8px;border:1px solid #d8d3c5;border-radius:7px;outline:none;text-align:center" style-focus="border-color:#2f4fd6">
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-stage" style="flex:1;position:relative;padding:14px 16px;min-height:0">
+        <div style="width:100%;height:100%;background:#fff;border:1px solid #ddd8cc;border-radius:14px;position:relative;overflow:hidden">
+          <canvas ref="{{ chartRef }}" onPointerDown="{{ onChartPointerDown }}" onPointerMove="{{ onChartPointerMove }}" onPointerUp="{{ onChartPointerUp }}" onPointerCancel="{{ onChartPointerUp }}" onPointerLeave="{{ onChartPointerUp }}" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab"></canvas>
+          <div style="{{ chartEmptyStyle }}">
+            <div style="text-align:center;max-width:300px">
+              <div style="font-size:34px;margin-bottom:8px;opacity:.25">◠</div>
+              <div style="font-size:13px;color:#8a8676;line-height:1.5">{{ chartEmptyText }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- legend -->
+      <div class="scr" style="flex:none;padding:10px 18px 14px;display:flex;gap:9px;flex-wrap:wrap;align-items:center;overflow-x:auto">
+        <span style="font-size:10.5px;color:#8a8676;letter-spacing:.4px;font-weight:500">{{ t.onChart }}</span>
+        <sc-for list="{{ legendItems }}" as="l" hint-placeholder-count="0">
+          <span style="display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:#3a3d46;background:#fff;border:1px solid #e0dbcf;padding:4px 10px 4px 8px;border-radius:20px">
+            <span style="width:14px;height:10px;border-radius:3px;border:1.5px solid {{ l.color }};background:{{ l.fill }}"></span>
+            {{ l.label }}
+            <span style="font-size:9.5px;color:#a39e8d;font-weight:500">{{ l.kind }}</span>
+          </span>
+        </sc-for>
+        <span style="{{ legendEmptyStyle }}">{{ t.legendEmpty }}</span>
+      </div>
+    </section>
+
+    <!-- ============ RIGHT: ELLIPSES + STATS ============ -->
+    <aside class="scr analysis-panel" style="width:360px;flex:none;background:#f7f5ef;border-left:1px solid #ddd8cc;display:flex;flex-direction:column;min-height:0;overflow-y:auto">
+
+      <!-- ELLIPSE MANAGER -->
+      <div style="{{ ellipsePanelStyle }}">
+      <div style="padding:16px;border-bottom:1px solid #e6e1d5">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <h2 style="margin:0;font-size:13px;font-weight:600;letter-spacing:.2px;display:flex;align-items:center;gap:7px">
+            <span style="width:7px;height:7px;border-radius:2px;background:#e0662a;display:inline-block"></span>
+            {{ t.ellTitle }}
+          </h2>
+          <button onClick="{{ onNewToggle }}" style="{{ newBtnStyle }}" style-hover="filter:brightness(1.05)">{{ newBtnLabel }}</button>
+        </div>
+
+        <!-- guided new form -->
+        <div style="{{ newFormStyle }}">
+          <div style="font-size:10.5px;color:#8a8676;margin-bottom:10px;line-height:1.4">{{ t.newHint }}</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;gap:7px">
+              <button onClick="{{ onNewSourceActive }}" style="{{ srcActiveStyle }}">{{ t.srcActive }}</button>
+              <button onClick="{{ onNewSourceManual }}" style="{{ srcManualStyle }}">{{ t.srcManual }}</button>
+            </div>
+            <input type="text" placeholder="{{ t.namePh }}" value="{{ newName }}" onInput="{{ onNewName }}" style="width:100%;font:400 12.5px 'IBM Plex Sans';padding:8px 10px;border:1px solid #d8d3c5;border-radius:8px;background:#fff;outline:none" style-focus="border-color:#e0662a">
+            <div style="{{ manualGridStyle }}">
+              <sc-for list="{{ newFields }}" as="fld" hint-placeholder-count="6">
+                <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#8a8676">
+                  {{ fld.label }}
+                  <input type="number" step="{{ fld.step }}" value="{{ fld.value }}" onInput="{{ fld.onInput }}" class="mono" style="width:100%;font-size:12px;padding:7px 8px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none" style-focus="border-color:#e0662a">
+                </label>
+              </sc-for>
+            </div>
+            <div style="{{ activeSrcNoteStyle }}">{{ activeSrcNote }}</div>
+            <button onClick="{{ onAddEllipse }}" style="width:100%;font:600 13px 'IBM Plex Sans';color:#fff;background:#e0662a;border:none;padding:10px;border-radius:9px;cursor:pointer" style-hover="filter:brightness(1.05)">{{ t.addEllipse }}</button>
+          </div>
+        </div>
+
+        <!-- ellipse list -->
+        <div style="display:flex;flex-direction:column;gap:9px;margin-top:12px">
+          <sc-for list="{{ ellipses }}" as="e" hint-placeholder-count="0">
+            <div style="border:1px solid #e2ddd0;border-radius:11px;background:#fff;overflow:hidden;animation:popin .18s ease">
+              <div style="display:flex;align-items:center;gap:9px;padding:9px 10px">
+                <button onClick="{{ e.onToggleVisible }}" title="Mostrar/ocultar" style="{{ e.eyeStyle }}">{{ e.eyeIcon }}</button>
+                <span style="width:16px;height:16px;border-radius:5px;flex:none;border:2px solid {{ e.color }};background:{{ e.swatchFill }}"></span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12.5px;font-weight:600;color:#23262e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ e.name }}</div>
+                  <div class="mono" style="font-size:9.5px;color:#9a9686">{{ e.meta }}</div>
+                </div>
+                <button onClick="{{ e.onEdit }}" title="Editar elipse" style="{{ e.editBtnStyle }}">✎</button>
+                <button onClick="{{ e.onRemove }}" title="Remover" style="font-size:14px;line-height:1;color:#b9564a;background:#fbeee9;border:1px solid #f3d9cf;width:26px;height:26px;border-radius:7px;cursor:pointer" style-hover="background:#f7ddd3">×</button>
+              </div>
+              <!-- edit drawer -->
+              <div style="{{ e.editStyle }}">
+                <div style="font-size:10px;color:#8a8676;margin-bottom:6px">{{ t.editValues }}</div>
+                <input type="text" value="{{ e.editName }}" onInput="{{ e.onEditName }}" placeholder="{{ t.namePh }}" style="width:100%;font:400 12px 'IBM Plex Sans';padding:7px 9px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none;margin-bottom:8px" style-focus="border-color:#e0662a">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px">
+                  <sc-for list="{{ e.editFields }}" as="fld" hint-placeholder-count="6">
+                    <label style="display:flex;flex-direction:column;gap:3px;font-size:9.5px;color:#8a8676">
+                      {{ fld.label }}
+                      <input type="number" step="{{ fld.step }}" value="{{ fld.value }}" onInput="{{ fld.onInput }}" class="mono" style="width:100%;font-size:11px;padding:6px 7px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none" style-focus="border-color:#e0662a">
+                    </label>
+                  </sc-for>
+                </div>
+                <div style="{{ e.editErrorStyle }}">{{ t.editInvalid }}</div>
+                <div style="display:flex;gap:7px;margin-bottom:12px">
+                  <button onClick="{{ e.onCancelEdit }}" style="font:500 11px 'IBM Plex Sans';color:#6f6b5d;background:#fff;border:1px solid #d8d3c5;padding:7px 10px;border-radius:7px;cursor:pointer">{{ t.refCancel }}</button>
+                  <button onClick="{{ e.onSaveEdit }}" style="flex:1;font:600 11.5px 'IBM Plex Sans';color:#fff;background:#e0662a;border:none;padding:7px 10px;border-radius:7px;cursor:pointer">{{ t.saveChanges }}</button>
+                </div>
+                <div style="font-size:10px;color:#8a8676;margin-bottom:6px">{{ t.colorLbl }}</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px">
+                  <sc-for list="{{ e.swatches }}" as="sw" hint-placeholder-count="8">
+                    <button onClick="{{ sw.onClick }}" style="{{ sw.style }}"></button>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <span style="font-size:10px;color:#8a8676">{{ t.strokeLbl }}</span>
+                  <div style="display:flex;gap:5px">
+                    <button onClick="{{ e.onSolid }}" style="{{ e.solidStyle }}">──</button>
+                    <button onClick="{{ e.onDashed }}" style="{{ e.dashedStyle }}">- -</button>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:9px">
+                  <span style="font-size:10px;color:#8a8676;white-space:nowrap">{{ t.widthLbl }}</span>
+                  <input type="range" min="1" max="5" step="0.5" value="{{ e.width }}" onInput="{{ e.onWidth }}" style="flex:1">
+                  <span class="mono" style="font-size:11px;color:#3a3d46;width:26px;text-align:right">{{ e.widthLabel }}</span>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+          <div style="{{ ellipseEmptyStyle }}">{{ t.ellEmpty }}</div>
+        </div>
+      </div>
+      </div>
+
+      <!-- INDIVIDUAL MEASUREMENT (tolerance / combined) -->
+      <div style="{{ indivPanelStyle }}">
+        <div style="padding:16px;border-bottom:1px solid #e6e1d5">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px">
+            <h2 style="margin:0;font-size:13px;font-weight:600;letter-spacing:.2px;display:flex;align-items:center;gap:7px">
+              <span style="width:7px;height:7px;border-radius:2px;background:#e0662a;display:inline-block"></span>
+              {{ t.indivTitle }}
+            </h2>
+            <div style="display:flex;gap:4px">
+              <sc-for list="{{ toleranceModes }}" as="m" hint-placeholder-count="2"><button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button></sc-for>
+            </div>
+          </div>
+          <div style="font-size:10.5px;color:#8a8676;margin-bottom:11px;line-height:1.45">{{ t.indivHint }}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#8a8676">{{ t.participant }}
+              <input type="text" value="{{ indivParticipant }}" onInput="{{ onIndivParticipant }}" style="width:100%;font-size:12px;padding:8px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#8a8676">{{ t.time }}
+              <input type="text" value="{{ indivTime }}" onInput="{{ onIndivTime }}" style="width:100%;font-size:12px;padding:8px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none">
+            </label>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px">
+            <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#8a8676">{{ t.indivRh }}
+              <input type="number" step="0.1" value="{{ indivRh }}" onInput="{{ onIndivRh }}" class="mono" style="width:100%;font-size:12.5px;padding:8px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none" style-focus="border-color:#e0662a">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#8a8676">{{ t.indivXc }}
+              <input type="number" step="0.1" value="{{ indivXc }}" onInput="{{ onIndivXc }}" class="mono" style="width:100%;font-size:12.5px;padding:8px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none" style-focus="border-color:#e0662a">
+            </label>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px">
+            <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#8a8676">{{ t.colorLbl }}
+              <input type="color" value="{{ indivColor }}" onInput="{{ onIndivColor }}" style="width:100%;height:31px;padding:3px;border:1px solid #d8d3c5;border-radius:7px;background:#fff">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#8a8676">{{ t.symbol }}
+              <select value="{{ indivSymbol }}" onChange="{{ onIndivSymbol }}" style="width:100%;font-size:11.5px;padding:7px;border:1px solid #d8d3c5;border-radius:7px;background:#fff">
+                <sc-for list="{{ symbolOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+              </select>
+            </label>
+          </div>
+          <div style="display:flex;gap:7px">
+            <button onClick="{{ onPlotIndiv }}" style="flex:1;font:600 12.5px 'IBM Plex Sans';color:#fff;background:#e0662a;border:none;padding:9px;border-radius:8px;cursor:pointer" style-hover="filter:brightness(1.05)">{{ t.indivPlot }}</button>
+            <button onClick="{{ onClearIndiv }}" style="font:500 12.5px 'IBM Plex Sans';color:#6f6b5d;background:#fff;border:1px solid #d8d3c5;padding:9px 14px;border-radius:8px;cursor:pointer" style-hover="border-color:#b9b3a2">{{ t.indivClear }}</button>
+          </div>
+          <div style="{{ indivNoPopStyle }}">{{ t.indivNoPop }}</div>
+          <div style="{{ measurementListStyle }}">
+            <sc-for list="{{ measurements }}" as="m" hint-placeholder-count="0">
+              <div style="display:flex;align-items:center;gap:7px;padding:7px 8px;background:#fff;border:1px solid #e2ddd0;border-radius:8px">
+                <span style="width:10px;height:10px;border-radius:2px;background:{{ m.color }}"></span>
+                <div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.label }}</div><div class="mono" style="font-size:9px;color:#9a9686">{{ m.coords }}</div></div>
+                <button onClick="{{ m.onRemove }}" title="{{ t.remove }}" style="border:none;background:none;color:#b9564a;font-size:14px;cursor:pointer">×</button>
+              </div>
+            </sc-for>
+          </div>
+          <!-- classification result -->
+          <div style="{{ indivResultStyle }}">
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:{{ iBadgeBg }};border-radius:11px 11px 0 0;margin-top:11px">
+              <span style="font-size:20px;color:{{ iBadgeColor }}">{{ iBadgeIcon }}</span>
+              <div style="font-size:12.5px;font-weight:700;color:{{ iBadgeColor }};letter-spacing:.3px">{{ iBadge }}</div>
+            </div>
+            <div style="padding:12px 14px;background:#fff;border:1px solid #e2ddd0;border-top:none;border-radius:0 0 11px 11px">
+              <div style="font-size:12px;color:#3a3d46;line-height:1.5;margin-bottom:11px">{{ iInterp }}</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <sc-for list="{{ iCells }}" as="c" hint-placeholder-count="2">
+                  <div style="background:#f7f5ef;border:1px solid #ece7db;border-radius:8px;padding:7px 9px">
+                    <div style="font-size:9.5px;color:#9a9686">{{ c.label }}</div>
+                    <div class="mono" style="font-size:13px;font-weight:600;color:#23262e">{{ c.value }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATISTICAL COMPARISON -->
+      <div style="padding:16px">
+        <h2 style="margin:0 0 12px;font-size:13px;font-weight:600;letter-spacing:.2px;display:flex;align-items:center;gap:7px">
+          <span style="width:7px;height:7px;border-radius:2px;background:#0f9d8f;display:inline-block"></span>
+          {{ t.cmpTitle }}
+        </h2>
+        <div style="font-size:10.5px;color:#8a8676;margin-bottom:11px;line-height:1.45">{{ t.cmpHint }}</div>
+        <div style="display:flex;gap:6px;margin-bottom:10px">
+          <sc-for list="{{ comparisonModes }}" as="m" hint-placeholder-count="2"><button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button></sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+          <label style="font-size:10px;color:#8a8676;display:flex;flex-direction:column;gap:4px">{{ cmpLabelA }}
+            <select value="{{ cmpA }}" onChange="{{ onCmpA }}" style="width:100%;font:400 12.5px 'IBM Plex Sans';padding:8px 10px;border:1px solid #d8d3c5;border-radius:8px;background:#fff;outline:none">
+              <option value="">{{ t.selectDots }}</option>
+              <sc-for list="{{ cmpOptions }}" as="o" hint-placeholder-count="2"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+            </select>
+          </label>
+          <label style="font-size:10px;color:#8a8676;display:flex;flex-direction:column;gap:4px">{{ cmpLabelB }}
+            <select value="{{ cmpB }}" onChange="{{ onCmpB }}" style="width:100%;font:400 12.5px 'IBM Plex Sans';padding:8px 10px;border:1px solid #d8d3c5;border-radius:8px;background:#fff;outline:none">
+              <option value="">{{ t.selectDots }}</option>
+              <sc-for list="{{ cmpOptions }}" as="o" hint-placeholder-count="2"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+            </select>
+          </label>
+        </div>
+        <div style="{{ pairedPanelStyle }}">
+          <div style="display:flex;gap:6px;margin-bottom:9px">
+            <sc-for list="{{ pairedViews }}" as="v" hint-placeholder-count="2"><button onClick="{{ v.onClick }}" style="{{ v.style }}">{{ v.label }}</button></sc-for>
+          </div>
+          <div style="font-size:9.5px;color:#8a8676;line-height:1.4;margin-bottom:8px">{{ t.pairedHint }}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+            <sc-for list="{{ pairedFields }}" as="f" hint-placeholder-count="4">
+              <label style="display:flex;flex-direction:column;gap:3px;font-size:9.5px;color:#8a8676">{{ f.label }}
+                <input type="number" step="{{ f.step }}" value="{{ f.value }}" onInput="{{ f.onInput }}" class="mono" style="width:100%;font-size:11px;padding:6px 7px;border:1px solid #d8d3c5;border-radius:7px;background:#fff">
+              </label>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- result -->
+        <div style="{{ resultWrapStyle }}">
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:{{ badgeBg }};border-radius:11px 11px 0 0">
+            <span style="font-size:20px">{{ badgeIcon }}</span>
+            <div style="line-height:1.2">
+              <div style="font-size:13px;font-weight:700;color:{{ badgeColor }};letter-spacing:.3px">{{ badgeText }}</div>
+              <div class="mono" style="font-size:11px;color:{{ badgeColor }};opacity:.85">p {{ pText }}</div>
+            </div>
+          </div>
+          <div style="padding:12px 14px;background:#fff;border:1px solid #e2ddd0;border-top:none;border-radius:0 0 11px 11px">
+            <div style="font-size:12px;color:#3a3d46;line-height:1.5;margin-bottom:11px">{{ interpText }}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <sc-for list="{{ statCells }}" as="s" hint-placeholder-count="4">
+                <div style="background:#f7f5ef;border:1px solid #ece7db;border-radius:8px;padding:7px 9px">
+                  <div style="font-size:9.5px;color:#9a9686">{{ s.label }}</div>
+                  <div class="mono" style="font-size:13px;font-weight:600;color:#23262e">{{ s.value }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="{{ warnStyle }}">{{ warnText }}</div>
+          </div>
+        </div>
+        <div style="{{ cmpEmptyStyle }}">{{ t.cmpEmpty }}</div>
+      </div>
+    </aside>
+  </div>
+  </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    ready: false,
+    screen: 'home',       // 'home' | 'app'
+    method: 'confidence', // 'tolerance' | 'confidence' | 'combined'
+    lang: 'pt-BR',        // 'pt-BR' | 'en' | 'es'
+    pops: [],
+    fSex: '',
+    fType: '',
+    search: '',
+    refKeys: [],          // populations plotted (order = color index)
+    refModes: {},         // key -> 'conf95' | 'tolerance'
+    activeKey: null,      // for "da população ativa"
+    ellipses: [],
+    editingId: null,
+    editDraft: null,
+    editError: false,
+    showNew: false,
+    newSource: 'active',  // 'active' | 'manual'
+    newName: '',
+    newVals: { rhMean:'', rhSd:'', xcHMean:'', xcHSd:'', r:'', n:'' },
+    showPhase: false,
+    showText: false,
+    annotations: [],
+    annotationDraft: { text:'', font:'IBM Plex Sans', color:'#1b1e26', size:'16', x:'12', y:'12' },
+    cmpA: '',
+    cmpB: '',
+    comparisonMode: 'independent', // 'independent' | 'paired'
+    pairedView: 'linked',          // 'linked' | 'delta'
+    paired: { sdRh:'', sdXc:'', r:'', n:'' },
+    bounds: null,
+    // individual measurement (tolerance technique)
+    tolMode: 'classic',            // 'classic' | 'zscore'
+    indiv: { participant:'P1', time:'T1', rh:'', xc:'', color:'#e0662a', symbol:'circle' },
+    indivShown: false,
+    measurements: [],
+    // axis window
+    showAxisWin: false,
+    axisMode: 'auto',     // 'auto' | 'zero' | 'manual'
+    axisManual: { xMin:'', xMax:'', xStep:'', yMin:'', yMax:'', yStep:'' },
+    axisNames: { x:'R/H', y:'Xc/H' },
+    axisUnits: { x:'Ω/m', y:'Ω/m' },
+    // add-reference form
+    showAddRef: false,
+    customRefs: [],       // user-added reference populations
+    newRef: { name:'', sex:'M', type:'Healthy', country:'', n:'', rhMean:'', rhSd:'', xcHMean:'', xcHSd:'', r:'' },
+  };
+
+  REF_COLORS = ['#2f4fd6','#0f9d8f','#7b3ff2','#c0248f','#b45309'];
+  CONF_COLORS = ['#e0662a','#0891b2','#d1417a','#2a9d5c','#8a5cf6','#b45309'];
+  SWATCHES = ['#e0662a','#0891b2','#d1417a','#2a9d5c','#8a5cf6','#2f4fd6','#b45309','#1b1e26'];
+  CHI = { t50:1.386, t75:2.773, t95:5.991, c95:5.991 };
+  THUMB_WIN = { xmin:200, xmax:520, ymin:18, ymax:66 };
+
+  I18N = {
+    'pt-BR': {
+      hSub:'ANÁLISE VETORIAL DE BIOIMPEDÂNCIA', hTitle:'Escolha a técnica de análise',
+      hDesc:'O BIVA2.0 constrói nomogramas RXc e roda os testes estatísticos. Selecione como você quer trabalhar — dá para trocar depois.',
+      open:'Abrir', back:'Voltar ao início',
+      hFoot:'Baseado em 183 populações de referência publicadas. As elipses e testes seguem os métodos clássicos de Piccoli (BIVA).',
+      mTolTitle:'Tolerância', mTolDesc:'Classifique um indivíduo contra as elipses de tolerância (50·75·95%) de uma população de referência.',
+      mConfTitle:'Confiança', mConfDesc:'Compare a posição vetorial média de grupos com elipses de confiança 95% e teste de Hotelling T².',
+      mCombTitle:'Mista', mCombDesc:'Tolerância e confiança lado a lado: classifique indivíduos e compare grupos no mesmo gráfico.',
+      mTolF:['Elipses 50·75·95%','Classificação individual','Interpretação em texto'],
+      mConfF:['Elipse de confiança 95%','Teste de Hotelling T²','Comparação de grupos'],
+      mCombF:['Todas as elipses','Indivíduos + grupos','Análise completa'],
+      exportPng:'Exportar PNG', exportExcel:'Exportar Excel',
+      popTitle:'Populações de referência', searchPh:'Buscar por país, sexo, equipamento…',
+      noneFound:'Nenhuma população encontrada com esses filtros.',
+      sexAll:'Todos', sexM:'Masc', sexF:'Fem',
+      tAll:'Todas', tHealthy:'Saudável', tSport:'Atletas', tClinical:'Clínica',
+      modeConf:'Confiança 95%', modeTol:'Tolerância 50·75·95',
+      chartTitle:'Nomograma RXc', chartSubBase:'Resistência/Estatura × Reatância/Estatura (Ω/m)',
+      phase:'Ângulo de fase', axes:'Eixos ▾', textBox:'Texto',
+      textTitle:'Caixas de texto', textPlaceholder:'Digite a anotação para a figura…', textSize:'Tamanho da fonte', textAdd:'Adicionar ao gráfico', textDragHint:'Arraste a caixa de texto diretamente no gráfico para reposicioná-la.', remove:'Remover',
+      onChart:'NO GRÁFICO:', legendEmpty:'nada selecionado ainda',
+      chartEmpty:'Selecione uma ou mais populações à esquerda. Cada uma entra como elipse de confiança 95% — troque para tolerância no próprio cartão.',
+      chartEmptyTol:'Selecione uma população de referência à esquerda para desenhar suas elipses de tolerância e classificar um indivíduo.',
+      axisWinTitle:'Eixos do gráfico', axisScale:'ESCALA',
+      axAuto:'Melhor ajuste', axZero:'Incluir zero', axManual:'Manual',
+      axStart:'início', axEnd:'fim', axStep:'intervalo', axCustom:'Digite um nome…',
+      axisNameX:'NOME DO EIXO X (resistência)', axisNameY:'NOME DO EIXO Y (reatância)',
+      unitLbl:'Unidade', migrateBtn:'Migrar para Mista',
+      addRef:'+ Nova referência', addRefTitle:'Adicionar referência ao banco',
+      addRefHint:'Insira os parâmetros de uma nova população. Ela é adicionada à lista abaixo das referências publicadas (só nesta sessão).',
+      refName:'Nome / legenda', refCountry:'País', refSex:'Sexo', refType:'Tipo', refCancel:'Cancelar', refSave:'Adicionar ao banco',
+      refCustomTag:'sua referência',
+      ellTitle:'Elipses de confiança', newAdd:'+ Nova', newClose:'Fechar',
+      newHint:'Crie uma elipse de confiança (IC 95% da média) a partir da população ativa, ou insira os parâmetros manualmente.',
+      srcActive:'Da população ativa', srcManual:'Manual', namePh:'Nome da elipse',
+      fRhMean:'R/H média', fRhSd:'R/H DP', fXcMean:'Xc/H média', fXcSd:'Xc/H DP', fR:'Correlação', fN:'N',
+      addEllipse:'Adicionar elipse de confiança',
+      activeNoneNote:'Nenhuma população ativa. Clique numa população à esquerda primeiro.',
+      ellEmpty:'Nenhuma elipse ainda. Adicione uma da população ativa ou manualmente.',
+      colorLbl:'COR', strokeLbl:'TRAÇO', widthLbl:'ESPESSURA',
+      editValues:'VALORES DA ELIPSE', saveChanges:'Salvar alterações', editInvalid:'Revise os valores: DP > 0, N > 2 e correlação entre -1 e 1.',
+      indivTitle:'Participantes e tempos', indivHint:'Adicione uma ou mais medidas. Medidas do mesmo participante são conectadas na ordem de inclusão para a análise longitudinal.',
+      indivRh:'R/H', indivXc:'Xc/H', indivPlot:'Adicionar medida', indivClear:'Limpar todas', participant:'Participante', time:'Tempo', symbol:'SÍMBOLO',
+      tolClassic:'Clássica', tolZ:'Z-score',
+      indivNoPop:'Selecione uma população de referência (à esquerda) para servir de base à classificação.',
+      indivBadgeIn50:'DENTRO DA ELIPSE 50%', indivBadgeIn75:'DENTRO DA ELIPSE 75%', indivBadgeIn95:'DENTRO DA ELIPSE 95%', indivBadgeOut:'FORA DA ELIPSE 95%',
+      cmpTitle:'Comparação estatística',
+      cmpHint:'Compare a posição vetorial de dois grupos (Hotelling T²). Escolha entre populações no gráfico e elipses adicionadas.',
+      grpA:'GRUPO A', grpB:'GRUPO B', selectDots:'— selecione —', independent:'Independente', paired:'Pareada', time1:'T1 / Antes', time2:'T2 / Depois',
+      pairedLinked:'T1 e T2 conectados', pairedDelta:'Deltas no zero', pairedHint:'Informe a dispersão das diferenças pareadas. Esses valores não podem ser obtidos apenas das duas elipses marginais.', pairedSdRh:'DP ΔR/H', pairedSdXc:'DP ΔXc/H', pairedCorr:'Correlação Δ', pairedN:'N pareado',
+      cmpEmpty:'Selecione dois grupos para ver o resultado.',
+      sig:'DIFERENÇA SIGNIFICATIVA', nsig:'SEM DIFERENÇA SIGNIFICATIVA', notCalc:'NÃO CALCULÁVEL',
+      small:'pequena', moderate:'moderada', large:'grande',
+      warnSmall:'Amostra pequena (N mínimo = ', warnSmall2:'). Interprete o resultado com cautela.',
+      tolTitle:'confiança 95%', tolTitleTol:'tolerância', kindConf:'confiança',
+    },
+    'en': {
+      hSub:'BIOIMPEDANCE VECTOR ANALYSIS', hTitle:'Choose the analysis technique',
+      hDesc:'BIVA2.0 builds RXc nomograms and runs the statistical tests. Pick how you want to work — you can switch later.',
+      open:'Open', back:'Back to start',
+      hFoot:'Based on 183 published reference populations. Ellipses and tests follow the classic Piccoli (BIVA) methods.',
+      mTolTitle:'Tolerance', mTolDesc:'Classify an individual against the tolerance ellipses (50·75·95%) of a reference population.',
+      mConfTitle:'Confidence', mConfDesc:'Compare mean vector positions of groups with 95% confidence ellipses and Hotelling T² test.',
+      mCombTitle:'Combined', mCombDesc:'Tolerance and confidence side by side: classify individuals and compare groups on the same chart.',
+      mTolF:['50·75·95% ellipses','Individual classification','Plain-text interpretation'],
+      mConfF:['95% confidence ellipse','Hotelling T² test','Group comparison'],
+      mCombF:['All ellipses','Individuals + groups','Full analysis'],
+      exportPng:'Export PNG', exportExcel:'Export Excel',
+      popTitle:'Reference populations', searchPh:'Search by country, sex, device…',
+      noneFound:'No population matches these filters.',
+      sexAll:'All', sexM:'Male', sexF:'Female',
+      tAll:'All', tHealthy:'Healthy', tSport:'Athletes', tClinical:'Clinical',
+      modeConf:'Confidence 95%', modeTol:'Tolerance 50·75·95',
+      chartTitle:'RXc nomogram', chartSubBase:'Resistance/Height × Reactance/Height (Ω/m)',
+      phase:'Phase angle', axes:'Axes ▾', textBox:'Text',
+      textTitle:'Text boxes', textPlaceholder:'Type an annotation for the figure…', textSize:'Font size', textAdd:'Add to chart', textDragHint:'Drag a text box directly on the chart to reposition it.', remove:'Remove',
+      onChart:'ON CHART:', legendEmpty:'nothing selected yet',
+      chartEmpty:'Select one or more populations on the left. Each is added as a 95% confidence ellipse — switch to tolerance on its card.',
+      chartEmptyTol:'Select a reference population on the left to draw its tolerance ellipses and classify an individual.',
+      axisWinTitle:'Chart axes', axisScale:'SCALE',
+      axAuto:'Best fit', axZero:'Include zero', axManual:'Manual',
+      axStart:'start', axEnd:'end', axStep:'step', axCustom:'Type a name…',
+      axisNameX:'X AXIS NAME (resistance)', axisNameY:'Y AXIS NAME (reactance)',
+      unitLbl:'Unit', migrateBtn:'Switch to Combined',
+      addRef:'+ New reference', addRefTitle:'Add reference to the bank',
+      addRefHint:'Enter the parameters of a new population. It is added to the list below the published references (this session only).',
+      refName:'Name / legend', refCountry:'Country', refSex:'Sex', refType:'Type', refCancel:'Cancel', refSave:'Add to bank',
+      refCustomTag:'your reference',
+      ellTitle:'Confidence ellipses', newAdd:'+ New', newClose:'Close',
+      newHint:'Create a confidence ellipse (95% CI of the mean) from the active population, or enter parameters manually.',
+      srcActive:'From active population', srcManual:'Manual', namePh:'Ellipse name',
+      fRhMean:'R/H mean', fRhSd:'R/H SD', fXcMean:'Xc/H mean', fXcSd:'Xc/H SD', fR:'Correlation', fN:'N',
+      addEllipse:'Add confidence ellipse',
+      activeNoneNote:'No active population. Click a population on the left first.',
+      ellEmpty:'No ellipse yet. Add one from the active population or manually.',
+      colorLbl:'COLOR', strokeLbl:'STROKE', widthLbl:'WIDTH',
+      editValues:'ELLIPSE VALUES', saveChanges:'Save changes', editInvalid:'Check the values: SD > 0, N > 2 and correlation between -1 and 1.',
+      indivTitle:'Participants and times', indivHint:'Add one or more measurements. Measurements from the same participant are connected in entry order for longitudinal analysis.',
+      indivRh:'R/H', indivXc:'Xc/H', indivPlot:'Add measurement', indivClear:'Clear all', participant:'Participant', time:'Time', symbol:'SYMBOL',
+      tolClassic:'Classic', tolZ:'Z-score',
+      indivNoPop:'Select a reference population (left) to base the classification on.',
+      indivBadgeIn50:'INSIDE 50% ELLIPSE', indivBadgeIn75:'INSIDE 75% ELLIPSE', indivBadgeIn95:'INSIDE 95% ELLIPSE', indivBadgeOut:'OUTSIDE 95% ELLIPSE',
+      cmpTitle:'Statistical comparison',
+      cmpHint:'Compare the vector position of two groups (Hotelling T²). Choose among plotted populations and added ellipses.',
+      grpA:'GROUP A', grpB:'GROUP B', selectDots:'— select —', independent:'Independent', paired:'Paired', time1:'T1 / Before', time2:'T2 / After',
+      pairedLinked:'Linked T1 and T2', pairedDelta:'Deltas at zero', pairedHint:'Enter the dispersion of the paired differences. These values cannot be recovered from the two marginal ellipses alone.', pairedSdRh:'SD ΔR/H', pairedSdXc:'SD ΔXc/H', pairedCorr:'Delta correlation', pairedN:'Paired N',
+      cmpEmpty:'Select two groups to see the result.',
+      sig:'SIGNIFICANT DIFFERENCE', nsig:'NO SIGNIFICANT DIFFERENCE', notCalc:'NOT COMPUTABLE',
+      small:'small', moderate:'moderate', large:'large',
+      warnSmall:'Small sample (min N = ', warnSmall2:'). Interpret the result with caution.',
+      tolTitle:'95% confidence', tolTitleTol:'tolerance', kindConf:'confidence',
+    },
+    'es': {
+      hSub:'ANÁLISIS VECTORIAL DE BIOIMPEDANCIA', hTitle:'Elige la técnica de análisis',
+      hDesc:'BIVA2.0 construye nomogramas RXc y ejecuta las pruebas estadísticas. Elige cómo trabajar — puedes cambiar después.',
+      open:'Abrir', back:'Volver al inicio',
+      hFoot:'Basado en 183 poblaciones de referencia publicadas. Las elipses y pruebas siguen los métodos clásicos de Piccoli (BIVA).',
+      mTolTitle:'Tolerancia', mTolDesc:'Clasifica a un individuo frente a las elipses de tolerancia (50·75·95%) de una población de referencia.',
+      mConfTitle:'Confianza', mConfDesc:'Compara la posición vectorial media de grupos con elipses de confianza 95% y prueba de Hotelling T².',
+      mCombTitle:'Mixta', mCombDesc:'Tolerancia y confianza lado a lado: clasifica individuos y compara grupos en el mismo gráfico.',
+      mTolF:['Elipses 50·75·95%','Clasificación individual','Interpretación en texto'],
+      mConfF:['Elipse de confianza 95%','Prueba de Hotelling T²','Comparación de grupos'],
+      mCombF:['Todas las elipses','Individuos + grupos','Análisis completo'],
+      exportPng:'Exportar PNG', exportExcel:'Exportar Excel',
+      popTitle:'Poblaciones de referencia', searchPh:'Buscar por país, sexo, equipo…',
+      noneFound:'Ninguna población coincide con estos filtros.',
+      sexAll:'Todos', sexM:'Masc', sexF:'Fem',
+      tAll:'Todas', tHealthy:'Sana', tSport:'Atletas', tClinical:'Clínica',
+      modeConf:'Confianza 95%', modeTol:'Tolerancia 50·75·95',
+      chartTitle:'Nomograma RXc', chartSubBase:'Resistencia/Estatura × Reactancia/Estatura (Ω/m)',
+      phase:'Ángulo de fase', axes:'Ejes ▾', textBox:'Texto',
+      textTitle:'Cajas de texto', textPlaceholder:'Escribe una anotación para la figura…', textSize:'Tamaño de fuente', textAdd:'Añadir al gráfico', textDragHint:'Arrastra una caja de texto directamente en el gráfico para cambiar su posición.', remove:'Eliminar',
+      onChart:'EN EL GRÁFICO:', legendEmpty:'nada seleccionado aún',
+      chartEmpty:'Selecciona una o más poblaciones a la izquierda. Cada una entra como elipse de confianza 95% — cambia a tolerancia en su tarjeta.',
+      chartEmptyTol:'Selecciona una población de referencia a la izquierda para dibujar sus elipses de tolerancia y clasificar a un individuo.',
+      axisWinTitle:'Ejes del gráfico', axisScale:'ESCALA',
+      axAuto:'Mejor ajuste', axZero:'Incluir cero', axManual:'Manual',
+      axStart:'inicio', axEnd:'fin', axStep:'intervalo', axCustom:'Escribe un nombre…',
+      axisNameX:'NOMBRE DEL EJE X (resistencia)', axisNameY:'NOMBRE DEL EJE Y (reactancia)',
+      unitLbl:'Unidad', migrateBtn:'Pasar a Mixta',
+      addRef:'+ Nueva referencia', addRefTitle:'Añadir referencia al banco',
+      addRefHint:'Introduce los parámetros de una nueva población. Se añade a la lista debajo de las referencias publicadas (solo esta sesión).',
+      refName:'Nombre / leyenda', refCountry:'País', refSex:'Sexo', refType:'Tipo', refCancel:'Cancelar', refSave:'Añadir al banco',
+      refCustomTag:'tu referencia',
+      ellTitle:'Elipses de confianza', newAdd:'+ Nueva', newClose:'Cerrar',
+      newHint:'Crea una elipse de confianza (IC 95% de la media) desde la población activa, o introduce los parámetros manualmente.',
+      srcActive:'De la población activa', srcManual:'Manual', namePh:'Nombre de la elipse',
+      fRhMean:'R/H media', fRhSd:'R/H DE', fXcMean:'Xc/H media', fXcSd:'Xc/H DE', fR:'Correlación', fN:'N',
+      addEllipse:'Añadir elipse de confianza',
+      activeNoneNote:'Ninguna población activa. Haz clic en una población a la izquierda primero.',
+      ellEmpty:'Ninguna elipse aún. Añade una desde la población activa o manualmente.',
+      colorLbl:'COLOR', strokeLbl:'TRAZO', widthLbl:'GROSOR',
+      editValues:'VALORES DE LA ELIPSE', saveChanges:'Guardar cambios', editInvalid:'Revise los valores: DE > 0, N > 2 y correlación entre -1 y 1.',
+      indivTitle:'Participantes y tiempos', indivHint:'Añade una o más mediciones. Las mediciones del mismo participante se conectan en el orden de entrada para el análisis longitudinal.',
+      indivRh:'R/H', indivXc:'Xc/H', indivPlot:'Añadir medición', indivClear:'Limpiar todo', participant:'Participante', time:'Tiempo', symbol:'SÍMBOLO',
+      tolClassic:'Clásica', tolZ:'Z-score',
+      indivNoPop:'Selecciona una población de referencia (izquierda) como base de la clasificación.',
+      indivBadgeIn50:'DENTRO DE LA ELIPSE 50%', indivBadgeIn75:'DENTRO DE LA ELIPSE 75%', indivBadgeIn95:'DENTRO DE LA ELIPSE 95%', indivBadgeOut:'FUERA DE LA ELIPSE 95%',
+      cmpTitle:'Comparación estadística',
+      cmpHint:'Compara la posición vectorial de dos grupos (Hotelling T²). Elige entre poblaciones trazadas y elipses añadidas.',
+      grpA:'GRUPO A', grpB:'GRUPO B', selectDots:'— selecciona —', independent:'Independiente', paired:'Pareada', time1:'T1 / Antes', time2:'T2 / Después',
+      pairedLinked:'T1 y T2 conectados', pairedDelta:'Deltas en cero', pairedHint:'Introduce la dispersión de las diferencias pareadas. Estos valores no se pueden obtener solo de las dos elipses marginales.', pairedSdRh:'DE ΔR/H', pairedSdXc:'DE ΔXc/H', pairedCorr:'Correlación Δ', pairedN:'N pareado',
+      cmpEmpty:'Selecciona dos grupos para ver el resultado.',
+      sig:'DIFERENCIA SIGNIFICATIVA', nsig:'SIN DIFERENCIA SIGNIFICATIVA', notCalc:'NO CALCULABLE',
+      small:'pequeña', moderate:'moderada', large:'grande',
+      warnSmall:'Muestra pequeña (N mínimo = ', warnSmall2:'). Interpreta el resultado con cautela.',
+      tolTitle:'confianza 95%', tolTitleTol:'tolerancia', kindConf:'confianza',
+    },
+  };
+  _T(){ return this.I18N[this.state.lang] || this.I18N['pt-BR']; }
+
+  componentDidMount() {
+    this._load();
+    this._onResize = () => this._draw();
+    window.addEventListener('resize', this._onResize);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._onResize); }
+  componentDidUpdate() { this._draw(); }
+
+  _load(tries) {
+    tries = tries || 0;
+    const raw = window.BIVA2_POPULATIONS;
+    if (!Array.isArray(raw) || !raw.length) {
+      if (tries < 40) return void setTimeout(() => this._load(tries + 1), 60);
+      return;
+    }
+    const pops = raw.map((p, i) => this._normalize(p, i)).filter((p) => this._keep(p));
+    this.setState({ pops, ready: true });
+  }
+
+  // ---------- normalization ----------
+  _inferCountry(l){const c=['Italy','USA','Brazil','Mexico','Spain','France','Germany','Portugal'];return c.find((x)=>new RegExp('\\b'+x+'\\b','i').test(l))||'—';}
+  _ptCountry(c){const m={Italy:'Itália',USA:'EUA',Brazil:'Brasil',Mexico:'México',Spain:'Espanha',France:'França',Germany:'Alemanha',Portugal:'Portugal'};return m[c]||c;}
+  _inferAge(l){const r=l.match(/(\d+)\s*age\s*(\d+)\s*(yr|years?|days?)/i);if(r)return r[1]+'–'+r[2]+' anos';const s=l.match(/age\s*(\d+)/i);if(s)return s[1]+' anos';if(/adult/i.test(l))return 'Adultos';return '—';}
+  _inferEquip(l){const m=l.match(/\(([^)]*(?:Akern|RJL|BIA|Bodystat|InBody|Tanita|SEAC)[^)]*)\)/i);if(m)return m[1].replace(/\s+/g,' ').trim();if(/akern/i.test(l))return 'Akern-RJL';if(/rjl/i.test(l))return 'RJL Systems';return '—';}
+  _inferType(l){if(/athlet|sport|endurance|velocity|power|team-sports/i.test(l))return 'Sport';if(/clinical|patient|disease|renal|cardiac|obese|cancer|sarcopen/i.test(l))return 'Clinical';if(/healthy|reference|adult|children|adolescent/i.test(l))return 'Healthy';return 'Other';}
+  _inferSex(p,l){const s=String(p.sex||'').toLowerCase();if(s==='m'||s==='f')return s.toUpperCase();if(/females?/i.test(l))return 'F';if(/males?/i.test(l))return 'M';return '—';}
+  _normalize(p,i){
+    const legend=String(p.legend||('População '+(i+1))).replace(/\s+/g,' ').trim();
+    const source=p.source==='confidence'?'confidence':'tolerance';
+    const country=this._inferCountry(legend);
+    return {
+      key:source+':'+(p.code||i+1)+':'+i,
+      code:p.code||i+1, legend, source,
+      sex:this._inferSex(p,legend),
+      countryRaw:country, country:this._ptCountry(country),
+      age:this._inferAge(legend), equip:this._inferEquip(legend), type:this._inferType(legend),
+      n:Number(p.n)||1,
+      rhMean:Number(p.r_h_mean), rhSd:Number(p.r_h_sd),
+      xcHMean:Number(p.xc_h_mean), xcHSd:Number(p.xc_h_sd),
+      r:Math.max(-0.999,Math.min(0.999,Number(p.correlation)||0)),
+    };
+  }
+  _keep(p){
+    return [p.n,p.rhMean,p.rhSd,p.xcHMean,p.xcHSd,p.r].every((v)=>Number.isFinite(v))
+      && p.n>2 && p.rhSd>0 && p.xcHSd>0 && Math.abs(p.r)<1;
+  }
+
+  // ---------- math ----------
+  _ellipsePts(mx,my,sx,sy,r,chi){
+    const pts=[],steps=120,c=Math.sqrt(chi),sr=Math.max(-0.999,Math.min(0.999,r||0)),o=Math.sqrt(1-sr*sr);
+    for(let i=0;i<=steps;i++){const t=i*2*Math.PI/steps,cs=Math.cos(t),sn=Math.sin(t);pts.push({x:mx+sx*c*cs,y:my+sy*c*(sr*cs+o*sn)});}
+    return pts;
+  }
+  _covFromPop(p){return[[p.rhSd*p.rhSd,p.r*p.rhSd*p.xcHSd],[p.r*p.rhSd*p.xcHSd,p.xcHSd*p.xcHSd]];}
+  _inv2(m){const d=m[0][0]*m[1][1]-m[0][1]*m[1][0];if(!Number.isFinite(d)||Math.abs(d)<1e-10)return null;return[[m[1][1]/d,-m[0][1]/d],[-m[1][0]/d,m[0][0]/d]];}
+  _quad(v,m){return v[0]*(m[0][0]*v[0]+m[0][1]*v[1])+v[1]*(m[1][0]*v[0]+m[1][1]*v[1]);}
+  _logGamma(z){const c=[676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];if(z<0.5)return Math.log(Math.PI)-Math.log(Math.sin(Math.PI*z))-this._logGamma(1-z);let x=0.99999999999980993;const s=z-1;for(let i=0;i<c.length;i++)x+=c[i]/(s+i+1);const g=7,tv=s+g+0.5;return 0.5*Math.log(2*Math.PI)+(s+0.5)*Math.log(tv)-tv+Math.log(x);}
+  _betaCF(a,b,x){const mi=120,eps=3e-9,fp=1e-30;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<fp)d=fp;d=1/d;let h=d;for(let m=1;m<=mi;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<fp)d=fp;c=1+aa/c;if(Math.abs(c)<fp)c=fp;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<fp)d=fp;c=1+aa/c;if(Math.abs(c)<fp)c=fp;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<eps)break;}return h;}
+  _regBeta(x,a,b){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(this._logGamma(a+b)-this._logGamma(a)-this._logGamma(b)+a*Math.log(x)+b*Math.log(1-x));if(x<(a+1)/(a+b+2))return bt*this._betaCF(a,b,x)/a;return 1-bt*this._betaCF(b,a,1-x)/b;}
+  _fSurv(f,d1,d2){if(!Number.isFinite(f)||f<0||d1<=0||d2<=0)return NaN;const x=d1*f/(d1*f+d2);return Math.max(0,Math.min(1,1-this._regBeta(x,d1/2,d2/2)));}
+  _hotelling(A,B){
+    const P=2;if(A.n<=P||B.n<=P)return{error:'amostra insuficiente'};
+    const cA=this._covFromPop(A),cB=this._covFromPop(B),den=A.n+B.n-2;if(den<=0)return{error:'amostra insuficiente'};
+    const pooled=[[((A.n-1)*cA[0][0]+(B.n-1)*cB[0][0])/den,((A.n-1)*cA[0][1]+(B.n-1)*cB[0][1])/den],[((A.n-1)*cA[1][0]+(B.n-1)*cB[1][0])/den,((A.n-1)*cA[1][1]+(B.n-1)*cB[1][1])/den]];
+    const inv=this._inv2(pooled);if(!inv)return{error:'matriz singular'};
+    const diff=[A.rhMean-B.rhMean,A.xcHMean-B.xcHMean];
+    const d2=this._quad(diff,inv);
+    const t2=A.n*B.n/(A.n+B.n)*d2;
+    const df1=P,df2=A.n+B.n-P-1;
+    const fv=df2/(P*(A.n+B.n-2))*t2;
+    return{d2,d:Math.sqrt(Math.max(0,d2)),t2,fValue:fv,df1,df2,pValue:this._fSurv(fv,df1,df2),nA:A.n,nB:B.n};
+  }
+  _hotellingPaired(delta){
+    const P=2,n=delta.n;
+    if(!(n>P&&delta.rhSd>0&&delta.xcHSd>0&&Math.abs(delta.r)<1)) return{error:'informe DP dos deltas, correlação e N pareado válidos'};
+    const inv=this._inv2(this._covFromPop(delta)); if(!inv)return{error:'matriz singular'};
+    const diff=[delta.rhMean,delta.xcHMean];
+    const d2=this._quad(diff,inv),t2=n*d2,df1=P,df2=n-P;
+    const fv=df2/(P*(n-1))*t2;
+    return{d2,d:Math.sqrt(Math.max(0,d2)),t2,fValue:fv,df1,df2,pValue:this._fSurv(fv,df1,df2),nA:n,nB:n,paired:true};
+  }
+
+  // ---------- helpers ----------
+  _fmt(x,d){ if(!Number.isFinite(x))return '—'; return x.toFixed(d==null?1:d); }
+  _refColor(key){ const i=this.state.refKeys.indexOf(key); return i<0?null:this.REF_COLORS[i%this.REF_COLORS.length]; }
+  _byKey(key){ return this.state.pops.find((p)=>p.key===key) || this.state.customRefs.find((p)=>p.key===key); }
+  _hexA(hex,a){ const h=hex.replace('#','');const r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);return 'rgba('+r+','+g+','+b+','+a+')'; }
+  _isZMode(){ return this.state.tolMode==='zscore' && (this.state.method==='tolerance'||this.state.method==='combined') && !!this._byKey(this.state.activeKey); }
+  _displayStats(p){
+    const base=this._isZMode()?this._byKey(this.state.activeKey):null;
+    if(!base) return{...p};
+    return{...p,rhMean:(p.rhMean-base.rhMean)/base.rhSd,xcHMean:(p.xcHMean-base.xcHMean)/base.xcHSd,rhSd:p.rhSd/base.rhSd,xcHSd:p.xcHSd/base.xcHSd};
+  }
+  _displayPoint(pt){
+    const base=this._isZMode()?this._byKey(this.state.activeKey):null;
+    return base?{...pt,x:(pt.x-base.rhMean)/base.rhSd,y:(pt.y-base.xcHMean)/base.xcHSd}:{...pt};
+  }
+
+  _filtered(){
+    const { pops, customRefs, fSex, fType, search } = this.state;
+    const q = search.trim().toLowerCase();
+    return [...customRefs, ...pops].filter((p)=>{
+      if(fSex && p.sex!==fSex) return false;
+      if(fType && p.type!==fType) return false;
+      if(q && !(p.legend.toLowerCase().includes(q) || p.country.toLowerCase().includes(q) || p.equip.toLowerCase().includes(q))) return false;
+      return true;
+    });
+  }
+
+  _thumbPath(p){
+    const w=this.THUMB_WIN, pts=this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd,p.xcHSd,p.r,this.CHI.t95);
+    const mapx=(x)=>6+(x-w.xmin)/(w.xmax-w.xmin)*50;
+    const mapy=(y)=>40-(y-w.ymin)/(w.ymax-w.ymin)*36;
+    let d='';
+    pts.forEach((pt,i)=>{ d+=(i?'L':'M')+mapx(pt.x).toFixed(1)+' '+mapy(pt.y).toFixed(1)+' '; });
+    return d+'Z';
+  }
+
+  // effective ellipse mode for a reference, honoring the technique tab
+  _effMode(key){
+    const m=this.state.method;
+    if(m==='tolerance') return 'tolerance';
+    if(m==='confidence') return 'conf95';
+    return this.state.refModes[key]||'conf95';
+  }
+  // geometry currently on chart
+  _drawnItems(){
+    const delta=this._pairedDeltaData();
+    if(this.state.method==='confidence'&&this.state.comparisonMode==='paired'&&this.state.pairedView==='delta'&&delta) return[{kind:'delta',e:delta}];
+    const items=[];
+    this.state.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p) items.push({kind:'ref',pop:p,color:this._refColor(k),mode:this._effMode(k)}); });
+    this.state.ellipses.forEach((e)=>{ if(e.visible) items.push({kind:'conf',e}); });
+    return items;
+  }
+
+  _computeBounds(){
+    const items=this._drawnItems();
+    const indivs=this._indivPoints();
+    if(!items.length && !indivs.length) return null;
+    let xmin=1e9,xmax=-1e9,ymin=1e9,ymax=-1e9;
+    items.forEach((it)=>{
+      let pts;
+      if(it.kind==='ref'){ const p=this._displayStats(it.pop); if(it.mode==='tolerance') pts=this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd,p.xcHSd,p.r,this.CHI.t95); else { const se=1/Math.sqrt(p.n); pts=this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd*se,p.xcHSd*se,p.r,this.CHI.c95); } }
+      else { const e=this._displayStats(it.e),se=(sd,n)=>sd/Math.sqrt(n); pts=this._ellipsePts(e.rhMean,e.xcHMean,se(e.rhSd,e.n),se(e.xcHSd,e.n),e.r,this.CHI.c95); }
+      pts.forEach((pt)=>{ if(pt.x<xmin)xmin=pt.x;if(pt.x>xmax)xmax=pt.x;if(pt.y<ymin)ymin=pt.y;if(pt.y>ymax)ymax=pt.y; });
+    });
+    indivs.forEach((raw)=>{const indiv=this._displayPoint(raw);if(indiv.x<xmin)xmin=indiv.x;if(indiv.x>xmax)xmax=indiv.x;if(indiv.y<ymin)ymin=indiv.y;if(indiv.y>ymax)ymax=indiv.y;});
+    if(!Number.isFinite(xmin)) return null;
+    const px=(xmax-xmin)*0.18||30, py=(ymax-ymin)*0.18||6;
+    if(this._isZMode()||(this.state.method==='confidence'&&this.state.comparisonMode==='paired'&&this.state.pairedView==='delta')){
+      const ax=Math.max(Math.abs(xmin),Math.abs(xmax),1)+px,ay=Math.max(Math.abs(ymin),Math.abs(ymax),1)+py;
+      return{xmin:-ax,xmax:ax,ymin:-ay,ymax:ay};
+    }
+    if(this.state.showPhase)return{xmin:Math.min(0,xmin-px),xmax:xmax+px,ymin:Math.min(0,ymin-py),ymax:ymax+py};
+    return { xmin:xmin-px, xmax:xmax+px, ymin:Math.max(0,ymin-py), ymax:ymax+py };
+  }
+
+  // resolve effective bounds honoring the axis-window mode
+  _bounds(){
+    const auto=this._computeBounds(); if(!auto) return null;
+    const m=this.state.axisMode, am=this.state.axisManual;
+    if(m==='zero'){ return { xmin:0, xmax:auto.xmax, ymin:0, ymax:auto.ymax }; }
+    if(m==='manual'){
+      const num=(v,fb)=>{ const n=parseFloat(v); return Number.isFinite(n)?n:fb; };
+      let xmin=num(am.xMin,auto.xmin),xmax=num(am.xMax,auto.xmax),ymin=num(am.yMin,auto.ymin),ymax=num(am.yMax,auto.ymax);
+      if(xmax<=xmin)xmax=xmin+1; if(ymax<=ymin)ymax=ymin+1;
+      return { xmin,xmax,ymin,ymax };
+    }
+    return auto;
+  }
+
+  _draw(){
+    const cv=this._canvas; if(!cv) return;
+    const rect=cv.getBoundingClientRect(); if(!rect.width||!rect.height) return;
+    const dpr=window.devicePixelRatio||1;
+    cv.width=rect.width*dpr; cv.height=rect.height*dpr;
+    const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+    const W=rect.width,H=rect.height;
+    ctx.clearRect(0,0,W,H);
+    const items=this._drawnItems();
+    const indivs=this._indivPoints();
+    if(!items.length && !indivs.length && !this.state.annotations.length) return;
+    const b=this._bounds(); if(!b) return;
+    const pad={l:58,r:18,t:16,b:44};
+    const px=(x)=>pad.l+(x-b.xmin)/(b.xmax-b.xmin)*(W-pad.l-pad.r);
+    const py=(y)=>H-pad.b-(y-b.ymin)/(b.ymax-b.ymin)*(H-pad.t-pad.b);
+
+    // gridlines + ticks
+    const nice=(range)=>{const raw=range/5;const mag=Math.pow(10,Math.floor(Math.log10(raw)));const n=raw/mag;let s;if(n<1.5)s=1;else if(n<3)s=2;else if(n<7)s=5;else s=10;return s*mag;};
+    const am=this.state.axisManual, manualAx=this.state.axisMode==='manual';
+    const mstep=(v)=>{ const n=parseFloat(v); return (manualAx && Number.isFinite(n) && n>0)?n:null; };
+    const stepX=mstep(am.xStep)||nice(b.xmax-b.xmin), stepY=mstep(am.yStep)||nice(b.ymax-b.ymin);
+    ctx.font="500 10px 'IBM Plex Mono',monospace"; ctx.fillStyle='#a39e8d'; ctx.strokeStyle='#efece3'; ctx.lineWidth=1;
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    const tick=(v,s)=>{const d=s<1?1:0;return Math.abs(v)<1e-9?'0':v.toFixed(d);};
+    for(let x=Math.ceil(b.xmin/stepX)*stepX; x<=b.xmax; x+=stepX){ const X=px(x); ctx.beginPath();ctx.moveTo(X,pad.t);ctx.lineTo(X,H-pad.b);ctx.stroke(); ctx.fillText(tick(x,stepX),X,H-pad.b+7); }
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    for(let y=Math.ceil(b.ymin/stepY)*stepY; y<=b.ymax; y+=stepY){ const Y=py(y); ctx.beginPath();ctx.moveTo(pad.l,Y);ctx.lineTo(W-pad.r,Y);ctx.stroke(); ctx.fillText(tick(y,stepY),pad.l-8,Y); }
+    // axis frame
+    ctx.strokeStyle='#d8d3c5'; ctx.lineWidth=1.2; ctx.strokeRect(pad.l,pad.t,W-pad.l-pad.r,H-pad.t-pad.b);
+    if(b.xmin<0&&b.xmax>0){ctx.strokeStyle='#9a9686';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(px(0),pad.t);ctx.lineTo(px(0),H-pad.b);ctx.stroke();}
+    if(b.ymin<0&&b.ymax>0){ctx.strokeStyle='#9a9686';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(pad.l,py(0));ctx.lineTo(W-pad.r,py(0));ctx.stroke();}
+    // axis titles
+    ctx.fillStyle='#6f6b5d'; ctx.font="600 11px 'IBM Plex Sans',sans-serif";
+    const deltaView=this.state.method==='confidence'&&this.state.comparisonMode==='paired'&&this.state.pairedView==='delta';
+    const an=this._isZMode()?{x:'Z(R/H)',y:'Z(Xc/H)'}:(deltaView?{x:'ΔR/H',y:'ΔXc/H'}:this.state.axisNames), au=(this._isZMode()||deltaView)?{x:'',y:''}:this.state.axisUnits;
+    const ux=(au.x||'').trim(), uy=(au.y||'').trim();
+    const xTitle=(an.x||'R/H')+(ux?('  ('+ux+')'):''), yTitle=(an.y||'Xc/H')+(uy?('  ('+uy+')'):'');
+    ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.fillText(xTitle,(pad.l+(W-pad.r))/2,H-6);
+    ctx.save(); ctx.translate(13,(pad.t+(H-pad.b))/2); ctx.rotate(-Math.PI/2); ctx.textBaseline='top'; ctx.fillText(yTitle,0,0); ctx.restore();
+
+    // draw ellipses
+    const drawEl=(pts,stroke,fill,lw,dash)=>{
+      ctx.beginPath(); pts.forEach((pt,i)=>{ const X=px(pt.x),Y=py(pt.y); if(i)ctx.lineTo(X,Y);else ctx.moveTo(X,Y); }); ctx.closePath();
+      if(fill){ctx.fillStyle=fill;ctx.fill();}
+      ctx.setLineDash(dash||[]); ctx.strokeStyle=stroke; ctx.lineWidth=lw; ctx.stroke(); ctx.setLineDash([]);
+    };
+    items.forEach((it)=>{
+      if(it.kind==='ref'){
+        const p=this._displayStats(it.pop),col=it.color;
+        if(it.mode==='tolerance'){
+          [['t95',0.06],['t75',0.10],['t50',0.15]].forEach(([lvl,a])=>{
+            drawEl(this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd,p.xcHSd,p.r,this.CHI[lvl]),col,this._hexA(col,a),lvl==='t50'?2:1.4);
+          });
+        } else {
+          const se=1/Math.sqrt(p.n);
+          drawEl(this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd*se,p.xcHSd*se,p.r,this.CHI.c95),col,this._hexA(col,0.10),2);
+        }
+        // center
+        const cx=px(p.rhMean),cy=py(p.xcHMean);
+        ctx.fillStyle=col; ctx.beginPath(); ctx.arc(cx,cy,3.2,0,7); ctx.fill();
+        if(this.state.showPhase&&b.xmin<=0&&b.xmax>=0&&b.ymin<=0&&b.ymax>=0){ const angle=Math.atan2(p.xcHMean,p.rhMean)*180/Math.PI;ctx.strokeStyle=this._hexA(col,0.6); ctx.setLineDash([4,3]); ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(px(0),py(0)); ctx.lineTo(cx,cy); ctx.stroke(); ctx.setLineDash([]);ctx.fillStyle=col;ctx.font="600 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(angle.toFixed(1)+'°',cx+5,cy-4); }
+        ctx.fillStyle=col;ctx.font="600 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText((it.pop.country+' '+it.pop.sex).trim(),cx+6,cy-5);
+      } else {
+        const e=this._displayStats(it.e), se=(sd,n)=>sd/Math.sqrt(n);
+        drawEl(this._ellipsePts(e.rhMean,e.xcHMean,se(e.rhSd,e.n),se(e.xcHSd,e.n),e.r,this.CHI.c95),e.color,this._hexA(e.color,0.10),e.width,e.stroke==='dashed'?[6,4]:[]);
+        const cx=px(e.rhMean),cy=py(e.xcHMean); ctx.fillStyle=e.color; ctx.beginPath(); ctx.arc(cx,cy,3,0,7); ctx.fill();
+        ctx.fillStyle=e.color;ctx.font="600 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(e.name,cx+6,cy-5);
+      }
+    });
+
+    // paired before/after: connect ellipse centers and show direction
+    if(this.state.method==='confidence'&&this.state.comparisonMode==='paired'&&this.state.pairedView==='linked'){
+      const A=this._resolveCmp(this.state.cmpA),B=this._resolveCmp(this.state.cmpB);
+      if(A&&B){const x1=px(A.rhMean),y1=py(A.xcHMean),x2=px(B.rhMean),y2=py(B.xcHMean),ang=Math.atan2(y2-y1,x2-x1);ctx.strokeStyle='#1b1e26';ctx.lineWidth=1.8;ctx.setLineDash([6,3]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#1b1e26';ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-9*Math.cos(ang-.45),y2-9*Math.sin(ang-.45));ctx.lineTo(x2-9*Math.cos(ang+.45),y2-9*Math.sin(ang+.45));ctx.closePath();ctx.fill();}
+    }
+
+    // longitudinal tolerance trajectories
+    const groups={};indivs.forEach((m)=>{(groups[m.participant]||(groups[m.participant]=[])).push(m);});
+    Object.values(groups).forEach((list)=>{if(list.length<2)return;ctx.strokeStyle=this._hexA(list[0].color,0.65);ctx.lineWidth=1.6;ctx.beginPath();list.forEach((raw,i)=>{const p=this._displayPoint(raw),X=px(p.x),Y=py(p.y);if(i)ctx.lineTo(X,Y);else ctx.moveTo(X,Y);});ctx.stroke();});
+    const drawSymbol=(X,Y,m)=>{ctx.save();ctx.fillStyle='#fff';ctx.strokeStyle=m.color;ctx.lineWidth=2.2;ctx.beginPath();if(m.symbol==='square')ctx.rect(X-5,Y-5,10,10);else if(m.symbol==='diamond'){ctx.moveTo(X,Y-7);ctx.lineTo(X+7,Y);ctx.lineTo(X,Y+7);ctx.lineTo(X-7,Y);ctx.closePath();}else if(m.symbol==='triangle'){ctx.moveTo(X,Y-7);ctx.lineTo(X+7,Y+6);ctx.lineTo(X-7,Y+6);ctx.closePath();}else ctx.arc(X,Y,6,0,7);ctx.fill();ctx.stroke();ctx.restore();};
+    indivs.forEach((raw)=>{const indiv=this._displayPoint(raw),X=px(indiv.x),Y=py(indiv.y);drawSymbol(X,Y,raw);ctx.fillStyle=raw.color;ctx.font="600 9.5px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(raw.participant+' · '+raw.time,X+8,Y-5);});
+
+    // legend inside the exported figure
+    const legend=[];items.forEach((it)=>{if(it.kind==='ref')legend.push({color:it.color,label:(it.pop.country+' '+it.pop.sex).trim()});else legend.push({color:it.e.color,label:it.e.name});});
+    Object.values(groups).forEach((list)=>{if(list[0])legend.push({color:list[0].color,label:list[0].participant});});
+    if(legend.length){ctx.font="500 10px 'IBM Plex Sans'";const maxW=Math.min(210,Math.max(...legend.map((l)=>ctx.measureText(l.label).width))+38),boxH=legend.length*17+14,bx=W-pad.r-maxW-8,by=pad.t+8;ctx.fillStyle='rgba(255,255,255,.92)';ctx.strokeStyle='#d8d3c5';ctx.lineWidth=1;ctx.fillRect(bx,by,maxW,boxH);ctx.strokeRect(bx,by,maxW,boxH);legend.forEach((l,i)=>{const yy=by+12+i*17;ctx.strokeStyle=l.color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx+9,yy);ctx.lineTo(bx+24,yy);ctx.stroke();ctx.fillStyle='#3a3d46';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(l.label,bx+29,yy,maxW-36);});}
+
+    // user text boxes, also included in PNG export
+    this._annotationBoxes=[];
+    this.state.annotations.forEach((a)=>{const size=Math.max(8,Math.min(48,+a.size||16)),lines=String(a.text||'').split(/\n/),x=W*(+a.x||0)/100,y=H*(+a.y||0)/100;ctx.font="600 "+size+"px '"+a.font+"',sans-serif";const tw=Math.max(...lines.map((line)=>ctx.measureText(line).width),20),lh=size*1.25,bw=tw+16,bh=lines.length*lh+12;ctx.fillStyle='rgba(255,255,255,.9)';ctx.strokeStyle=this._hexA(a.color,0.35);ctx.lineWidth=1;ctx.fillRect(x,y,bw,bh);ctx.strokeRect(x,y,bw,bh);ctx.fillStyle=a.color;ctx.textAlign='left';ctx.textBaseline='top';lines.forEach((line,i)=>ctx.fillText(line,x+8,y+6+i*lh));this._annotationBoxes.push({id:a.id,x,y,w:bw,h:bh});});
+  }
+
+  _indivPoints(){ return this.state.measurements.map((m)=>({...m,x:m.rh,y:m.xc})); }
+  _indivPoint(){ const pts=this._indivPoints();return pts.length?this._displayPoint(pts[pts.length-1]):null; }
+  _latestMeasurement(){const a=this.state.measurements;return a.length?a[a.length-1]:null;}
+  // classify individual against active population's tolerance ellipses
+  _classifyIndiv(){
+    const pt=this._latestMeasurement(); if(!pt) return null;
+    const p=this._byKey(this.state.activeKey); if(!p) return {noPop:true};
+    const inv=this._inv2(this._covFromPop(p)); if(!inv) return {noPop:true};
+    const d2=this._quad([pt.rh-p.rhMean,pt.xc-p.xcHMean],inv);
+    let level; if(d2<=this.CHI.t50) level='in50'; else if(d2<=this.CHI.t75) level='in75'; else if(d2<=this.CHI.t95) level='in95'; else level='out';
+    return {level,d2,d:Math.sqrt(Math.max(0,d2)),pop:p};
+  }
+
+  // ---------- handlers ----------
+  _setF(patch){ this.setState(patch); }
+  _defaultMode(){ return this.state.method==='tolerance' ? 'tolerance' : 'conf95'; }
+  _enterMethod(m){
+    this.setState({ screen:'app', method:m, refKeys:[], refModes:{}, activeKey:null, ellipses:[], editingId:null, editDraft:null, editError:false, cmpA:'', cmpB:'', comparisonMode:'independent', pairedView:'linked', paired:{sdRh:'',sdXc:'',r:'',n:''}, indiv:{participant:'P1',time:'T1',rh:'',xc:'',color:'#e0662a',symbol:'circle'}, indivShown:false, measurements:[], tolMode:'classic', bounds:null, showNew:false, showAxisWin:false, showText:false, showAddRef:false, annotations:[], axisMode:'auto', axisNames:{x:'R/H',y:'Xc/H'}, axisUnits:{x:'Ω/m',y:'Ω/m'} });
+  }
+  _migrateToCombined(){
+    // preserve current selections; freeze each ref's current effective mode
+    const refModes={...this.state.refModes};
+    this.state.refKeys.forEach((k)=>{ refModes[k]=this._effMode(k); });
+    this.setState({ method:'combined', refModes });
+  }
+  _goHome(){ this.setState({ screen:'home' }); }
+  _setLang(l){ this.setState({ lang:l }); }
+  _toggleRef(key){
+    const s=this.state; const has=s.refKeys.includes(key);
+    const refKeys=has?s.refKeys.filter((k)=>k!==key):[...s.refKeys,key];
+    const refModes={...s.refModes};
+    if(!has && !refModes[key]) refModes[key]='conf95';
+    this.setState({refKeys, refModes, activeKey:has?(refKeys[refKeys.length-1]||null):key, bounds:null});
+  }
+  _setAxisMode(m){ this.setState({axisMode:m}); }
+  _setAxisManual(field,v){ this.setState({axisManual:{...this.state.axisManual,[field]:v}}); }
+  _setAxisName(axis,v){ this.setState({axisNames:{...this.state.axisNames,[axis]:v}}); }
+  _setAxisUnit(axis,v){ this.setState({axisUnits:{...this.state.axisUnits,[axis]:v}}); }
+  _setIndiv(field,v){ this.setState({indiv:{...this.state.indiv,[field]:v}}); }
+  _plotIndiv(){
+    const v=this.state.indiv,rh=+v.rh,xc=+v.xc,participant=String(v.participant||'').trim(),time=String(v.time||'').trim();
+    if(!participant||!time||!Number.isFinite(rh)||!Number.isFinite(xc))return;
+    const previous=this.state.measurements.find((m)=>m.participant===participant);
+    const m={id:'m'+Date.now(),participant,time,rh,xc,color:previous?previous.color:v.color,symbol:previous?previous.symbol:v.symbol,order:this.state.measurements.length};
+    this.setState({measurements:[...this.state.measurements,m],indiv:{...v,time:this._nextTime(time),rh:'',xc:'',color:m.color,symbol:m.symbol},indivShown:true,bounds:null});
+  }
+  _nextTime(time){const m=String(time).match(/^(.*?)(\d+)$/);return m?(m[1]+(+m[2]+1)):time;}
+  _removeMeasurement(id){const measurements=this.state.measurements.filter((m)=>m.id!==id);this.setState({measurements,indivShown:!!measurements.length,bounds:null});}
+  _clearIndiv(){ this.setState({indiv:{...this.state.indiv,rh:'',xc:''}, measurements:[],indivShown:false,bounds:null}); }
+  _setTolMode(mode){this.setState({tolMode:mode,axisMode:'auto',bounds:null});}
+  _setPaired(field,v){this.setState({paired:{...this.state.paired,[field]:v},bounds:null});}
+  _setComparisonMode(mode){this.setState({comparisonMode:mode,cmpA:'',cmpB:'',bounds:null});}
+  _setAnnotation(field,v){this.setState({annotationDraft:{...this.state.annotationDraft,[field]:v}});}
+  _addAnnotation(){const d=this.state.annotationDraft,text=String(d.text||'').trim();if(!text)return;const a={...d,text,id:'a'+Date.now(),x:Math.max(0,Math.min(95,+d.x||0)),y:Math.max(0,Math.min(95,+d.y||0)),size:Math.max(8,Math.min(48,+d.size||16))};this.setState({annotations:[...this.state.annotations,a],annotationDraft:{...d,text:'',y:String(Math.min(90,+d.y+10))}});}
+  _removeAnnotation(id){this.setState({annotations:this.state.annotations.filter((a)=>a.id!==id)});}
+  _annotationPointer(ev){const e=ev.nativeEvent||ev,r=this._canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top,w:r.width,h:r.height};}
+  _startAnnotationDrag(ev){const p=this._annotationPointer(ev),hit=(this._annotationBoxes||[]).slice().reverse().find((b)=>p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h);if(hit){ev.preventDefault&&ev.preventDefault();this._dragAnnotation={id:hit.id,dx:p.x-hit.x,dy:p.y-hit.y};if(ev.currentTarget){ev.currentTarget.style.cursor='grabbing';ev.currentTarget.setPointerCapture&&ev.currentTarget.setPointerCapture(ev.pointerId);}}}
+  _moveAnnotationDrag(ev){if(!this._dragAnnotation)return;ev.preventDefault&&ev.preventDefault();const p=this._annotationPointer(ev),d=this._dragAnnotation,box=(this._annotationBoxes||[]).find((b)=>b.id===d.id),maxX=Math.max(0,p.w-(box?box.w:0)),maxY=Math.max(0,p.h-(box?box.h:0)),x=Math.max(0,Math.min(maxX,(p.x-d.dx)))/p.w*100,y=Math.max(0,Math.min(maxY,(p.y-d.dy)))/p.h*100;this.setState({annotations:this.state.annotations.map((a)=>a.id===d.id?{...a,x,y}:a)});}
+  _endAnnotationDrag(ev){if(ev&&ev.currentTarget)ev.currentTarget.style.cursor='grab';this._dragAnnotation=null;}
+  _setNewRef(field,v){ this.setState({newRef:{...this.state.newRef,[field]:v}}); }
+  _addRef(){
+    const v=this.state.newRef;
+    const rec={ n:+v.n, r_h_mean:+v.rhMean, r_h_sd:+v.rhSd, xc_h_mean:+v.xcHMean, xc_h_sd:+v.xcHSd, correlation:+v.r,
+      legend:(v.name||'Referência').trim()+(v.country?(' '+v.country):''), sex:v.sex, source:'custom' };
+    const idx=this.state.pops.length+this.state.customRefs.length;
+    const norm=this._normalize(rec, idx);
+    norm.key='custom:'+Date.now(); norm.custom=true;
+    if(v.type) norm.type=v.type;
+    if(!this._keep(norm)) return;
+    this.setState({ customRefs:[...this.state.customRefs, norm], showAddRef:false,
+      newRef:{ name:'', sex:'M', type:'Healthy', country:'', n:'', rhMean:'', rhSd:'', xcHMean:'', xcHSd:'', r:'' } });
+  }
+  _setRefMode(key,mode){ this.setState({refModes:{...this.state.refModes,[key]:mode}, bounds:null}); }
+  _newVal(field,v){ this.setState({newVals:{...this.state.newVals,[field]:v}}); }
+  _addEllipse(){
+    const s=this.state; let src;
+    if(s.newSource==='active'){ const p=this._byKey(s.activeKey); if(!p) return; src={rhMean:p.rhMean,rhSd:p.rhSd,xcHMean:p.xcHMean,xcHSd:p.xcHSd,r:p.r,n:p.n}; }
+    else { const v=s.newVals; src={rhMean:+v.rhMean,rhSd:+v.rhSd,xcHMean:+v.xcHMean,xcHSd:+v.xcHSd,r:Math.max(-0.999,Math.min(0.999,+v.r||0)),n:+v.n}; if(!(src.rhSd>0&&src.xcHSd>0&&src.n>2&&Number.isFinite(src.rhMean)&&Number.isFinite(src.xcHMean))) return; }
+    const id='e'+Date.now();
+    const color=this.CONF_COLORS[s.ellipses.length%this.CONF_COLORS.length];
+    const name=s.newName.trim()||('Elipse '+(s.ellipses.length+1));
+    const e={id,name,color,stroke:'solid',width:2,visible:true,...src};
+    this.setState({ellipses:[...s.ellipses,e],showNew:false,newName:'',newVals:{rhMean:'',rhSd:'',xcHMean:'',xcHSd:'',r:'',n:''},bounds:null});
+  }
+  _updEllipse(id,patch){ this.setState({ellipses:this.state.ellipses.map((e)=>e.id===id?{...e,...patch}:e), bounds:patch.visible!==undefined?null:this.state.bounds}); }
+  _startEditEllipse(e){
+    if(this.state.editingId===e.id){ this.setState({editingId:null,editDraft:null,editError:false}); return; }
+    this.setState({editingId:e.id,editError:false,editDraft:{name:e.name,rhMean:String(e.rhMean),rhSd:String(e.rhSd),xcHMean:String(e.xcHMean),xcHSd:String(e.xcHSd),r:String(e.r),n:String(e.n)}});
+  }
+  _setEditEllipse(field,value){ this.setState({editDraft:{...(this.state.editDraft||{}),[field]:value},editError:false}); }
+  _saveEditEllipse(id){
+    const d=this.state.editDraft||{};
+    const patch={name:String(d.name||'').trim(),rhMean:+d.rhMean,rhSd:+d.rhSd,xcHMean:+d.xcHMean,xcHSd:+d.xcHSd,r:+d.r,n:+d.n};
+    const valid=patch.name&&Number.isFinite(patch.rhMean)&&Number.isFinite(patch.xcHMean)&&patch.rhSd>0&&patch.xcHSd>0&&patch.n>2&&Number.isFinite(patch.r)&&Math.abs(patch.r)<1;
+    if(!valid){ this.setState({editError:true}); return; }
+    this.setState({ellipses:this.state.ellipses.map((e)=>e.id===id?{...e,...patch}:e),editingId:null,editDraft:null,editError:false,bounds:null});
+  }
+  _removeEllipse(id){ this.setState({ellipses:this.state.ellipses.filter((e)=>e.id!==id), editingId:this.state.editingId===id?null:this.state.editingId, editDraft:this.state.editingId===id?null:this.state.editDraft, editError:false, bounds:null}); }
+
+  _resolveCmp(val){
+    if(!val) return null;
+    if(val.indexOf('pop:')===0){ const p=this._byKey(val.slice(4)); return p?{...p,_label:'Pop '+p.code}:null; }
+    if(val.indexOf('ell:')===0){ const e=this.state.ellipses.find((x)=>x.id===val.slice(4)); return e?{rhMean:e.rhMean,rhSd:e.rhSd,xcHMean:e.xcHMean,xcHSd:e.xcHSd,r:e.r,n:e.n,_label:e.name}:null; }
+    return null;
+  }
+  _pairedDeltaData(){
+    if(this.state.comparisonMode!=='paired')return null;
+    const A=this._resolveCmp(this.state.cmpA),B=this._resolveCmp(this.state.cmpB),p=this.state.paired;
+    if(!A||!B)return null;
+    const d={name:'Δ '+A._label+' → '+B._label,color:'#0f9d8f',stroke:'solid',width:2.2,visible:true,rhMean:B.rhMean-A.rhMean,xcHMean:B.xcHMean-A.xcHMean,rhSd:+p.sdRh,xcHSd:+p.sdXc,r:+p.r,n:+p.n};
+    return d.rhSd>0&&d.xcHSd>0&&d.n>2&&Number.isFinite(d.r)&&Math.abs(d.r)<1?d:null;
+  }
+
+  _exportPNG(){
+    const cv=this._canvas; if(!cv) return;
+    const tmp=document.createElement('canvas'); tmp.width=cv.width; tmp.height=cv.height;
+    const c=tmp.getContext('2d'); c.fillStyle='#fff'; c.fillRect(0,0,tmp.width,tmp.height); c.drawImage(cv,0,0);
+    const a=document.createElement('a'); a.download='biva-nomograma.png'; a.href=tmp.toDataURL('image/png'); a.click();
+  }
+  _xmlEsc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');}
+  _downloadWorkbook(filename,sheets){
+    const cell=(v,header)=>{const numeric=typeof v==='number'&&Number.isFinite(v);return '<Cell'+(header?' ss:StyleID="Header"':'')+'><Data ss:Type="'+(numeric?'Number':'String')+'">'+this._xmlEsc(numeric?v:String(v==null?'':v))+'</Data></Cell>';};
+    const xml='<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="Header"><Font ss:Bold="1"/><Interior ss:Color="#DCE6F1" ss:Pattern="Solid"/></Style></Styles>'+sheets.map((s)=>'<Worksheet ss:Name="'+this._xmlEsc(s.name.slice(0,31))+'"><Table>'+s.rows.map((r,i)=>'<Row>'+r.map((v)=>cell(v,i===0)).join('')+'</Row>').join('')+'</Table></Worksheet>').join('')+'</Workbook>';
+    const url=URL.createObjectURL(new Blob(['\ufeff'+xml],{type:'application/vnd.ms-excel;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=filename+'.xls';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  _exportExcel(){
+    const entities=[];
+    this.state.refKeys.forEach((k)=>{const p=this._byKey(k);if(p)entities.push({...p,_label:(p.country+' '+p.sex).trim(),_source:'referência selecionada'});});
+    this.state.ellipses.forEach((e)=>entities.push({...e,_label:e.name,_source:'elipse adicionada'}));
+    const ellipseRows=[['Nome','Origem','R/H média','R/H DP','Xc/H média','Xc/H DP','Correlação','N','Cor','Traço','Espessura'],...entities.map((e)=>[e._label,e._source,e.rhMean,e.rhSd,e.xcHMean,e.xcHSd,e.r,e.n,e.color||'',e.stroke||'',e.width||''])];
+    const pairRows=[['Elipse A','Elipse B','N A','N B','D de Mahalanobis','D²','Hotelling T²','F','gl1','gl2','p-valor','Status']];
+    for(let i=0;i<entities.length;i++)for(let j=i+1;j<entities.length;j++){const A=entities[i],B=entities[j],r=this._hotelling(A,B);pairRows.push(r.error?[A._label,B._label,A.n,B.n,'','','','','','','',r.error]:[A._label,B._label,A.n,B.n,r.d,r.d2,r.t2,r.fValue,r.df1,r.df2,r.pValue,r.pValue<0.05?'significativo':'não significativo']);}
+    const sheets=[{name:'Elipses',rows:ellipseRows},{name:'Comparações em pares',rows:pairRows}];
+    const delta=this._pairedDeltaData();
+    if(delta){const r=this._hotellingPaired(delta);sheets.push({name:'Análise pareada',rows:[['T1','T2','Δ R/H','Δ Xc/H','DP ΔR/H','DP ΔXc/H','Correlação Δ','N','D','D²','Hotelling T²','F','gl1','gl2','p-valor'],[this._resolveCmp(this.state.cmpA)._label,this._resolveCmp(this.state.cmpB)._label,delta.rhMean,delta.xcHMean,delta.rhSd,delta.xcHSd,delta.r,delta.n,r.d,r.d2,r.t2,r.fValue,r.df1,r.df2,r.pValue]]});}
+    if(this.state.measurements.length)sheets.push({name:'Longitudinal tolerância',rows:[['Participante','Tempo','R/H','Xc/H','Cor','Símbolo'],...this.state.measurements.map((m)=>[m.participant,m.time,m.rh,m.xc,m.color,m.symbol])]});
+    if(this.state.annotations.length)sheets.push({name:'Anotações',rows:[['Texto','Fonte','Cor','Tamanho','X (%)','Y (%)'],...this.state.annotations.map((a)=>[a.text,a.font,a.color,a.size,a.x,a.y])]});
+    this._downloadWorkbook('BIVA2-estatisticas-'+new Date().toISOString().slice(0,10),sheets);
+  }
+
+  renderVals(){
+    const s=this.state;
+    const t=this._T();
+    const filtered=this._filtered();
+
+    // filter buttons
+    const segBase='flex:1;font:500 11.5px \'IBM Plex Sans\';padding:6px 4px;border-radius:8px;cursor:pointer;transition:.12s;';
+    const seg=(active)=>segBase+(active?'background:#1b1e26;color:#fff;border:1px solid #1b1e26':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5');
+    const sexFilters=[['',t.sexAll],['M',t.sexM],['F',t.sexF]].map(([v,label])=>({label,style:seg(s.fSex===v),onClick:()=>this._setF({fSex:v})}));
+    const chipBase='font:500 11px \'IBM Plex Sans\';padding:5px 11px;border-radius:20px;cursor:pointer;transition:.12s;';
+    const chip=(active)=>chipBase+(active?'background:#2f4fd6;color:#fff;border:1px solid #2f4fd6':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5');
+    const typeFilters=[['',t.tAll],['Healthy',t.tHealthy],['Sport',t.tSport],['Clinical',t.tClinical]].map(([v,label])=>({label,style:chip(s.fType===v),onClick:()=>this._setF({fType:v})}));
+
+    // population cards
+    const typeColor={Sport:'#7b3ff2',Clinical:'#c0248f',Healthy:'#0f9d8f',Other:'#8a8676'};
+    const pops=filtered.map((p)=>{
+      const sel=s.refKeys.includes(p.key);
+      const col=this._refColor(p.key);
+      const active=s.activeKey===p.key;
+      const mode=this._effMode(p.key);
+      const modeBtn=(on)=>'flex:1;font:500 10px \'IBM Plex Sans\';padding:5px 6px;border-radius:6px;cursor:pointer;'+(on?'background:'+(col||'#2f4fd6')+';color:#fff;border:1px solid transparent':'background:#f3f0e8;color:#6f6b5d;border:1px solid #e2ddd0');
+      return {
+        modeRow: (sel && s.method==='combined')?'margin-top:7px;display:flex;gap:5px':'display:none',
+        confStyle:modeBtn(mode==='conf95'), tolStyle:modeBtn(mode==='tolerance'),
+        onConf:(ev)=>{ if(ev)ev.stopPropagation(); this._setRefMode(p.key,'conf95'); },
+        onTol:(ev)=>{ if(ev)ev.stopPropagation(); this._setRefMode(p.key,'tolerance'); },
+        key:p.key, legend:p.legend, country:p.country, sex:p.sex, age:p.age, n:p.n, type:p.type,
+        onToggle:()=>this._toggleRef(p.key),
+        sexLabel:p.sex, sexColor:p.sex==='F'?'#c0248f':(p.sex==='M'?'#2f4fd6':'#8a8676'),
+        subLine:p.equip+' · '+p.age,
+        customTagStyle:p.custom?'font-size:9px;color:#fff;background:#e0662a;padding:1px 6px;border-radius:5px;font-weight:600':'display:none',
+        accent: sel? (col||'#2f4fd6') : 'transparent',
+        thumbPath:this._thumbPath(p),
+        thumbFill: sel? this._hexA(col,0.14) : 'rgba(120,120,120,0.06)',
+        thumbStroke: sel? col : '#b9b3a2',
+        typeChip:'font-size:9.5px;color:#fff;background:'+(typeColor[p.type]||'#8a8676')+';padding:1px 6px;border-radius:5px;font-weight:500',
+        cardStyle:'display:flex;gap:10px;padding:9px;border-radius:12px;cursor:pointer;transition:.12s;align-items:stretch;'
+          +(sel?'background:#fff;border:1.5px solid '+(active?'#1b1e26':(col||'#2f4fd6'))+';box-shadow:0 1px 4px rgba(0,0,0,.05)':'background:#fdfcf9;border:1px solid #e6e1d5'),
+        rhText:this._fmt(p.rhMean,1)+' ±'+this._fmt(p.rhSd,1),
+        xcText:this._fmt(p.xcHMean,1)+' ±'+this._fmt(p.xcHSd,1),
+        statRow: sel?'margin-top:6px;padding-top:6px;border-top:1px dashed #e6e1d5;display:flex;gap:6px;align-items:center;font-size:10.5px;color:#5f5b4d':'display:none',
+      };
+    });
+
+    // legend
+    const legendItems=[];
+    s.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p){ const c=this._refColor(k); const md=this._effMode(k); legendItems.push({color:c,fill:this._hexA(c,0.12),label:p.country+' '+p.sex,kind:md==='tolerance'?t.tolTitleTol:t.tolTitle}); } });
+    s.ellipses.forEach((e)=>{ if(e.visible) legendItems.push({color:e.color,fill:this._hexA(e.color,0.12),label:e.name,kind:t.kindConf}); });
+    [...new Map(s.measurements.map((m)=>[m.participant,m])).values()].forEach((m)=>legendItems.push({color:m.color,fill:this._hexA(m.color,0.12),label:m.participant,kind:'longitudinal'}));
+
+    // ellipse list
+    const ellipses=s.ellipses.map((e)=>{
+      const editing=s.editingId===e.id;
+      const draft=editing?(s.editDraft||{}):{};
+      const editDefs=[['rhMean',t.fRhMean,'0.1'],['rhSd',t.fRhSd,'0.1'],['xcHMean',t.fXcMean,'0.1'],['xcHSd',t.fXcSd,'0.1'],['r',t.fR,'0.01'],['n',t.fN,'1']];
+      return {
+        id:e.id, name:e.name, color:e.color, width:e.width, widthLabel:e.width.toFixed(1),
+        swatchFill:e.visible?this._hexA(e.color,0.25):'transparent',
+        meta:'R/H '+this._fmt(e.rhMean,1)+' · Xc/H '+this._fmt(e.xcHMean,1)+' · N='+e.n,
+        eyeIcon:e.visible?'●':'○',
+        eyeStyle:'font-size:13px;line-height:1;width:26px;height:26px;border-radius:7px;cursor:pointer;flex:none;'+(e.visible?'color:#2f4fd6;background:#eef1fc;border:1px solid #d6def7':'color:#a39e8d;background:#f3f0e8;border:1px solid #e2ddd0'),
+        editBtnStyle:'font-size:12px;line-height:1;width:26px;height:26px;border-radius:7px;cursor:pointer;'+(editing?'color:#fff;background:#e0662a;border:1px solid #e0662a':'color:#6f6b5d;background:#f3f0e8;border:1px solid #e2ddd0'),
+        editStyle:editing?'padding:12px;border-top:1px solid #eee7d9;background:#faf8f2':'display:none',
+        swatches:this.SWATCHES.map((c)=>({style:'width:24px;height:24px;border-radius:7px;cursor:pointer;background:'+c+';border:2px solid '+(e.color===c?'#1b1e26':'transparent'),onClick:()=>this._updEllipse(e.id,{color:c})})),
+        solidStyle:'font:600 11px \'IBM Plex Mono\';padding:4px 10px;border-radius:7px;cursor:pointer;'+(e.stroke==='solid'?'background:#1b1e26;color:#fff;border:1px solid #1b1e26':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5'),
+        dashedStyle:'font:600 11px \'IBM Plex Mono\';padding:4px 10px;border-radius:7px;cursor:pointer;'+(e.stroke==='dashed'?'background:#1b1e26;color:#fff;border:1px solid #1b1e26':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5'),
+        onToggleVisible:()=>this._updEllipse(e.id,{visible:!e.visible}),
+        onEdit:()=>this._startEditEllipse(e),
+        editName:draft.name||'', onEditName:(ev)=>this._setEditEllipse('name',ev.target.value),
+        editFields:editDefs.map(([field,label,step])=>({label,step,value:draft[field]??'',onInput:(ev)=>this._setEditEllipse(field,ev.target.value)})),
+        editErrorStyle:(editing&&s.editError)?'font-size:10.5px;color:#b45309;background:#fdf3e8;border:1px solid #f2ddc2;border-radius:7px;padding:7px 8px;margin-bottom:8px;line-height:1.35':'display:none',
+        onSaveEdit:()=>this._saveEditEllipse(e.id), onCancelEdit:()=>this.setState({editingId:null,editDraft:null,editError:false}),
+        onRemove:()=>this._removeEllipse(e.id),
+        onSolid:()=>this._updEllipse(e.id,{stroke:'solid'}),
+        onDashed:()=>this._updEllipse(e.id,{stroke:'dashed'}),
+        onWidth:(ev)=>this._updEllipse(e.id,{width:+ev.target.value}),
+      };
+    });
+
+    // new-ellipse form
+    const activePop=this._byKey(s.activeKey);
+    const manual=s.newSource==='manual';
+    const fieldDefs=[['rhMean',t.fRhMean,'0.1'],['rhSd',t.fRhSd,'0.1'],['xcHMean',t.fXcMean,'0.1'],['xcHSd',t.fXcSd,'0.1'],['r',t.fR,'0.01'],['n',t.fN,'1']];
+    const newFields=fieldDefs.map(([f,label,step])=>({label,step,value:s.newVals[f],onInput:(ev)=>this._newVal(f,ev.target.value)}));
+    const srcBtn=(active)=>'flex:1;font:500 11.5px \'IBM Plex Sans\';padding:7px;border-radius:8px;cursor:pointer;'+(active?'background:#e0662a;color:#fff;border:1px solid #e0662a':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5');
+
+    // comparison options
+    const cmpOptions=[];
+    if(s.comparisonMode==='independent')s.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p) cmpOptions.push({value:'pop:'+k,label:'◆ '+p.country+' '+p.sex+' (N='+p.n+')'}); });
+    s.ellipses.forEach((e)=>{ cmpOptions.push({value:'ell:'+e.id,label:'● '+e.name+' (N='+e.n+')'}); });
+
+    // comparison result
+    const A=this._resolveCmp(s.cmpA), B=this._resolveCmp(s.cmpB);
+    let showResult=false, badgeText='',badgeIcon='',badgeBg='',badgeColor='',pText='',interpText='',statCells=[],warnText='',warnShow=false;
+    if(A&&B){
+      const delta=this._pairedDeltaData();
+      const res=s.comparisonMode==='paired'?(delta?this._hotellingPaired(delta):{error:'Informe os parâmetros das diferenças pareadas.'}):this._hotelling(A,B);
+      showResult=true;
+      if(res.error){
+        badgeText=t.notCalc; badgeIcon='⚠'; badgeBg='#fdf1e7'; badgeColor='#b45309'; pText='—';
+        interpText=res.error; statCells=[];
+      } else {
+        const sig=res.pValue<0.05;
+        const D=res.d;
+        const mag=D<1?t.small:(D<2?t.moderate:t.large);
+        badgeText=sig?t.sig:t.nsig;
+        badgeIcon=sig?'▲':'✓';
+        badgeBg=sig?'#fdeee7':'#eaf6ef';
+        badgeColor=sig?'#c2410c':'#0f7d55';
+        pText=(res.pValue<0.001?'< 0.001':'= '+res.pValue.toFixed(3));
+        const L=this.state.lang;
+        if(L==='en'){
+          interpText=sig
+            ? 'The mean vectors of '+A._label+' and '+B._label+' differ significantly (p'+pText+'). The separation between the two groups is '+mag+' (Mahalanobis D = '+D.toFixed(2)+'), indicating distinct body composition/hydration.'
+            : 'There is no evidence of a difference between the mean vectors of '+A._label+' and '+B._label+' (p'+pText+'). The two groups are statistically compatible in RXc position; the observed separation ('+mag+', D = '+D.toFixed(2)+') may be due to chance.';
+        } else if(L==='es'){
+          interpText=sig
+            ? 'Los vectores medios de '+A._label+' y '+B._label+' difieren de forma significativa (p'+pText+'). La separación entre los dos grupos es '+mag+' (D de Mahalanobis = '+D.toFixed(2)+'), indicando composición/hidratación corporal distinta.'
+            : 'No hay evidencia de diferencia entre los vectores medios de '+A._label+' y '+B._label+' (p'+pText+'). Los dos grupos son estadísticamente compatibles en posición RXc; la separación observada ('+mag+', D = '+D.toFixed(2)+') puede deberse al azar.';
+        } else {
+          interpText=sig
+            ? 'Os vetores médios de '+A._label+' e '+B._label+' diferem de forma estatisticamente significativa (p'+pText+'). A separação entre os dois grupos é '+mag+' (D de Mahalanobis = '+D.toFixed(2)+'), indicando composição/hidratação corporal distinta.'
+            : 'Não há evidência de diferença entre os vetores médios de '+A._label+' e '+B._label+' (p'+pText+'). Os dois grupos são estatisticamente compatíveis na posição RXc; a separação observada ('+mag+', D = '+D.toFixed(2)+') pode ser devida ao acaso.';
+        }
+        statCells=[
+          {label:'p-value',value:res.pValue<0.001?'<0.001':res.pValue.toFixed(3)},
+          {label:'Mahalanobis D²',value:res.d2.toFixed(2)},
+          {label:'Hotelling T²',value:res.t2.toFixed(1)},
+          {label:'F ('+res.df1+', '+res.df2+')',value:res.fValue.toFixed(1)},
+        ];
+        const minN=s.comparisonMode==='paired'?(+s.paired.n):Math.min(A.n,B.n);if(minN<30){ warnShow=true; warnText='⚠ '+t.warnSmall+minN+t.warnSmall2; }
+      }
+    }
+
+    // ---- home / method cards ----
+    const svgEl=(inner)=>React.createElement('svg',{viewBox:'0 0 40 30',style:{width:'34px',height:'26px'},dangerouslySetInnerHTML:{__html:inner}});
+    const ellSvg='<path d="M20 4 C31 4 37 10 37 15 C37 20 31 26 20 26 C9 26 3 20 3 15 C3 10 9 4 20 4 Z" fill="none" stroke="#fff" stroke-width="1.6" opacity=".9"/><circle cx="20" cy="15" r="2.2" fill="#fff"/>';
+    const tolSvg='<ellipse cx="20" cy="15" rx="17" ry="11" fill="none" stroke="#fff" stroke-width="1.4" opacity=".55"/><ellipse cx="20" cy="15" rx="11.5" ry="7.5" fill="none" stroke="#fff" stroke-width="1.4" opacity=".8"/><ellipse cx="20" cy="15" rx="6" ry="4" fill="none" stroke="#fff" stroke-width="1.6"/>';
+    const combSvg=tolSvg+'<circle cx="30" cy="7" r="2.4" fill="#fff"/>';
+    const methodCards=[
+      {id:'tolerance',accent:'#2f4fd6',tint:'rgba(47,79,214,.18)',icon:svgEl(tolSvg),title:t.mTolTitle,desc:t.mTolDesc,features:t.mTolF,onClick:()=>this._enterMethod('tolerance')},
+      {id:'confidence',accent:'#e0662a',tint:'rgba(224,102,42,.18)',icon:svgEl(ellSvg),title:t.mConfTitle,desc:t.mConfDesc,features:t.mConfF,onClick:()=>this._enterMethod('confidence')},
+      {id:'combined',accent:'#0f9d8f',tint:'rgba(15,157,143,.18)',icon:svgEl(combSvg),title:t.mCombTitle,desc:t.mCombDesc,features:t.mCombF,onClick:()=>this._enterMethod('combined')},
+    ];
+    const methodName = s.method==='tolerance'?t.mTolTitle:(s.method==='confidence'?t.mConfTitle:t.mCombTitle);
+    const showEllipsePanel = s.method==='confidence' || s.method==='combined';
+    const showIndivPanel = s.method==='tolerance' || s.method==='combined';
+
+    // ---- axis window ----
+    const axBtn=(on)=>'flex:1;font:500 11px \'IBM Plex Sans\';padding:7px 6px;border-radius:7px;cursor:pointer;'+(on?'background:#1b1e26;color:#fff;border:1px solid #1b1e26':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5');
+    const axisModes=[['auto',t.axAuto],['zero',t.axZero],['manual',t.axManual]].map(([v,label])=>({label,style:axBtn(s.axisMode===v),onClick:()=>this._setAxisMode(v)}));
+    const am=s.axisManual;
+    const axisManualRows=[
+      {axis:(s.axisNames.x||'R/H'),step:'1',stepv:'1',min:am.xMin,max:am.xMax,stepval:am.xStep,onMin:(e)=>this._setAxisManual('xMin',e.target.value),onMax:(e)=>this._setAxisManual('xMax',e.target.value),onStep:(e)=>this._setAxisManual('xStep',e.target.value)},
+      {axis:(s.axisNames.y||'Xc/H'),step:'0.5',stepv:'0.5',min:am.yMin,max:am.yMax,stepval:am.yStep,onMin:(e)=>this._setAxisManual('yMin',e.target.value),onMax:(e)=>this._setAxisManual('yMax',e.target.value),onStep:(e)=>this._setAxisManual('yStep',e.target.value)},
+    ];
+    const preBtn=(on)=>'font:600 10.5px \'IBM Plex Mono\';padding:4px 9px;border-radius:6px;cursor:pointer;'+(on?'background:#2f4fd6;color:#fff;border:1px solid #2f4fd6':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5');
+    const mkPresets=(setter,axis,list,cur)=>list.map((v)=>({label:v,style:preBtn(cur===v),onClick:()=>setter(axis,v)}));
+    const units=['Ω','Ω/m','Ωm'];
+    const axisNameRows=[
+      {label:t.axisNameX,value:s.axisNames.x,presets:mkPresets((a,v)=>this._setAxisName(a,v),'x',['R','R/H','Rsp'],s.axisNames.x),onInput:(e)=>this._setAxisName('x',e.target.value),
+        unitLbl:t.unitLbl, unitValue:s.axisUnits.x, unitPresets:mkPresets((a,v)=>this._setAxisUnit(a,v),'x',units,s.axisUnits.x), onUnit:(e)=>this._setAxisUnit('x',e.target.value)},
+      {label:t.axisNameY,value:s.axisNames.y,presets:mkPresets((a,v)=>this._setAxisName(a,v),'y',['Xc','Xc/H','Xcsp'],s.axisNames.y),onInput:(e)=>this._setAxisName('y',e.target.value),
+        unitLbl:t.unitLbl, unitValue:s.axisUnits.y, unitPresets:mkPresets((a,v)=>this._setAxisUnit(a,v),'y',units,s.axisUnits.y), onUnit:(e)=>this._setAxisUnit('y',e.target.value)},
+    ];
+
+    const smallModeBtn=(on,accent)=>'font:600 10px \'IBM Plex Sans\';padding:5px 8px;border-radius:7px;cursor:pointer;white-space:nowrap;'+(on?'background:'+accent+';color:#fff;border:1px solid '+accent:'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5');
+    const toleranceModes=[
+      {label:t.tolClassic,style:smallModeBtn(s.tolMode==='classic','#2f4fd6'),onClick:()=>this._setTolMode('classic')},
+      {label:t.tolZ,style:smallModeBtn(s.tolMode==='zscore','#2f4fd6'),onClick:()=>this._setTolMode('zscore')},
+    ];
+    const comparisonModes=[{label:t.independent,style:smallModeBtn(s.comparisonMode==='independent','#0f9d8f'),onClick:()=>this._setComparisonMode('independent')}];
+    if(showEllipsePanel)comparisonModes.push({label:t.paired,style:smallModeBtn(s.comparisonMode==='paired','#0f9d8f'),onClick:()=>this._setComparisonMode('paired')});
+    const pairedViews=[
+      {label:t.pairedLinked,style:smallModeBtn(s.pairedView==='linked','#e0662a'),onClick:()=>this.setState({pairedView:'linked',bounds:null})},
+      {label:t.pairedDelta,style:smallModeBtn(s.pairedView==='delta','#e0662a'),onClick:()=>this.setState({pairedView:'delta',axisMode:'auto',bounds:null})},
+    ];
+    const pairedFields=[['sdRh',t.pairedSdRh,'0.1'],['sdXc',t.pairedSdXc,'0.1'],['r',t.pairedCorr,'0.01'],['n',t.pairedN,'1']].map(([f,label,step])=>({label,step,value:s.paired[f],onInput:(e)=>this._setPaired(f,e.target.value)}));
+    const measurements=s.measurements.map((m)=>({label:m.participant+' · '+m.time,coords:'R/H '+this._fmt(m.rh,1)+' · Xc/H '+this._fmt(m.xc,1),color:m.color,onRemove:()=>this._removeMeasurement(m.id)}));
+    const annotations=s.annotations.map((a)=>({...a,onRemove:()=>this._removeAnnotation(a.id)}));
+    const fontOptions=[{value:'IBM Plex Sans',label:'Plex Sans'},{value:'IBM Plex Mono',label:'Plex Mono'},{value:'Georgia',label:'Georgia'},{value:'Arial',label:'Arial'}];
+    const symbolOptions=[{value:'circle',label:'● Círculo'},{value:'square',label:'■ Quadrado'},{value:'diamond',label:'◆ Losango'},{value:'triangle',label:'▲ Triângulo'}];
+
+    // ---- individual classification ----
+    const cls=this._classifyIndiv();
+    let indivResultStyle='display:none', iBadge='', iBadgeBg='', iBadgeColor='', iBadgeIcon='', iInterp='', iCells=[];
+    const badgeMap={in50:[t.indivBadgeIn50,'#eaf1fd','#1e40af','◉'],in75:[t.indivBadgeIn75,'#eef6ee','#0f7d55','◎'],in95:[t.indivBadgeIn95,'#fdf5e8','#b45309','○'],out:[t.indivBadgeOut,'#fdeee7','#c2410c','▲']};
+    if(cls && !cls.noPop){
+      indivResultStyle='';
+      const bm=badgeMap[cls.level]; iBadge=bm[0]; iBadgeBg=bm[1]; iBadgeColor=bm[2]; iBadgeIcon=bm[3];
+      const L=s.lang, pop=cls.pop.country+' '+cls.pop.sex, dd=cls.d.toFixed(2);
+      const inside=cls.level!=='out';
+      if(L==='en') iInterp=inside?('This individual falls within the '+(cls.level==='in50'?'50%':cls.level==='in75'?'75%':'95%')+' tolerance ellipse of '+pop+' (Mahalanobis D = '+dd+'). Its RXc vector is typical for this reference group.'):('This individual falls OUTSIDE the 95% tolerance ellipse of '+pop+' (Mahalanobis D = '+dd+'), suggesting an atypical body composition/hydration relative to this reference group.');
+      else if(L==='es') iInterp=inside?('Este individuo cae dentro de la elipse de tolerancia del '+(cls.level==='in50'?'50%':cls.level==='in75'?'75%':'95%')+' de '+pop+' (D de Mahalanobis = '+dd+'). Su vector RXc es típico de este grupo de referencia.'):('Este individuo cae FUERA de la elipse de tolerancia del 95% de '+pop+' (D de Mahalanobis = '+dd+'), lo que sugiere una composición/hidratación corporal atípica respecto a este grupo.');
+      else iInterp=inside?('Este indivíduo está dentro da elipse de tolerância de '+(cls.level==='in50'?'50%':cls.level==='in75'?'75%':'95%')+' de '+pop+' (D de Mahalanobis = '+dd+'). O vetor RXc é típico deste grupo de referência.'):('Este indivíduo está FORA da elipse de tolerância de 95% de '+pop+' (D de Mahalanobis = '+dd+'), sugerindo composição/hidratação corporal atípica em relação a este grupo.');
+      iCells=[{label:'Mahalanobis D',value:dd},{label:'D²',value:cls.d2.toFixed(2)}];
+    }
+
+    // ---- add-reference form ----
+    const nr=s.newRef;
+    const refNumDefs=[['n',t.fN,'1'],['rhMean',t.fRhMean,'0.1'],['rhSd',t.fRhSd,'0.1'],['xcHMean',t.fXcMean,'0.1'],['xcHSd',t.fXcSd,'0.1'],['r',t.fR,'0.01']];
+    const refFields=refNumDefs.map(([f,label,step])=>({label,step,value:nr[f],onInput:(e)=>this._setNewRef(f,e.target.value)}));
+    const refSexOpts=[['M',t.sexM],['F',t.sexF]].map(([v,label])=>({label,style:'flex:1;font:500 11px \'IBM Plex Sans\';padding:7px;border-radius:7px;cursor:pointer;'+(nr.sex===v?'background:#e0662a;color:#fff;border:1px solid #e0662a':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5'),onClick:()=>this._setNewRef('sex',v)}));
+    const refTypeOpts=[['Healthy',t.tHealthy],['Sport',t.tSport],['Clinical',t.tClinical]].map(([v,label])=>({label,style:'flex:1;font:500 10.5px \'IBM Plex Sans\';padding:6px;border-radius:7px;cursor:pointer;'+(nr.type===v?'background:#1b1e26;color:#fff;border:1px solid #1b1e26':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5'),onClick:()=>this._setNewRef('type',v)}));
+
+    return {
+      t, lang:s.lang, onLang:(ev)=>this._setLang(ev.target.value),
+      homeStyle: s.screen==='home' ? '' : 'display:none',
+      appStyle: s.screen==='app' ? '' : 'display:none',
+      methodCards, methodName, onHome:()=>this._goHome(),
+      migrateStyle: (s.method==='combined') ? 'display:none' : 'display:flex;align-items:center;gap:6px;font:600 12px \'IBM Plex Sans\';color:#0f9d8f;background:rgba(15,157,143,.14);border:1px solid rgba(15,157,143,.35);padding:6px 12px;border-radius:8px;cursor:pointer',
+      onMigrate:()=>this._migrateToCombined(),
+
+      // add-reference
+      onToggleAddRef:()=>this.setState({showAddRef:!s.showAddRef}),
+      addRefBtnStyle:'font:600 11.5px \'IBM Plex Sans\';padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;'+(s.showAddRef?'background:#f3f0e8;color:#6f6b5d;border:1px solid #d8d3c5':'background:#fff;color:#e0662a;border:1px solid #f0dccd'),
+      addRefFormStyle:s.showAddRef?'margin-top:10px;padding:13px;background:#fbf6f1;border:1px solid #f0dccd;border-radius:12px;animation:popin .18s ease':'display:none',
+      refName:nr.name, onRefName:(e)=>this._setNewRef('name',e.target.value),
+      refCountry:nr.country, onRefCountry:(e)=>this._setNewRef('country',e.target.value),
+      refFields, refSexOpts, refTypeOpts,
+      onRefCancel:()=>this.setState({showAddRef:false}),
+      onRefSave:()=>this._addRef(),
+
+      popTotalLabel:(s.ready?(s.pops.length+s.customRefs.length):'…')+' '+(s.lang==='en'?'populations':(s.lang==='es'?'poblaciones':'populações')),
+      popCountLabel:filtered.length+' / '+((s.pops.length+s.customRefs.length)||'—'),
+      onSearch:(ev)=>this._setF({search:ev.target.value}),
+      sexFilters, typeFilters, pops,
+      emptyStyle:(s.ready&&!filtered.length)?'padding:24px 8px;text-align:center;font-size:12px;color:#a39e8d':'display:none',
+
+      chartRef:(el)=>{ this._canvas=el; if(el) requestAnimationFrame(()=>this._draw()); },
+      chartSub:this._isZMode()?'Z(R/H) × Z(Xc/H)':((s.method==='confidence'&&s.comparisonMode==='paired'&&s.pairedView==='delta')?'ΔR/H × ΔXc/H':t.chartSubBase),
+      chartEmptyStyle:(legendItems.length||this._indivPoint())?'display:none':'position:absolute;inset:0;display:flex;align-items:center;justify-content:center',
+      chartEmptyText: s.method==='tolerance'?t.chartEmptyTol:t.chartEmpty,
+      legendItems,
+      legendEmptyStyle:legendItems.length?'display:none':'font-size:11px;color:#a39e8d;font-style:italic',
+      onExport:()=>this._exportPNG(),
+      onExportExcel:()=>this._exportExcel(),
+      onTogglePhase:()=>this.setState({showPhase:!s.showPhase}),
+      phaseBtnStyle:'font:500 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:pointer;'+(s.showPhase?'background:#1b1e26;color:#fff;border:1px solid #1b1e26':'background:#fff;color:#3a3d46;border:1px solid #d8d3c5'),
+      onChartPointerDown:(e)=>this._startAnnotationDrag(e),onChartPointerMove:(e)=>this._moveAnnotationDrag(e),onChartPointerUp:(e)=>this._endAnnotationDrag(e),
+      onToggleText:()=>this.setState({showText:!s.showText,showAxisWin:false}),
+      textBtnStyle:'font:500 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:pointer;'+(s.showText?'background:#1b1e26;color:#fff;border:1px solid #1b1e26':'background:#fff;color:#3a3d46;border:1px solid #d8d3c5'),
+      textWinStyle:s.showText?'position:absolute;top:44px;right:0;width:330px;background:#fff;border:1px solid #ddd8cc;border-radius:13px;box-shadow:0 14px 40px rgba(0,0,0,.16);z-index:31;animation:winin .16s ease':'display:none',
+      annotationText:s.annotationDraft.text,annotationFont:s.annotationDraft.font,annotationColor:s.annotationDraft.color,annotationSize:s.annotationDraft.size,annotationX:s.annotationDraft.x,annotationY:s.annotationDraft.y,
+      onAnnotationText:(e)=>this._setAnnotation('text',e.target.value),onAnnotationFont:(e)=>this._setAnnotation('font',e.target.value),onAnnotationColor:(e)=>this._setAnnotation('color',e.target.value),onAnnotationSize:(e)=>this._setAnnotation('size',e.target.value),onAnnotationX:(e)=>this._setAnnotation('x',e.target.value),onAnnotationY:(e)=>this._setAnnotation('y',e.target.value),onAddAnnotation:()=>this._addAnnotation(),annotations,fontOptions,
+
+      // axis window
+      onToggleAxis:()=>this.setState({showAxisWin:!s.showAxisWin,showText:false}),
+      axisBtnStyle:'font:500 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:pointer;'+(s.showAxisWin?'background:#1b1e26;color:#fff;border:1px solid #1b1e26':'background:#fff;color:#3a3d46;border:1px solid #d8d3c5'),
+      axisWinStyle:s.showAxisWin?'position:absolute;top:44px;right:0;width:320px;background:#fff;border:1px solid #ddd8cc;border-radius:13px;box-shadow:0 14px 40px rgba(0,0,0,.16);z-index:30;animation:winin .16s ease':'display:none',
+      axisModes,
+      axisManualStyle:s.axisMode==='manual'?'':'display:none',
+      axisManualRows, axisNameRows,
+
+      // ellipse manager
+      ellipsePanelStyle: showEllipsePanel ? '' : 'display:none',
+      newBtnStyle:'font:600 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:pointer;'+(s.showNew?'background:#f3f0e8;color:#6f6b5d;border:1px solid #d8d3c5':'background:#e0662a;color:#fff;border:1px solid #e0662a'),
+      newBtnLabel:s.showNew?t.newClose:t.newAdd,
+      newFormStyle:s.showNew?'padding:13px;background:#fbf6f1;border:1px solid #f0dccd;border-radius:12px;animation:popin .18s ease':'display:none',
+      onNewToggle:()=>this.setState({showNew:!s.showNew}),
+      onNewSourceActive:()=>this.setState({newSource:'active'}),
+      onNewSourceManual:()=>this.setState({newSource:'manual'}),
+      srcActiveStyle:srcBtn(!manual), srcManualStyle:srcBtn(manual),
+      newName:s.newName, onNewName:(ev)=>this.setState({newName:ev.target.value}),
+      newFields,
+      manualGridStyle:manual?'display:grid;grid-template-columns:1fr 1fr;gap:8px':'display:none',
+      activeSrcNoteStyle:!manual?'font-size:11px;color:#8a6a4f;background:#fbeadd;border:1px solid #f2d3bd;border-radius:8px;padding:8px 10px':'display:none',
+      activeSrcNote:activePop?((s.lang==='en'?'Source: ':(s.lang==='es'?'Origen: ':'Origem: '))+activePop.country+' '+activePop.sex+' — R/H '+this._fmt(activePop.rhMean,1)+', Xc/H '+this._fmt(activePop.xcHMean,1)+', N='+activePop.n):t.activeNoneNote,
+      onAddEllipse:()=>this._addEllipse(),
+      ellipses,
+      ellipseEmptyStyle:s.ellipses.length?'display:none':'padding:16px 8px;text-align:center;font-size:11.5px;color:#a39e8d;line-height:1.5',
+
+      // individual (tolerance)
+      indivPanelStyle: showIndivPanel ? '' : 'display:none',
+      toleranceModes,indivRh:s.indiv.rh, indivXc:s.indiv.xc,indivParticipant:s.indiv.participant,indivTime:s.indiv.time,indivColor:s.indiv.color,indivSymbol:s.indiv.symbol,symbolOptions,
+      onIndivRh:(ev)=>this._setIndiv('rh',ev.target.value),
+      onIndivXc:(ev)=>this._setIndiv('xc',ev.target.value),
+      onIndivParticipant:(ev)=>this._setIndiv('participant',ev.target.value),onIndivTime:(ev)=>this._setIndiv('time',ev.target.value),onIndivColor:(ev)=>this._setIndiv('color',ev.target.value),onIndivSymbol:(ev)=>this._setIndiv('symbol',ev.target.value),
+      onPlotIndiv:()=>this._plotIndiv(), onClearIndiv:()=>this._clearIndiv(),
+      indivNoPopStyle:(!activePop && s.indivShown)?'font-size:11px;color:#b45309;background:#fdf3e8;border:1px solid #f2ddc2;border-radius:8px;padding:8px 10px;margin-top:8px':'display:none',
+      indivResultStyle, iBadge, iBadgeBg, iBadgeColor, iBadgeIcon, iInterp, iCells,measurements,measurementListStyle:s.measurements.length?'display:flex;flex-direction:column;gap:6px;margin-top:10px;max-height:180px;overflow:auto':'display:none',
+
+      // comparison
+      cmpOptions, cmpA:s.cmpA, cmpB:s.cmpB,
+      onCmpA:(ev)=>this.setState({cmpA:ev.target.value}),
+      onCmpB:(ev)=>this.setState({cmpB:ev.target.value}),
+      resultWrapStyle:showResult?'':'display:none',
+      badgeText,badgeIcon,badgeBg,badgeColor,pText,interpText,statCells,
+      warnStyle:warnShow?'margin-top:10px;font-size:11px;color:#b45309;background:#fdf3e8;border:1px solid #f2ddc2;border-radius:8px;padding:8px 10px;line-height:1.4':'display:none',
+      warnText,
+      cmpEmptyStyle:showResult?'display:none':'padding:18px 8px;text-align:center;font-size:11.5px;color:#a39e8d',
+      comparisonModes,cmpLabelA:s.comparisonMode==='paired'?t.time1:t.grpA,cmpLabelB:s.comparisonMode==='paired'?t.time2:t.grpB,
+      pairedPanelStyle:s.comparisonMode==='paired'?'padding:10px;background:#fbf6f1;border:1px solid #f0dccd;border-radius:9px;margin-bottom:12px':'display:none',pairedViews,pairedFields,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,46 +1,44 @@
-# aiBIVA - Software de Análise BIVA
+# BIVA2.0 - Software de Análise BIVA
 
 Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace integrada, com suporte a múltiplos métodos e populações de referência.
 
 ## 📋 Conteúdo
 
 - **index.html** - Entrada principal com redirecionamento para a Workspace
-- **aiBIVA-workspace.html** - Workspace integrada para tolerância, confiança e análise mista
+- **BIVA2.html** - Workspace integrada para tolerância, confiança e análise mista
 - **support.js** - Runtime local utilizado pela Workspace avançada
 - **reference_populations_final.json** - Base de dados com 183 populações completas
-- **aibiva-data.js** - Base JSON empacotada para uso direto no navegador
+- **biva2-data.js** - Base JSON empacotada para uso direto no navegador
 
 ## 🚀 Como Usar
 
 1. Extraia os arquivos do ZIP
-2. Abra **index.html** ou **aiBIVA-workspace.html** em um navegador web
+2. Abra **index.html** ou **BIVA2.html** em um navegador web
 3. Escolha o método de análise na Workspace (Tolerância, Confiança ou Mista)
 4. Selecione a população de referência usando os filtros quando estiver em Tolerância ou Mista
-5. Em tolerância, escolha elipse tradicional deslocada ou z-score centrado no zero
-6. Em confiança, adicione elipses manualmente ou importe várias elipses por Excel
-7. Em confiança, escolha Classic ou Specific; no Specific, informe perímetros de braço direito, cintura e panturrilha direita
-8. Marque múltiplas elipses de confiança para comparar elipses inteiras; a tela inicia sem elipse pré-desenhada
-9. Use paired confidence para indicar T1 e T2 nas elipses marcadas
-10. Na tolerância, selecione indivíduos relacionados pelo campo Grupo/Momento para alterar cor e símbolo
-11. Em tolerância, importe participantes em lote por Excel quando necessário
-12. Exporte a elipse em PNG, o gráfico em PNG, CSV ou Excel editável
-13. Salve/abra projetos em JSON para continuar a análise depois
-14. Ajuste manualmente os eixos, se precisar padronizar a escala dos gráficos
-15. Use "Migrar para Mista" para levar tolerance/confidence para a análise mista já carregada
+5. Em tolerância, escolha a elipse tradicional ou a padronização por z-score
+6. Adicione medidas com participante e tempo; medidas do mesmo participante serão conectadas
+7. Em confiança, crie e nomeie duas ou mais elipses por média, DP, correlação e N
+8. Para dados pareados, selecione T1 e T2 e informe os DP, correlação e N dos deltas
+9. Alterne entre a visualização T1/T2 conectada e a elipse dos deltas centrada no zero
+10. Use "Texto" para acrescentar anotações com fonte, cor, tamanho e posição editáveis
+11. Ajuste manualmente os eixos, se precisar padronizar a escala dos gráficos
+12. Exporte a figura completa em PNG ou as elipses e estatísticas em Excel
+13. Use "Migrar para Mista" para levar tolerância/confiança para a análise mista já carregada
 
 ## 🎯 Métodos Disponíveis
 
 ### Tolerância
 - Análise de variabilidade populacional
 - 3 elipses (50%, 75%, 95%)
-- 42 populações de referência
 - Modos tradicional deslocado e z-score centrado no zero
+- Múltiplas medidas por participante, tempos e trajetórias longitudinais
 
 ### Confiança
 - Intervalo de confiança (95%)
 - Erro padrão = DP/√N
-- Entrada manual ou importação em lote de elipses Classic ou Specific
-- Banco de elipses de confiança disponível no painel "Elipses para comparar"
+- Entrada manual, nome, cor, traço e espessura por elipse
+- Comparação independente e Hotelling T² pareado sobre os deltas
 
 ### Mista
 - Combinação de Tolerância + Confiança
@@ -69,42 +67,35 @@ Cada população contém:
 
 ## 📈 Funcionalidades
 
-✅ Entrada de dados individual ou em grupo
-✅ Autosave local e salvar/abrir projeto em JSON
+✅ Entrada de elipses e medidas individuais longitudinais
 ✅ Gráfico RXc com elipses e fallback Canvas local
-✅ Tema claro/escuro em todo o software
+✅ Interface exclusivamente em modo claro
 ✅ Tolerance tradicional deslocada ou centrada em z-score
 ✅ Eixos dos gráficos editáveis manualmente
 ✅ Atalho para abrir análise mista mantendo medições, elipses, estilos e eixos
 ✅ Linha do centro da elipse à origem com cálculo do ângulo de fase
 ✅ Confidence com entrada de elipses por média, DP, correlação e N
-✅ Importação em lote de elipses por Excel/CSV com modelo baixável
-✅ Relatório de importação para linhas inválidas
-✅ Importação em lote de participantes na tolerância com modelo baixável
-✅ Modos Classic e Specific com ajuste por perímetros corporais
 ✅ Estilo editável por elipse: cor, traço e espessura
 ✅ Edição de elipses customizadas já adicionadas
-✅ Filtros avançados (sexo, país, faixa etária, equipamento e população)
 ✅ Cálculos estatísticos (distância de Mahalanobis D² e classificação por elipse)
-✅ Export de gráficos em PNG
+✅ Hotelling T² independente e pareado, F e p-valor
+✅ Elipse de confiança dos deltas com origem centralizada
+✅ Trajetórias longitudinais com participante, tempo, cor e símbolo
+✅ Caixas de texto com fonte, cor, tamanho e posição editáveis
+✅ Nomes e legenda dentro da figura exportada
 ✅ Export PNG com fundo branco consistente
-✅ Export da elipse atual em PNG
-✅ Export de planilha Excel editável com metadados, elipses, medições e comparações pareadas
-✅ Export de dados em CSV
+✅ Excel com abas de elipses, comparações em pares, análise pareada e dados longitudinais
 ✅ Multi-idioma (PT-BR, EN, ES)
-✅ Janela flutuante móvel e fechável sobre o gráfico com p-values dos testes estatísticos
 ✅ Interface responsiva
-✅ Workspace avançada opcional com banco visual, eixos customizáveis e temas claro/escuro
+✅ Workspace única com banco visual e eixos customizáveis
 
 ## 🧪 Análise de Confiança
 
 - **Transversal:** compara duas elipses marcadas usando Hotelling T², F aproximado, p-value e distância de Mahalanobis.
-- **Paired confidence:** permite indicar T1 e T2 nas elipses marcadas para comparação pareada por ID.
-- **Classic/Specific:** Classic usa diretamente R/H e Xc/H; Specific aplica ajuste geométrico com perímetros de braço direito, cintura e panturrilha direita.
-- **Elipses de referência:** permite filtrar e marcar várias elipses de confiança por sexo, faixa etária, país, equipamento e tipo de população, comparando cada par como grupos inteiros.
-- **Importação:** o painel de confiança inclui modelo Excel para importar múltiplas elipses já no formato correto.
-- **Visualização:** a página de confiança começa sem elipse desenhada; as elipses aparecem quando são selecionadas para comparação ou quando a análise exige referência.
-- **Resultados no gráfico:** os p-values dos testes aparecem também em uma janela flutuante, móvel e fechável sobre o gráfico.
+- **Pareada:** aplica Hotelling T² de uma amostra ao vetor médio das diferenças T2-T1 usando a matriz de covariância dos deltas.
+- **Visualização T1/T2:** conecta os centros das duas elipses e indica a direção temporal.
+- **Visualização dos deltas:** desenha o IC 95% do delta e mantém a origem (0,0) no centro do gráfico.
+- **Excel:** calcula automaticamente todas as comparações independentes em pares entre as elipses disponíveis.
 - Para resultados estáveis, cada grupo/momento precisa ter amostra suficiente para estimar a matriz de covariância.
 
 ## 💻 Requisitos
@@ -122,11 +113,12 @@ Cada população contém:
 ## 🔗 Referências
 
 - Piccoli A, Nigrelli S, Caberlotto A, et al. Bivariate normal values of the bioelectrical impedance vector in adult and elderly populations. Am J Clin Nutr 1995;61:269-270.
+- Piccoli A, Pillon L, Dumler F. Impedance vector distribution by sex, race, body mass index, and age in the United States: standard reference intervals as bivariate Z scores. Nutrition. 2002;18(2):153-167.
 - Campa F, Matias C, Gatterer H, et al. Classic Bioelectrical Impedance Vector Reference Values for Assessing Body Composition in Male and Female Athletes. Int J Environ Res Public Health. 2019;16(24):5066.
 - Bioelectrical Impedance Vector Analysis (BIVA) - Metodologia científica estabelecida
 
 ---
 
-**Versão:** 8.2
-**Data:** Maio 2026
-**Desenvolvido com:** HTML5, CSS3, JavaScript, Canvas, Chart.js, Tailwind CSS
+**Versão:** 9.0
+**Data:** Julho 2026
+**Desenvolvido com:** HTML5, CSS3, JavaScript e Canvas

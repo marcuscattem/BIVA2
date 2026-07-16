@@ -1,4 +1,4 @@
-window.AIBIVA_POPULATIONS = [
+window.BIVA2_POPULATIONS = [
   {
     "code": 1,
     "n": 354,
