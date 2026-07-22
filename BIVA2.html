@@ -263,6 +263,7 @@
         </div>
         <div style="display:flex;gap:7px;position:relative">
           <button onClick="{{ onTogglePhase }}" style="{{ phaseBtnStyle }}" style-hover="border-color:var(--border-hover)">{{ t.phase }}</button>
+          <button onClick="{{ onToggleLegend }}" title="{{ t.legendToggleHint }}" style="{{ legendBtnStyle }}" style-hover="border-color:var(--border-hover)">{{ t.legendControl }}</button>
           <button onClick="{{ onToggleText }}" style="{{ textBtnStyle }}" style-hover="border-color:var(--border-hover)">{{ t.textBox }}</button>
           <button onClick="{{ onToggleAxis }}" style="{{ axisBtnStyle }}" style-hover="border-color:var(--border-hover)">{{ t.axes }}</button>
 
@@ -551,10 +552,29 @@
           <div style="{{ indivNoPopStyle }}">{{ t.indivNoPop }}</div>
           <div style="{{ measurementListStyle }}">
             <sc-for list="{{ measurements }}" as="m" hint-placeholder-count="0">
-              <div style="display:flex;align-items:center;gap:7px;padding:7px 8px;background:var(--bg-panel);border:1px solid var(--border-6);border-radius:8px">
-                <span style="width:10px;height:10px;border-radius:2px;background:{{ m.color }}"></span>
-                <div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.label }}</div><div class="mono" style="font-size:9px;color:var(--text-muted)">{{ m.coords }}</div></div>
-                <button onClick="{{ m.onRemove }}" title="{{ t.remove }}" style="border:none;background:none;color:#b9564a;font-size:14px;cursor:pointer">×</button>
+              <div style="background:var(--bg-panel);border:1px solid var(--border-6);border-radius:8px;overflow:hidden">
+                <div style="display:flex;align-items:center;gap:7px;padding:7px 8px">
+                  <span style="width:10px;height:10px;border-radius:2px;background:{{ m.color }}"></span>
+                  <div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.label }}</div><div class="mono" style="font-size:9px;color:var(--text-muted)">{{ m.coords }}</div></div>
+                  <button onClick="{{ m.onEdit }}" title="{{ t.editPoint }}" style="border:1px solid var(--border-2);background:var(--bg-chip2);color:var(--text-6);width:25px;height:25px;border-radius:6px;cursor:pointer">✎</button>
+                  <button onClick="{{ m.onRemove }}" title="{{ t.remove }}" style="border:none;background:none;color:#b9564a;font-size:14px;cursor:pointer">×</button>
+                </div>
+                <div style="{{ m.editStyle }}">
+                  <div style="font-size:10px;color:var(--text-muted);margin-bottom:7px">{{ t.editPointValues }}</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px">
+                    <label style="font-size:9.5px;color:var(--text-muted)">{{ t.participant }}<input type="text" value="{{ m.editParticipant }}" onInput="{{ m.onEditParticipant }}" style="width:100%;font-size:11px;padding:6px;border:1px solid var(--border-2);border-radius:6px;background:var(--bg-panel)"></label>
+                    <label style="font-size:9.5px;color:var(--text-muted)">{{ t.time }}<input type="text" value="{{ m.editTime }}" onInput="{{ m.onEditTime }}" style="width:100%;font-size:11px;padding:6px;border:1px solid var(--border-2);border-radius:6px;background:var(--bg-panel)"></label>
+                    <label style="font-size:9.5px;color:var(--text-muted)">{{ m.axisX }}<input type="number" step="0.1" value="{{ m.editRh }}" onInput="{{ m.onEditRh }}" class="mono" style="width:100%;font-size:11px;padding:6px;border:1px solid var(--border-2);border-radius:6px;background:var(--bg-panel)"></label>
+                    <label style="font-size:9.5px;color:var(--text-muted)">{{ m.axisY }}<input type="number" step="0.1" value="{{ m.editXc }}" onInput="{{ m.onEditXc }}" class="mono" style="width:100%;font-size:11px;padding:6px;border:1px solid var(--border-2);border-radius:6px;background:var(--bg-panel)"></label>
+                    <label style="font-size:9.5px;color:var(--text-muted)">{{ t.colorLbl }}<input type="color" value="{{ m.editColor }}" onInput="{{ m.onEditColor }}" style="width:100%;height:30px;padding:3px;border:1px solid var(--border-2);border-radius:6px;background:var(--bg-panel)"></label>
+                    <label style="font-size:9.5px;color:var(--text-muted)">{{ t.symbol }}<select value="{{ m.editSymbol }}" onChange="{{ m.onEditSymbol }}" style="width:100%;font-size:11px;padding:6px;border:1px solid var(--border-2);border-radius:6px;background:var(--bg-panel)"><sc-for list="{{ m.symbolOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label>
+                  </div>
+                  <div style="{{ m.editErrorStyle }}">{{ t.pointInvalid }}</div>
+                  <div style="display:flex;gap:6px">
+                    <button onClick="{{ m.onCancelEdit }}" style="font:500 10.5px 'IBM Plex Sans';padding:6px 9px;border:1px solid var(--border-2);border-radius:6px;background:var(--bg-panel);color:var(--text-6);cursor:pointer">{{ t.refCancel }}</button>
+                    <button onClick="{{ m.onSaveEdit }}" style="flex:1;font:600 10.5px 'IBM Plex Sans';padding:6px 9px;border:none;border-radius:6px;background:#e0662a;color:#fff;cursor:pointer">{{ t.saveChanges }}</button>
+                  </div>
+                </div>
               </div>
             </sc-for>
           </div>
@@ -678,6 +698,8 @@ class Component extends DCLogic {
     newName: '',
     newVals: { rhMean:'', rhSd:'', xcHMean:'', xcHSd:'', r:'', n:'' },
     showPhase: false,
+    legendVisible: true,
+    legendPos: { x:72, y:4 },
     showText: false,
     annotations: [],
     annotationDraft: { text:'', font:'IBM Plex Sans', color:'#1b1e26', size:'16', x:'12', y:'12' },
@@ -692,6 +714,9 @@ class Component extends DCLogic {
     indiv: { participant:'P1', time:'T1', rh:'', xc:'', color:'#e0662a', symbol:'circle' },
     indivShown: false,
     measurements: [],
+    editingMeasurementId: null,
+    measurementDraft: null,
+    measurementError: false,
     bivaMode: 'classic',          // 'classic' | 'specific'
     importStatus: { scope:'', type:'', text:'' },
     // axis window
@@ -737,7 +762,7 @@ class Component extends DCLogic {
       tAll:'Todas', tHealthy:'Saudável', tSport:'Atletas', tClinical:'Clínica',
       modeConf:'Confiança 95%', modeTol:'Tolerância 50·75·95',
       chartTitle:'Nomograma RXc', chartSubBase:'Resistência/Estatura × Reatância/Estatura (Ω/m)',
-      phase:'Ângulo de fase', axes:'Eixos ▾', textBox:'Texto',
+      phase:'Ângulo de fase', axes:'Eixos ▾', textBox:'Texto', legendControl:'Legenda', legendToggleHint:'Mostrar ou ocultar a legenda móvel',
       textTitle:'Caixas de texto', textPlaceholder:'Digite a anotação para a figura…', textSize:'Tamanho da fonte', textAdd:'Adicionar ao gráfico', textDragHint:'Arraste a caixa de texto diretamente no gráfico para reposicioná-la.', remove:'Remover',
       onChart:'NO GRÁFICO:', legendEmpty:'nada selecionado ainda',
       chartEmpty:'Selecione uma ou mais populações à esquerda. Cada uma entra como elipse de confiança 95% — troque para tolerância no próprio cartão.',
@@ -759,7 +784,7 @@ class Component extends DCLogic {
       activeNoneNote:'Nenhuma população ativa. Clique numa população à esquerda primeiro.',
       ellEmpty:'Nenhuma elipse ainda. Adicione uma da população ativa ou manualmente.',
       colorLbl:'COR', strokeLbl:'TRAÇO', widthLbl:'ESPESSURA',
-      editValues:'VALORES DA ELIPSE', saveChanges:'Salvar alterações', editInvalid:'Revise os valores: DP > 0, N > 2 e correlação entre -1 e 1.',
+      editValues:'VALORES DA ELIPSE', saveChanges:'Salvar alterações', editInvalid:'Revise os valores: DP > 0, N > 2 e correlação entre -1 e 1.', editPoint:'Editar ponto', editPointValues:'VALORES DO PONTO', pointInvalid:'Revise nome, tempo e coordenadas do ponto.',
       indivTitle:'Participantes e tempos', indivHint:'Adicione uma ou mais medidas. Medidas do mesmo participante são conectadas na ordem de inclusão para a análise longitudinal.',
       indivRh:'R/H', indivXc:'Xc/H', indivPlot:'Adicionar medida', indivClear:'Limpar todas', participant:'Participante', time:'Tempo', symbol:'SÍMBOLO',
       tolClassic:'Clássica', tolZ:'Z-score',
@@ -799,7 +824,7 @@ class Component extends DCLogic {
       tAll:'All', tHealthy:'Healthy', tSport:'Athletes', tClinical:'Clinical',
       modeConf:'Confidence 95%', modeTol:'Tolerance 50·75·95',
       chartTitle:'RXc nomogram', chartSubBase:'Resistance/Height × Reactance/Height (Ω/m)',
-      phase:'Phase angle', axes:'Axes ▾', textBox:'Text',
+      phase:'Phase angle', axes:'Axes ▾', textBox:'Text', legendControl:'Legend', legendToggleHint:'Show or hide the movable legend',
       textTitle:'Text boxes', textPlaceholder:'Type an annotation for the figure…', textSize:'Font size', textAdd:'Add to chart', textDragHint:'Drag a text box directly on the chart to reposition it.', remove:'Remove',
       onChart:'ON CHART:', legendEmpty:'nothing selected yet',
       chartEmpty:'Select one or more populations on the left. Each is added as a 95% confidence ellipse — switch to tolerance on its card.',
@@ -821,7 +846,7 @@ class Component extends DCLogic {
       activeNoneNote:'No active population. Click a population on the left first.',
       ellEmpty:'No ellipse yet. Add one from the active population or manually.',
       colorLbl:'COLOR', strokeLbl:'STROKE', widthLbl:'WIDTH',
-      editValues:'ELLIPSE VALUES', saveChanges:'Save changes', editInvalid:'Check the values: SD > 0, N > 2 and correlation between -1 and 1.',
+      editValues:'ELLIPSE VALUES', saveChanges:'Save changes', editInvalid:'Check the values: SD > 0, N > 2 and correlation between -1 and 1.', editPoint:'Edit point', editPointValues:'POINT VALUES', pointInvalid:'Check the point name, time and coordinates.',
       indivTitle:'Participants and times', indivHint:'Add one or more measurements. Measurements from the same participant are connected in entry order for longitudinal analysis.',
       indivRh:'R/H', indivXc:'Xc/H', indivPlot:'Add measurement', indivClear:'Clear all', participant:'Participant', time:'Time', symbol:'SYMBOL',
       tolClassic:'Classic', tolZ:'Z-score',
@@ -861,7 +886,7 @@ class Component extends DCLogic {
       tAll:'Todas', tHealthy:'Sana', tSport:'Atletas', tClinical:'Clínica',
       modeConf:'Confianza 95%', modeTol:'Tolerancia 50·75·95',
       chartTitle:'Nomograma RXc', chartSubBase:'Resistencia/Estatura × Reactancia/Estatura (Ω/m)',
-      phase:'Ángulo de fase', axes:'Ejes ▾', textBox:'Texto',
+      phase:'Ángulo de fase', axes:'Ejes ▾', textBox:'Texto', legendControl:'Leyenda', legendToggleHint:'Mostrar u ocultar la leyenda móvil',
       textTitle:'Cajas de texto', textPlaceholder:'Escribe una anotación para la figura…', textSize:'Tamaño de fuente', textAdd:'Añadir al gráfico', textDragHint:'Arrastra una caja de texto directamente en el gráfico para cambiar su posición.', remove:'Eliminar',
       onChart:'EN EL GRÁFICO:', legendEmpty:'nada seleccionado aún',
       chartEmpty:'Selecciona una o más poblaciones a la izquierda. Cada una entra como elipse de confianza 95% — cambia a tolerancia en su tarjeta.',
@@ -883,7 +908,7 @@ class Component extends DCLogic {
       activeNoneNote:'Ninguna población activa. Haz clic en una población a la izquierda primero.',
       ellEmpty:'Ninguna elipse aún. Añade una desde la población activa o manualmente.',
       colorLbl:'COLOR', strokeLbl:'TRAZO', widthLbl:'GROSOR',
-      editValues:'VALORES DE LA ELIPSE', saveChanges:'Guardar cambios', editInvalid:'Revise los valores: DE > 0, N > 2 y correlación entre -1 y 1.',
+      editValues:'VALORES DE LA ELIPSE', saveChanges:'Guardar cambios', editInvalid:'Revise los valores: DE > 0, N > 2 y correlación entre -1 y 1.', editPoint:'Editar punto', editPointValues:'VALORES DEL PUNTO', pointInvalid:'Revise el nombre, el tiempo y las coordenadas del punto.',
       indivTitle:'Participantes y tiempos', indivHint:'Añade una o más mediciones. Las mediciones del mismo participante se conectan en el orden de entrada para el análisis longitudinal.',
       indivRh:'R/H', indivXc:'Xc/H', indivPlot:'Añadir medición', indivClear:'Limpiar todo', participant:'Participante', time:'Tiempo', symbol:'SÍMBOLO',
       tolClassic:'Clásica', tolZ:'Z-score',
@@ -923,7 +948,7 @@ class Component extends DCLogic {
       tAll:'Tutte', tHealthy:'Sana', tSport:'Atleti', tClinical:'Clinica',
       modeConf:'Confidenza 95%', modeTol:'Tolleranza 50·75·95',
       chartTitle:'Nomogramma RXc', chartSubBase:'Resistenza/Statura × Reattanza/Statura (Ω/m)',
-      phase:'Angolo di fase', axes:'Assi ▾', textBox:'Testo',
+      phase:'Angolo di fase', axes:'Assi ▾', textBox:'Testo', legendControl:'Legenda', legendToggleHint:'Mostra o nascondi la legenda mobile',
       textTitle:'Caselle di testo', textPlaceholder:'Digita un\u2019annotazione per la figura…', textSize:'Dimensione carattere', textAdd:'Aggiungi al grafico', textDragHint:'Trascina una casella di testo direttamente sul grafico per riposizionarla.', remove:'Rimuovi',
       onChart:'SUL GRAFICO:', legendEmpty:'nulla selezionato ancora',
       chartEmpty:'Seleziona una o più popolazioni a sinistra. Ognuna viene aggiunta come ellisse di confidenza 95% — passa alla tolleranza sulla sua scheda.',
@@ -945,7 +970,7 @@ class Component extends DCLogic {
       activeNoneNote:'Nessuna popolazione attiva. Clicca prima su una popolazione a sinistra.',
       ellEmpty:'Ancora nessuna ellisse. Aggiungine una dalla popolazione attiva o manualmente.',
       colorLbl:'COLORE', strokeLbl:'TRATTO', widthLbl:'SPESSORE',
-      editValues:'VALORI DELL\u2019ELLISSE', saveChanges:'Salva modifiche', editInvalid:'Controlla i valori: DS > 0, N > 2 e correlazione tra -1 e 1.',
+      editValues:'VALORI DELL\u2019ELLISSE', saveChanges:'Salva modifiche', editInvalid:'Controlla i valori: DS > 0, N > 2 e correlazione tra -1 e 1.', editPoint:'Modifica punto', editPointValues:'VALORI DEL PUNTO', pointInvalid:'Controlla nome, tempo e coordinate del punto.',
       indivTitle:'Partecipanti e tempi', indivHint:'Aggiungi una o più misurazioni. Le misurazioni dello stesso partecipante vengono collegate nell\u2019ordine di inserimento per l\u2019analisi longitudinale.',
       indivRh:'R/H', indivXc:'Xc/H', indivPlot:'Aggiungi misurazione', indivClear:'Cancella tutto', participant:'Partecipante', time:'Tempo', symbol:'SIMBOLO',
       tolClassic:'Classica', tolZ:'Z-score',
@@ -1159,7 +1184,7 @@ class Component extends DCLogic {
       cross:'#f4f2ec', symbolFill:'#1e222e', legendBg:'rgba(30,34,46,.92)', legendBorder:'#3a3f4d', legendText:'#c8ccd6', annoBg:'rgba(30,34,46,.9)'
     } : {
       grid:'#efece3', tick:'#a39e8d', frame:'#d8d3c5', zero:'#9a9686', axisTitle:'#6f6b5d',
-      cross:'#1b1e26', symbolFill:'#fff', legendBg:'var(--anno-bg)', legendBorder:'#d8d3c5', legendText:'#3a3d46', annoBg:'rgba(255,255,255,.9)'
+      cross:'#1b1e26', symbolFill:'#fff', legendBg:'rgba(255,255,255,.94)', legendBorder:'#d8d3c5', legendText:'#3a3d46', annoBg:'rgba(255,255,255,.9)'
     };
   }
 
@@ -1171,6 +1196,7 @@ class Component extends DCLogic {
     const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
     const W=rect.width,H=rect.height;
     ctx.clearRect(0,0,W,H);
+    this._legendBox=null;
     const items=this._drawnItems();
     const indivs=this._indivPoints();
     if(!items.length && !indivs.length && !this.state.annotations.length) return;
@@ -1246,10 +1272,10 @@ class Component extends DCLogic {
     const drawSymbol=(X,Y,m)=>{ctx.save();ctx.fillStyle=cp.symbolFill;ctx.strokeStyle=m.color;ctx.lineWidth=2.2;ctx.beginPath();if(m.symbol==='square')ctx.rect(X-5,Y-5,10,10);else if(m.symbol==='diamond'){ctx.moveTo(X,Y-7);ctx.lineTo(X+7,Y);ctx.lineTo(X,Y+7);ctx.lineTo(X-7,Y);ctx.closePath();}else if(m.symbol==='triangle'){ctx.moveTo(X,Y-7);ctx.lineTo(X+7,Y+6);ctx.lineTo(X-7,Y+6);ctx.closePath();}else ctx.arc(X,Y,6,0,7);ctx.fill();ctx.stroke();ctx.restore();};
     indivs.forEach((raw)=>{const indiv=this._displayPoint(raw),X=px(indiv.x),Y=py(indiv.y);drawSymbol(X,Y,raw);ctx.fillStyle=raw.color;ctx.font="600 9.5px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(raw.participant+' · '+raw.time,X+8,Y-5);});
 
-    // legend inside the exported figure
+    // movable legend inside the figure and PNG export
     const legend=[];items.forEach((it)=>{if(it.kind==='ref')legend.push({color:it.color,label:(it.pop.country+' '+it.pop.sex).trim()});else legend.push({color:it.e.color,label:it.e.name});});
     Object.values(groups).forEach((list)=>{if(list[0])legend.push({color:list[0].color,label:list[0].participant});});
-    if(legend.length){ctx.font="500 10px 'IBM Plex Sans'";const maxW=Math.min(210,Math.max(...legend.map((l)=>ctx.measureText(l.label).width))+38),boxH=legend.length*17+14,bx=W-pad.r-maxW-8,by=pad.t+8;ctx.fillStyle=cp.legendBg;ctx.strokeStyle=cp.legendBorder;ctx.lineWidth=1;ctx.fillRect(bx,by,maxW,boxH);ctx.strokeRect(bx,by,maxW,boxH);legend.forEach((l,i)=>{const yy=by+12+i*17;ctx.strokeStyle=l.color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx+9,yy);ctx.lineTo(bx+24,yy);ctx.stroke();ctx.fillStyle=cp.legendText;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(l.label,bx+29,yy,maxW-36);});}
+    if(legend.length&&this.state.legendVisible){ctx.font="500 10px 'IBM Plex Sans'";const boxW=Math.min(220,Math.max(...legend.map((l)=>ctx.measureText(l.label).width))+42),boxH=legend.length*17+25,pos=this.state.legendPos||{x:72,y:4},bx=Math.max(0,Math.min(W-boxW,W*(+pos.x||0)/100)),by=Math.max(0,Math.min(H-boxH,H*(+pos.y||0)/100));ctx.fillStyle=cp.legendBg;ctx.strokeStyle=cp.legendBorder;ctx.lineWidth=1;ctx.fillRect(bx,by,boxW,boxH);ctx.strokeRect(bx,by,boxW,boxH);ctx.fillStyle=cp.legendText;ctx.font="600 9px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(this._T().legendControl.toUpperCase(),bx+9,by+10);ctx.font="600 14px 'IBM Plex Sans'";ctx.textAlign='center';ctx.fillText('×',bx+boxW-10,by+10);legend.forEach((l,i)=>{const yy=by+24+i*17;ctx.strokeStyle=l.color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx+9,yy);ctx.lineTo(bx+24,yy);ctx.stroke();ctx.fillStyle=cp.legendText;ctx.font="500 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(l.label,bx+29,yy,boxW-36);});this._legendBox={x:bx,y:by,w:boxW,h:boxH,close:{x:bx+boxW-22,y:by,w:22,h:22}};}
 
     // user text boxes, also included in PNG export
     this._annotationBoxes=[];
@@ -1274,7 +1300,7 @@ class Component extends DCLogic {
   _setF(patch){ this.setState(patch); }
   _defaultMode(){ return this.state.method==='tolerance' ? 'tolerance' : 'conf95'; }
   _enterMethod(m){
-    this.setState({ screen:'app', method:m, refKeys:[], refModes:{}, activeKey:null, ellipses:[], editingId:null, editDraft:null, editError:false, cmpA:'', cmpB:'', comparisonMode:'independent', pairedView:'linked', paired:{sdRh:'',sdXc:'',r:'',n:'',referenceKey:''}, indiv:{participant:'P1',time:'T1',rh:'',xc:'',color:'#e0662a',symbol:'circle'}, indivShown:false, measurements:[], bivaMode:'classic', importStatus:{scope:'',type:'',text:''}, tolMode:'classic', bounds:null, showNew:false, showAxisWin:false, showText:false, showAddRef:false, annotations:[], axisMode:'auto', axisNames:{x:'R/H',y:'Xc/H'}, axisUnits:{x:'Ω/m',y:'Ω/m'} });
+    this.setState({ screen:'app', method:m, refKeys:[], refModes:{}, activeKey:null, ellipses:[], editingId:null, editDraft:null, editError:false, cmpA:'', cmpB:'', comparisonMode:'independent', pairedView:'linked', paired:{sdRh:'',sdXc:'',r:'',n:'',referenceKey:''}, indiv:{participant:'P1',time:'T1',rh:'',xc:'',color:'#e0662a',symbol:'circle'}, indivShown:false, measurements:[], editingMeasurementId:null,measurementDraft:null,measurementError:false,bivaMode:'classic', importStatus:{scope:'',type:'',text:''}, tolMode:'classic', bounds:null, showNew:false, showAxisWin:false, showText:false, showAddRef:false, annotations:[],legendVisible:true,legendPos:{x:72,y:4},axisMode:'auto', axisNames:{x:'R/H',y:'Xc/H'}, axisUnits:{x:'Ω/m',y:'Ω/m'} });
   }
   _migrateToCombined(){
     // preserve current selections; freeze each ref's current effective mode
@@ -1359,9 +1385,12 @@ class Component extends DCLogic {
     const m={id:'m'+Date.now(),participant,time,rh,xc,color:previous?previous.color:v.color,symbol:previous?previous.symbol:v.symbol,order:this.state.measurements.length,metric:this.state.bivaMode};
     this.setState({measurements:[...this.state.measurements,m],indiv:{...v,time:this._nextTime(time),rh:'',xc:'',color:m.color,symbol:m.symbol},indivShown:true,bounds:null});
   }
+  _startEditMeasurement(m){this.setState({editingMeasurementId:m.id,measurementDraft:{participant:m.participant,time:m.time,rh:String(m.rh),xc:String(m.xc),color:m.color,symbol:m.symbol},measurementError:false});}
+  _setMeasurementDraft(field,value){this.setState({measurementDraft:{...this.state.measurementDraft,[field]:value},measurementError:false});}
+  _saveMeasurement(id){const d=this.state.measurementDraft||{},participant=String(d.participant||'').trim(),time=String(d.time||'').trim(),rh=+d.rh,xc=+d.xc,color=this._safeColor(d.color,'#e0662a'),symbol=this._safeSymbol(d.symbol);if(!participant||!time||!Number.isFinite(rh)||!Number.isFinite(xc)){this.setState({measurementError:true});return;}this.setState({measurements:this.state.measurements.map((m)=>m.id===id?{...m,participant,time,rh,xc,color,symbol}:m),editingMeasurementId:null,measurementDraft:null,measurementError:false,bounds:null});}
   _nextTime(time){const m=String(time).match(/^(.*?)(\d+)$/);return m?(m[1]+(+m[2]+1)):time;}
-  _removeMeasurement(id){const measurements=this.state.measurements.filter((m)=>m.id!==id);this.setState({measurements,indivShown:!!measurements.length,bounds:null});}
-  _clearIndiv(){ this.setState({indiv:{...this.state.indiv,rh:'',xc:''}, measurements:[],indivShown:false,bounds:null}); }
+  _removeMeasurement(id){const measurements=this.state.measurements.filter((m)=>m.id!==id);this.setState({measurements,indivShown:!!measurements.length,editingMeasurementId:this.state.editingMeasurementId===id?null:this.state.editingMeasurementId,measurementDraft:this.state.editingMeasurementId===id?null:this.state.measurementDraft,measurementError:false,bounds:null});}
+  _clearIndiv(){ this.setState({indiv:{...this.state.indiv,rh:'',xc:''}, measurements:[],indivShown:false,editingMeasurementId:null,measurementDraft:null,measurementError:false,bounds:null}); }
   _setTolMode(mode){if(mode==='zscore'&&this.state.bivaMode==='specific'){this.setState({importStatus:{scope:'tolerance',type:'error',text:this._T().zSpecificUnavailable}});return;}this.setState({tolMode:mode,axisMode:'auto',bounds:null});}
   _setPaired(field,v){this.setState({paired:{...this.state.paired,[field]:v,referenceKey:''},bounds:null});}
   _setPairedReference(key){
@@ -1373,9 +1402,9 @@ class Component extends DCLogic {
   _addAnnotation(){const d=this.state.annotationDraft,text=String(d.text||'').trim();if(!text)return;const a={...d,text,id:'a'+Date.now(),x:Math.max(0,Math.min(95,+d.x||0)),y:Math.max(0,Math.min(95,+d.y||0)),size:Math.max(8,Math.min(48,+d.size||16))};this.setState({annotations:[...this.state.annotations,a],annotationDraft:{...d,text:'',y:String(Math.min(90,+d.y+10))}});}
   _removeAnnotation(id){this.setState({annotations:this.state.annotations.filter((a)=>a.id!==id)});}
   _annotationPointer(ev){const e=ev.nativeEvent||ev,r=this._canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top,w:r.width,h:r.height};}
-  _startAnnotationDrag(ev){const p=this._annotationPointer(ev),hit=(this._annotationBoxes||[]).slice().reverse().find((b)=>p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h);if(hit){ev.preventDefault&&ev.preventDefault();this._dragAnnotation={id:hit.id,dx:p.x-hit.x,dy:p.y-hit.y};if(ev.currentTarget){ev.currentTarget.style.cursor='grabbing';ev.currentTarget.setPointerCapture&&ev.currentTarget.setPointerCapture(ev.pointerId);}}}
-  _moveAnnotationDrag(ev){if(!this._dragAnnotation)return;ev.preventDefault&&ev.preventDefault();const p=this._annotationPointer(ev),d=this._dragAnnotation,box=(this._annotationBoxes||[]).find((b)=>b.id===d.id),maxX=Math.max(0,p.w-(box?box.w:0)),maxY=Math.max(0,p.h-(box?box.h:0)),x=Math.max(0,Math.min(maxX,(p.x-d.dx)))/p.w*100,y=Math.max(0,Math.min(maxY,(p.y-d.dy)))/p.h*100;this.setState({annotations:this.state.annotations.map((a)=>a.id===d.id?{...a,x,y}:a)});}
-  _endAnnotationDrag(ev){if(ev&&ev.currentTarget)ev.currentTarget.style.cursor='grab';this._dragAnnotation=null;}
+  _startAnnotationDrag(ev){const p=this._annotationPointer(ev),lb=this._legendBox;if(lb&&p.x>=lb.x&&p.x<=lb.x+lb.w&&p.y>=lb.y&&p.y<=lb.y+lb.h){ev.preventDefault&&ev.preventDefault();const c=lb.close;if(c&&p.x>=c.x&&p.x<=c.x+c.w&&p.y>=c.y&&p.y<=c.y+c.h){this.setState({legendVisible:false});return;}this._dragLegend={dx:p.x-lb.x,dy:p.y-lb.y,w:lb.w,h:lb.h};if(ev.currentTarget){ev.currentTarget.style.cursor='grabbing';ev.currentTarget.setPointerCapture&&ev.currentTarget.setPointerCapture(ev.pointerId);}return;}const hit=(this._annotationBoxes||[]).slice().reverse().find((b)=>p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h);if(hit){ev.preventDefault&&ev.preventDefault();this._dragAnnotation={id:hit.id,dx:p.x-hit.x,dy:p.y-hit.y};if(ev.currentTarget){ev.currentTarget.style.cursor='grabbing';ev.currentTarget.setPointerCapture&&ev.currentTarget.setPointerCapture(ev.pointerId);}}}
+  _moveAnnotationDrag(ev){if(this._dragLegend){ev.preventDefault&&ev.preventDefault();const p=this._annotationPointer(ev),d=this._dragLegend,maxX=Math.max(0,p.w-d.w),maxY=Math.max(0,p.h-d.h),x=Math.max(0,Math.min(maxX,p.x-d.dx))/p.w*100,y=Math.max(0,Math.min(maxY,p.y-d.dy))/p.h*100;this.setState({legendPos:{x,y}});return;}if(!this._dragAnnotation)return;ev.preventDefault&&ev.preventDefault();const p=this._annotationPointer(ev),d=this._dragAnnotation,box=(this._annotationBoxes||[]).find((b)=>b.id===d.id),maxX=Math.max(0,p.w-(box?box.w:0)),maxY=Math.max(0,p.h-(box?box.h:0)),x=Math.max(0,Math.min(maxX,(p.x-d.dx)))/p.w*100,y=Math.max(0,Math.min(maxY,(p.y-d.dy)))/p.h*100;this.setState({annotations:this.state.annotations.map((a)=>a.id===d.id?{...a,x,y}:a)});}
+  _endAnnotationDrag(ev){if(ev&&ev.currentTarget)ev.currentTarget.style.cursor='grab';this._dragAnnotation=null;this._dragLegend=null;}
   _setNewRef(field,v){ this.setState({newRef:{...this.state.newRef,[field]:v}}); }
   _addRef(){
     const v=this.state.newRef;
@@ -1649,10 +1678,10 @@ class Component extends DCLogic {
     ];
     const pairedFields=[['sdRh','DP Δ'+axisX,'0.1'],['sdXc','DP Δ'+axisY,'0.1'],['r',t.pairedCorr,'0.01'],['n',t.pairedN,'1']].map(([f,label,step])=>({label,step,value:s.paired[f],onInput:(e)=>this._setPaired(f,e.target.value)}));
     const pairedReferenceOptions=specific?[]:s.pairedRefs.map((p)=>({value:p.key,label:p.legend+' (N='+p.n+')'}));
-    const measurements=currentMeasurements.map((m)=>({label:m.participant+' · '+m.time,coords:axisX+' '+this._fmt(m.rh,1)+' · '+axisY+' '+this._fmt(m.xc,1),color:m.color,onRemove:()=>this._removeMeasurement(m.id)}));
+    const symbolOptions=[{value:'circle',label:'● Círculo'},{value:'square',label:'■ Quadrado'},{value:'diamond',label:'◆ Losango'},{value:'triangle',label:'▲ Triângulo'}];
+    const measurements=currentMeasurements.map((m)=>{const editing=s.editingMeasurementId===m.id,d=editing?(s.measurementDraft||{}):{};return{label:m.participant+' · '+m.time,coords:axisX+' '+this._fmt(m.rh,1)+' · '+axisY+' '+this._fmt(m.xc,1),color:m.color,axisX,axisY,editStyle:editing?'padding:9px;border-top:1px solid var(--border-5);background:var(--bg-drawer)':'display:none',editParticipant:d.participant||'',editTime:d.time||'',editRh:d.rh??'',editXc:d.xc??'',editColor:d.color||m.color,editSymbol:d.symbol||m.symbol,symbolOptions,onEdit:()=>this._startEditMeasurement(m),onEditParticipant:(e)=>this._setMeasurementDraft('participant',e.target.value),onEditTime:(e)=>this._setMeasurementDraft('time',e.target.value),onEditRh:(e)=>this._setMeasurementDraft('rh',e.target.value),onEditXc:(e)=>this._setMeasurementDraft('xc',e.target.value),onEditColor:(e)=>this._setMeasurementDraft('color',e.target.value),onEditSymbol:(e)=>this._setMeasurementDraft('symbol',e.target.value),editErrorStyle:editing&&s.measurementError?'font-size:9.5px;color:#b45309;margin-bottom:7px':'display:none',onCancelEdit:()=>this.setState({editingMeasurementId:null,measurementDraft:null,measurementError:false}),onSaveEdit:()=>this._saveMeasurement(m.id),onRemove:()=>this._removeMeasurement(m.id)};});
     const annotations=s.annotations.map((a)=>({...a,onRemove:()=>this._removeAnnotation(a.id)}));
     const fontOptions=[{value:'IBM Plex Sans',label:'Plex Sans'},{value:'IBM Plex Mono',label:'Plex Mono'},{value:'Georgia',label:'Georgia'},{value:'Arial',label:'Arial'}];
-    const symbolOptions=[{value:'circle',label:'● Círculo'},{value:'square',label:'■ Quadrado'},{value:'diamond',label:'◆ Losango'},{value:'triangle',label:'▲ Triângulo'}];
 
     // ---- individual classification ----
     const cls=this._classifyIndiv();
@@ -1714,6 +1743,8 @@ class Component extends DCLogic {
       onExportExcel:()=>this._exportExcel(),
       onTogglePhase:()=>this.setState({showPhase:!s.showPhase}),
       phaseBtnStyle:'font:500 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:pointer;'+(s.showPhase?'background:var(--strong-bg);color:var(--strong-text);border:1px solid var(--strong-bg)':'background:var(--bg-panel);color:var(--text-2);border:1px solid var(--border-2)'),
+      onToggleLegend:()=>this.setState({legendVisible:!s.legendVisible}),
+      legendBtnStyle:'font:500 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:pointer;'+(s.legendVisible?'background:var(--strong-bg);color:var(--strong-text);border:1px solid var(--strong-bg)':'background:var(--bg-panel);color:var(--text-2);border:1px solid var(--border-2)'),
       onChartPointerDown:(e)=>this._startAnnotationDrag(e),onChartPointerMove:(e)=>this._moveAnnotationDrag(e),onChartPointerUp:(e)=>this._endAnnotationDrag(e),
       onToggleText:()=>this.setState({showText:!s.showText,showAxisWin:false}),
       textBtnStyle:'font:500 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:pointer;'+(s.showText?'background:var(--strong-bg);color:var(--strong-text);border:1px solid var(--strong-bg)':'background:var(--bg-panel);color:var(--text-2);border:1px solid var(--border-2)'),

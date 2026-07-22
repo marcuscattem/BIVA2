@@ -90,6 +90,8 @@ Cada população contém:
 ✅ Hotelling T² independente e pareado, F e p-valor
 ✅ Elipse de confiança dos deltas com origem centralizada
 ✅ Trajetórias longitudinais com participante, tempo, cor e símbolo
+✅ Edição individual de nome, tempo, coordenadas, cor e símbolo dos pontos
+✅ Legenda interna móvel, fechável e reativável pelo botão Legenda
 ✅ Caixas de texto com fonte, cor, tamanho e posição editáveis
 ✅ Nomes e legenda dentro da figura exportada
 ✅ Export PNG com fundo branco consistente
