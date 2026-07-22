@@ -1792,7 +1792,7 @@ class Component extends DCLogic {
       onIndivParticipant:(ev)=>this._setIndiv('participant',ev.target.value),onIndivTime:(ev)=>this._setIndiv('time',ev.target.value),onIndivColor:(ev)=>this._setIndiv('color',ev.target.value),onIndivSymbol:(ev)=>this._setIndiv('symbol',ev.target.value),
       onPlotIndiv:()=>this._plotIndiv(), onClearIndiv:()=>this._clearIndiv(),
       indivNoPopStyle:(!activePop && s.indivShown)?'font-size:11px;color:#b45309;background:var(--bg-warn3);border:1px solid var(--border-warn3);border-radius:8px;padding:8px 10px;margin-top:8px':'display:none',
-      indivResultStyle, iBadge, iBadgeBg, iBadgeColor, iBadgeIcon, iInterp, iCells,measurements,measurementListStyle:currentMeasurements.length?'display:flex;flex-direction:column;gap:6px;margin-top:10px;max-height:180px;overflow:auto':'display:none',
+      indivResultStyle, iBadge, iBadgeBg, iBadgeColor, iBadgeIcon, iInterp, iCells,measurements,measurementListStyle:currentMeasurements.length?('display:flex;flex-direction:column;gap:6px;margin-top:10px;'+(s.editingMeasurementId?'max-height:none;overflow:visible':'max-height:180px;overflow:auto')):'display:none',
 
       // comparison
       cmpOptions, cmpA:s.cmpA, cmpB:s.cmpB,
