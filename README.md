@@ -7,19 +7,22 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 - **index.html** - Entrada principal com redirecionamento para a Workspace
 - **BIVA2.html** - Workspace integrada para tolerância, confiança e análise mista
 - **support.js** - Runtime local utilizado pela Workspace avançada
-- **reference_populations_final.json** - Base de dados com 183 populações completas
+- **reference_populations_final.json** - Base revisada com 166 populações (133 de confiança e 33 de tolerância)
+- **paired_reference_populations.json** - Oito conjuntos de referência para análise pareada
 - **biva2-data.js** - Base JSON empacotada para uso direto no navegador
+- **BIVA2-modelo-importacao.xlsx** - Modelo padronizado para importação em lote
+- **xlsx.full.min.js** - Leitor local de planilhas Excel, sem envio de dados
 
 ## 🚀 Como Usar
 
 1. Extraia os arquivos do ZIP
 2. Abra **index.html** ou **BIVA2.html** em um navegador web
 3. Escolha o método de análise na Workspace (Tolerância, Confiança ou Mista)
-4. Selecione a população de referência usando os filtros quando estiver em Tolerância ou Mista
+4. Selecione a população de referência usando os filtros ou importe o modelo Excel preenchido
 5. Em tolerância, escolha a elipse tradicional ou a padronização por z-score
 6. Adicione medidas com participante e tempo; medidas do mesmo participante serão conectadas
 7. Em confiança, crie e nomeie duas ou mais elipses por média, DP, correlação e N
-8. Para dados pareados, selecione T1 e T2 e informe os DP, correlação e N dos deltas
+8. Para dados pareados, selecione T1 e T2 e informe os deltas ou escolha uma referência pareada publicada
 9. Alterne entre a visualização T1/T2 conectada e a elipse dos deltas centrada no zero
 10. Use "Texto" para acrescentar anotações com fonte, cor, tamanho e posição editáveis
 11. Ajuste manualmente os eixos, se precisar padronizar a escala dos gráficos
@@ -43,7 +46,7 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 ### Mista
 - Combinação de Tolerância + Confiança
 - Visão completa e comparativa
-- 183 populações
+- 166 populações e 8 conjuntos pareados
 
 ## 🌐 Idiomas Suportados
 
@@ -53,9 +56,7 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 
 ## 📊 Populações de Referência
 
-Total de **183 populações completas** após limpeza de registros incompletos, Piccoli solto e elipses de braço digitadas manualmente, com referências atléticas adicionadas de Campa et al. 2019:
-- **BIVAtolerance25042024.xlsm** e artigo Campa 2019 (42 populações)
-- **BIVAconfidenceBonegeometryfemaleathletes.xls** e artigo Campa 2019 (141 populações)
+Total de **166 populações** importadas exclusivamente das abas “Confidence refs” (133) e “Tolerance refs” (33) do arquivo de referência fornecido, além de **8 conjuntos pareados** da aba “Confidence paired data”. A aba auxiliar de coordenadas de desenho não foi tratada como população.
 
 Cada população contém:
 - Código e identificação
@@ -68,6 +69,11 @@ Cada população contém:
 ## 📈 Funcionalidades
 
 ✅ Entrada de elipses e medidas individuais longitudinais
+✅ Importação simultânea de vários participantes e grupos por Excel
+✅ Modelo Excel para download com validação e colunas calculadas
+✅ Cálculo automático de média, DP amostral, correlação de Pearson e N por grupo
+✅ BIVA clássica (R/H, Xc/H) e específica (Rsp, Xcsp)
+✅ Bloqueio da análise quando faltam estatura ou perímetros exigidos
 ✅ Gráfico RXc com elipses e fallback Canvas local
 ✅ Interface exclusivamente em modo claro
 ✅ Tolerance tradicional deslocada ou centrada em z-score

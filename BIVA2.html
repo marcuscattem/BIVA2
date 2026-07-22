@@ -42,6 +42,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="biva2-data.js"></script>
+<script src="xlsx.full.min.js"></script>
 <style>
   html,body{margin:0;padding:0;height:100%}
   body{background:#eceae2;color:#1b1e26;font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
@@ -360,6 +361,23 @@
           <button onClick="{{ onNewToggle }}" style="{{ newBtnStyle }}" style-hover="filter:brightness(1.05)">{{ newBtnLabel }}</button>
         </div>
 
+        <div style="padding:11px;background:#f0f4fb;border:1px solid #d7e2f2;border-radius:10px;margin-bottom:12px">
+          <div style="font-size:11.5px;font-weight:600;color:#173f8a;margin-bottom:4px">{{ t.batchTitle }}</div>
+          <div style="font-size:9.5px;color:#65758b;line-height:1.4;margin-bottom:8px">{{ t.batchHint }}</div>
+          <div style="font-size:9px;color:#65758b;letter-spacing:.3px;margin-bottom:5px">{{ t.modeLabel }}</div>
+          <div style="display:flex;gap:5px;margin-bottom:7px">
+            <sc-for list="{{ bivaModes }}" as="m" hint-placeholder-count="2"><button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button></sc-for>
+          </div>
+          <div style="{{ specificNoteStyle }}">{{ t.specificNote }}</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <a href="BIVA2-modelo-importacao.xlsx" download style="flex:1;text-align:center;font-size:10.5px;font-weight:600;color:#173f8a;background:#fff;border:1px solid #b9cbe4;padding:7px 8px;border-radius:7px;text-decoration:none">{{ t.downloadModel }}</a>
+            <label style="flex:1;text-align:center;font-size:10.5px;font-weight:600;color:#fff;background:#173f8a;border:1px solid #173f8a;padding:7px 8px;border-radius:7px;cursor:pointer">{{ t.importExcel }}
+              <input type="file" accept=".xlsx,.xls,.csv" onChange="{{ onImportConfidence }}" style="display:none">
+            </label>
+          </div>
+          <div style="{{ confidenceImportStatusStyle }}">{{ confidenceImportStatus }}</div>
+        </div>
+
         <!-- guided new form -->
         <div style="{{ newFormStyle }}">
           <div style="font-size:10.5px;color:#8a8676;margin-bottom:10px;line-height:1.4">{{ t.newHint }}</div>
@@ -452,6 +470,22 @@
             </div>
           </div>
           <div style="font-size:10.5px;color:#8a8676;margin-bottom:11px;line-height:1.45">{{ t.indivHint }}</div>
+          <div style="padding:11px;background:#f0f4fb;border:1px solid #d7e2f2;border-radius:10px;margin-bottom:11px">
+            <div style="font-size:11.5px;font-weight:600;color:#173f8a;margin-bottom:4px">{{ t.batchTitle }}</div>
+            <div style="font-size:9.5px;color:#65758b;line-height:1.4;margin-bottom:8px">{{ t.batchHint }}</div>
+            <div style="font-size:9px;color:#65758b;letter-spacing:.3px;margin-bottom:5px">{{ t.modeLabel }}</div>
+            <div style="display:flex;gap:5px;margin-bottom:7px">
+              <sc-for list="{{ bivaModes }}" as="m" hint-placeholder-count="2"><button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button></sc-for>
+            </div>
+            <div style="{{ specificNoteStyle }}">{{ t.specificNote }}</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <a href="BIVA2-modelo-importacao.xlsx" download style="flex:1;text-align:center;font-size:10.5px;font-weight:600;color:#173f8a;background:#fff;border:1px solid #b9cbe4;padding:7px 8px;border-radius:7px;text-decoration:none">{{ t.downloadModel }}</a>
+              <label style="flex:1;text-align:center;font-size:10.5px;font-weight:600;color:#fff;background:#173f8a;border:1px solid #173f8a;padding:7px 8px;border-radius:7px;cursor:pointer">{{ t.importExcel }}
+                <input type="file" accept=".xlsx,.xls,.csv" onChange="{{ onImportTolerance }}" style="display:none">
+              </label>
+            </div>
+            <div style="{{ toleranceImportStatusStyle }}">{{ toleranceImportStatus }}</div>
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
             <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#8a8676">{{ t.participant }}
               <input type="text" value="{{ indivParticipant }}" onInput="{{ onIndivParticipant }}" style="width:100%;font-size:12px;padding:8px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none">
@@ -461,10 +495,10 @@
             </label>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px">
-            <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#8a8676">{{ t.indivRh }}
+            <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#8a8676">{{ indivAxisX }}
               <input type="number" step="0.1" value="{{ indivRh }}" onInput="{{ onIndivRh }}" class="mono" style="width:100%;font-size:12.5px;padding:8px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none" style-focus="border-color:#e0662a">
             </label>
-            <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#8a8676">{{ t.indivXc }}
+            <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#8a8676">{{ indivAxisY }}
               <input type="number" step="0.1" value="{{ indivXc }}" onInput="{{ onIndivXc }}" class="mono" style="width:100%;font-size:12.5px;padding:8px;border:1px solid #d8d3c5;border-radius:7px;background:#fff;outline:none" style-focus="border-color:#e0662a">
             </label>
           </div>
@@ -538,6 +572,12 @@
           </label>
         </div>
         <div style="{{ pairedPanelStyle }}">
+          <label style="font-size:9.5px;color:#8a8676;display:flex;flex-direction:column;gap:4px;margin-bottom:9px">{{ t.pairedReference }}
+            <select value="{{ pairedReferenceKey }}" onChange="{{ onPairedReference }}" style="width:100%;font:400 11.5px 'IBM Plex Sans';padding:7px 9px;border:1px solid #d8d3c5;border-radius:7px;background:#fff">
+              <option value="">{{ t.pairedManual }}</option>
+              <sc-for list="{{ pairedReferenceOptions }}" as="o" hint-placeholder-count="2"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+            </select>
+          </label>
           <div style="display:flex;gap:6px;margin-bottom:9px">
             <sc-for list="{{ pairedViews }}" as="v" hint-placeholder-count="2"><button onClick="{{ v.onClick }}" style="{{ v.style }}">{{ v.label }}</button></sc-for>
           </div>
@@ -589,6 +629,7 @@ class Component extends DCLogic {
     method: 'confidence', // 'tolerance' | 'confidence' | 'combined'
     lang: 'pt-BR',        // 'pt-BR' | 'en' | 'es'
     pops: [],
+    pairedRefs: [],
     fSex: '',
     fType: '',
     search: '',
@@ -611,13 +652,15 @@ class Component extends DCLogic {
     cmpB: '',
     comparisonMode: 'independent', // 'independent' | 'paired'
     pairedView: 'linked',          // 'linked' | 'delta'
-    paired: { sdRh:'', sdXc:'', r:'', n:'' },
+    paired: { sdRh:'', sdXc:'', r:'', n:'', referenceKey:'' },
     bounds: null,
     // individual measurement (tolerance technique)
     tolMode: 'classic',            // 'classic' | 'zscore'
     indiv: { participant:'P1', time:'T1', rh:'', xc:'', color:'#e0662a', symbol:'circle' },
     indivShown: false,
     measurements: [],
+    bivaMode: 'classic',          // 'classic' | 'specific'
+    importStatus: { scope:'', type:'', text:'' },
     // axis window
     showAxisWin: false,
     axisMode: 'auto',     // 'auto' | 'zero' | 'manual'
@@ -641,7 +684,7 @@ class Component extends DCLogic {
       hSub:'ANÁLISE VETORIAL DE BIOIMPEDÂNCIA', hTitle:'Escolha a técnica de análise',
       hDesc:'O BIVA2.0 constrói nomogramas RXc e roda os testes estatísticos. Selecione como você quer trabalhar — dá para trocar depois.',
       open:'Abrir', back:'Voltar ao início',
-      hFoot:'Baseado em 183 populações de referência publicadas. As elipses e testes seguem os métodos clássicos de Piccoli (BIVA).',
+      hFoot:'Baseado em 166 populações de referência e 8 conjuntos pareados revisados. As elipses e testes seguem os métodos de Piccoli (BIVA).',
       mTolTitle:'Tolerância', mTolDesc:'Classifique um indivíduo contra as elipses de tolerância (50·75·95%) de uma população de referência.',
       mConfTitle:'Confiança', mConfDesc:'Compare a posição vetorial média de grupos com elipses de confiança 95% e teste de Hotelling T².',
       mCombTitle:'Mista', mCombDesc:'Tolerância e confiança lado a lado: classifique indivíduos e compare grupos no mesmo gráfico.',
@@ -649,6 +692,12 @@ class Component extends DCLogic {
       mConfF:['Elipse de confiança 95%','Teste de Hotelling T²','Comparação de grupos'],
       mCombF:['Todas as elipses','Indivíduos + grupos','Análise completa'],
       exportPng:'Exportar PNG', exportExcel:'Exportar Excel',
+      batchTitle:'Importação em lote', batchHint:'Baixe o modelo, preencha os participantes e importe várias elipses ou pontos de uma vez.',
+      downloadModel:'Baixar modelo Excel', importExcel:'Importar Excel', modeLabel:'NORMALIZAÇÃO', bivaClassic:'BIVA clássica', bivaSpecific:'BIVA específica',
+      specificNote:'Rsp e Xcsp usam estatura e perímetros de braço direito, cintura e panturrilha direita.',
+      importHMissing:'A importação foi bloqueada: todas as linhas precisam de estatura (H).', importPerimMissing:'A importação foi bloqueada: BIVA específica exige os três perímetros em todas as linhas.',
+      importColumns:'A planilha precisa conter Grupo, R_ohm e Xc_ohm.', importNoGroups:'Nenhum grupo válido foi encontrado. Confiança exige ao menos 3 participantes por grupo.',
+      importReading:'Lendo planilha…', importConfOk:'elipses calculadas e adicionadas.', importTolOk:'pontos calculados e adicionados.', zSpecificUnavailable:'Z-score requer referência clássica R/H e Xc/H; use BIVA clássica.',
       popTitle:'Populações de referência', searchPh:'Buscar por país, sexo, equipamento…',
       noneFound:'Nenhuma população encontrada com esses filtros.',
       sexAll:'Todos', sexM:'Masc', sexF:'Fem',
@@ -686,7 +735,7 @@ class Component extends DCLogic {
       cmpTitle:'Comparação estatística',
       cmpHint:'Compare a posição vetorial de dois grupos (Hotelling T²). Escolha entre populações no gráfico e elipses adicionadas.',
       grpA:'GRUPO A', grpB:'GRUPO B', selectDots:'— selecione —', independent:'Independente', paired:'Pareada', time1:'T1 / Antes', time2:'T2 / Depois',
-      pairedLinked:'T1 e T2 conectados', pairedDelta:'Deltas no zero', pairedHint:'Informe a dispersão das diferenças pareadas. Esses valores não podem ser obtidos apenas das duas elipses marginais.', pairedSdRh:'DP ΔR/H', pairedSdXc:'DP ΔXc/H', pairedCorr:'Correlação Δ', pairedN:'N pareado',
+      pairedLinked:'T1 e T2 conectados', pairedDelta:'Deltas no zero', pairedHint:'Informe a dispersão das diferenças pareadas. Esses valores não podem ser obtidos apenas das duas elipses marginais.', pairedSdRh:'DP ΔR/H', pairedSdXc:'DP ΔXc/H', pairedCorr:'Correlação Δ', pairedN:'N pareado', pairedReference:'Referência pareada (opcional)', pairedManual:'Inserção manual',
       cmpEmpty:'Selecione dois grupos para ver o resultado.',
       sig:'DIFERENÇA SIGNIFICATIVA', nsig:'SEM DIFERENÇA SIGNIFICATIVA', notCalc:'NÃO CALCULÁVEL',
       small:'pequena', moderate:'moderada', large:'grande',
@@ -697,7 +746,7 @@ class Component extends DCLogic {
       hSub:'BIOIMPEDANCE VECTOR ANALYSIS', hTitle:'Choose the analysis technique',
       hDesc:'BIVA2.0 builds RXc nomograms and runs the statistical tests. Pick how you want to work — you can switch later.',
       open:'Open', back:'Back to start',
-      hFoot:'Based on 183 published reference populations. Ellipses and tests follow the classic Piccoli (BIVA) methods.',
+      hFoot:'Based on 166 reviewed reference populations and 8 paired datasets. Ellipses and tests follow Piccoli BIVA methods.',
       mTolTitle:'Tolerance', mTolDesc:'Classify an individual against the tolerance ellipses (50·75·95%) of a reference population.',
       mConfTitle:'Confidence', mConfDesc:'Compare mean vector positions of groups with 95% confidence ellipses and Hotelling T² test.',
       mCombTitle:'Combined', mCombDesc:'Tolerance and confidence side by side: classify individuals and compare groups on the same chart.',
@@ -705,6 +754,12 @@ class Component extends DCLogic {
       mConfF:['95% confidence ellipse','Hotelling T² test','Group comparison'],
       mCombF:['All ellipses','Individuals + groups','Full analysis'],
       exportPng:'Export PNG', exportExcel:'Export Excel',
+      batchTitle:'Batch import', batchHint:'Download the template, enter participants, and import multiple ellipses or points at once.',
+      downloadModel:'Download Excel template', importExcel:'Import Excel', modeLabel:'NORMALIZATION', bivaClassic:'Classic BIVA', bivaSpecific:'Specific BIVA',
+      specificNote:'Rsp and Xcsp use height and right-arm, waist, and right-calf circumferences.',
+      importHMissing:'Import blocked: every row must include height (H).', importPerimMissing:'Import blocked: specific BIVA requires all three circumferences in every row.',
+      importColumns:'The spreadsheet must contain Grupo, R_ohm, and Xc_ohm.', importNoGroups:'No valid group was found. Confidence requires at least 3 participants per group.',
+      importReading:'Reading spreadsheet…', importConfOk:'ellipses calculated and added.', importTolOk:'points calculated and added.', zSpecificUnavailable:'Z-score requires a classic R/H and Xc/H reference; use classic BIVA.',
       popTitle:'Reference populations', searchPh:'Search by country, sex, device…',
       noneFound:'No population matches these filters.',
       sexAll:'All', sexM:'Male', sexF:'Female',
@@ -742,7 +797,7 @@ class Component extends DCLogic {
       cmpTitle:'Statistical comparison',
       cmpHint:'Compare the vector position of two groups (Hotelling T²). Choose among plotted populations and added ellipses.',
       grpA:'GROUP A', grpB:'GROUP B', selectDots:'— select —', independent:'Independent', paired:'Paired', time1:'T1 / Before', time2:'T2 / After',
-      pairedLinked:'Linked T1 and T2', pairedDelta:'Deltas at zero', pairedHint:'Enter the dispersion of the paired differences. These values cannot be recovered from the two marginal ellipses alone.', pairedSdRh:'SD ΔR/H', pairedSdXc:'SD ΔXc/H', pairedCorr:'Delta correlation', pairedN:'Paired N',
+      pairedLinked:'Linked T1 and T2', pairedDelta:'Deltas at zero', pairedHint:'Enter the dispersion of the paired differences. These values cannot be recovered from the two marginal ellipses alone.', pairedSdRh:'SD ΔR/H', pairedSdXc:'SD ΔXc/H', pairedCorr:'Delta correlation', pairedN:'Paired N', pairedReference:'Paired reference (optional)', pairedManual:'Manual entry',
       cmpEmpty:'Select two groups to see the result.',
       sig:'SIGNIFICANT DIFFERENCE', nsig:'NO SIGNIFICANT DIFFERENCE', notCalc:'NOT COMPUTABLE',
       small:'small', moderate:'moderate', large:'large',
@@ -753,7 +808,7 @@ class Component extends DCLogic {
       hSub:'ANÁLISIS VECTORIAL DE BIOIMPEDANCIA', hTitle:'Elige la técnica de análisis',
       hDesc:'BIVA2.0 construye nomogramas RXc y ejecuta las pruebas estadísticas. Elige cómo trabajar — puedes cambiar después.',
       open:'Abrir', back:'Volver al inicio',
-      hFoot:'Basado en 183 poblaciones de referencia publicadas. Las elipses y pruebas siguen los métodos clásicos de Piccoli (BIVA).',
+      hFoot:'Basado en 166 poblaciones de referencia revisadas y 8 conjuntos pareados. Las elipses y pruebas siguen los métodos BIVA de Piccoli.',
       mTolTitle:'Tolerancia', mTolDesc:'Clasifica a un individuo frente a las elipses de tolerancia (50·75·95%) de una población de referencia.',
       mConfTitle:'Confianza', mConfDesc:'Compara la posición vectorial media de grupos con elipses de confianza 95% y prueba de Hotelling T².',
       mCombTitle:'Mixta', mCombDesc:'Tolerancia y confianza lado a lado: clasifica individuos y compara grupos en el mismo gráfico.',
@@ -761,6 +816,12 @@ class Component extends DCLogic {
       mConfF:['Elipse de confianza 95%','Prueba de Hotelling T²','Comparación de grupos'],
       mCombF:['Todas las elipses','Individuos + grupos','Análisis completo'],
       exportPng:'Exportar PNG', exportExcel:'Exportar Excel',
+      batchTitle:'Importación por lotes', batchHint:'Descarga el modelo, introduce los participantes e importa varias elipses o puntos a la vez.',
+      downloadModel:'Descargar modelo Excel', importExcel:'Importar Excel', modeLabel:'NORMALIZACIÓN', bivaClassic:'BIVA clásica', bivaSpecific:'BIVA específica',
+      specificNote:'Rsp y Xcsp usan estatura y perímetros de brazo derecho, cintura y pantorrilla derecha.',
+      importHMissing:'Importación bloqueada: todas las filas deben incluir estatura (H).', importPerimMissing:'Importación bloqueada: BIVA específica exige los tres perímetros en todas las filas.',
+      importColumns:'La hoja debe contener Grupo, R_ohm y Xc_ohm.', importNoGroups:'No se encontró ningún grupo válido. Confianza exige al menos 3 participantes por grupo.',
+      importReading:'Leyendo la hoja…', importConfOk:'elipses calculadas y añadidas.', importTolOk:'puntos calculados y añadidos.', zSpecificUnavailable:'Z-score exige una referencia clásica R/H y Xc/H; usa BIVA clásica.',
       popTitle:'Poblaciones de referencia', searchPh:'Buscar por país, sexo, equipo…',
       noneFound:'Ninguna población coincide con estos filtros.',
       sexAll:'Todos', sexM:'Masc', sexF:'Fem',
@@ -798,7 +859,7 @@ class Component extends DCLogic {
       cmpTitle:'Comparación estadística',
       cmpHint:'Compara la posición vectorial de dos grupos (Hotelling T²). Elige entre poblaciones trazadas y elipses añadidas.',
       grpA:'GRUPO A', grpB:'GRUPO B', selectDots:'— selecciona —', independent:'Independiente', paired:'Pareada', time1:'T1 / Antes', time2:'T2 / Después',
-      pairedLinked:'T1 y T2 conectados', pairedDelta:'Deltas en cero', pairedHint:'Introduce la dispersión de las diferencias pareadas. Estos valores no se pueden obtener solo de las dos elipses marginales.', pairedSdRh:'DE ΔR/H', pairedSdXc:'DE ΔXc/H', pairedCorr:'Correlación Δ', pairedN:'N pareado',
+      pairedLinked:'T1 y T2 conectados', pairedDelta:'Deltas en cero', pairedHint:'Introduce la dispersión de las diferencias pareadas. Estos valores no se pueden obtener solo de las dos elipses marginales.', pairedSdRh:'DE ΔR/H', pairedSdXc:'DE ΔXc/H', pairedCorr:'Correlación Δ', pairedN:'N pareado', pairedReference:'Referencia pareada (opcional)', pairedManual:'Entrada manual',
       cmpEmpty:'Selecciona dos grupos para ver el resultado.',
       sig:'DIFERENCIA SIGNIFICATIVA', nsig:'SIN DIFERENCIA SIGNIFICATIVA', notCalc:'NO CALCULABLE',
       small:'pequeña', moderate:'moderada', large:'grande',
@@ -824,7 +885,8 @@ class Component extends DCLogic {
       return;
     }
     const pops = raw.map((p, i) => this._normalize(p, i)).filter((p) => this._keep(p));
-    this.setState({ pops, ready: true });
+    const pairedRefs = (window.BIVA2_PAIRED_REFERENCES||[]).map((p,i)=>this._normalizePaired(p,i)).filter((p)=>this._keepPaired(p));
+    this.setState({ pops, pairedRefs, ready: true });
   }
 
   // ---------- normalization ----------
@@ -836,20 +898,25 @@ class Component extends DCLogic {
   _inferSex(p,l){const s=String(p.sex||'').toLowerCase();if(s==='m'||s==='f')return s.toUpperCase();if(/females?/i.test(l))return 'F';if(/males?/i.test(l))return 'M';return '—';}
   _normalize(p,i){
     const legend=String(p.legend||('População '+(i+1))).replace(/\s+/g,' ').trim();
-    const source=p.source==='confidence'?'confidence':'tolerance';
-    const country=this._inferCountry(legend);
+    const source=['confidence','tolerance','custom'].includes(p.source)?p.source:'tolerance';
+    const country=p.country||this._inferCountry(legend);
     return {
       key:source+':'+(p.code||i+1)+':'+i,
       code:p.code||i+1, legend, source,
       sex:this._inferSex(p,legend),
       countryRaw:country, country:this._ptCountry(country),
-      age:this._inferAge(legend), equip:this._inferEquip(legend), type:this._inferType(legend),
+      age:p.age||this._inferAge(legend), equip:p.equipment||this._inferEquip(legend), type:p.population||this._inferType(legend), reference:p.reference||'',
       n:Number(p.n)||1,
       rhMean:Number(p.r_h_mean), rhSd:Number(p.r_h_sd),
       xcHMean:Number(p.xc_h_mean), xcHSd:Number(p.xc_h_sd),
       r:Math.max(-0.999,Math.min(0.999,Number(p.correlation)||0)),
     };
   }
+  _normalizePaired(p,i){
+    const legend=String(p.legend||('Pareada '+(i+1))).replace(/\s+/g,' ').trim();
+    return {key:'paired:'+(p.code||i+1)+':'+i,code:p.code||i+1,legend,sex:this._inferSex(p,legend),country:this._ptCountry(p.country||this._inferCountry(legend)),equip:p.equipment||this._inferEquip(legend),type:p.population||this._inferType(legend),reference:p.reference||'',n:+p.n,rhMean:+p.dr_h_mean,rhSd:+p.dr_h_sd,xcHMean:+p.dxc_h_mean,xcHSd:+p.dxc_h_sd,r:Math.max(-0.999,Math.min(0.999,+p.correlation||0))};
+  }
+  _keepPaired(p){return this._keep(p);}
   _keep(p){
     return [p.n,p.rhMean,p.rhSd,p.xcHMean,p.xcHSd,p.r].every((v)=>Number.isFinite(v))
       && p.n>2 && p.rhSd>0 && p.xcHSd>0 && Math.abs(p.r)<1;
@@ -895,7 +962,7 @@ class Component extends DCLogic {
   _refColor(key){ const i=this.state.refKeys.indexOf(key); return i<0?null:this.REF_COLORS[i%this.REF_COLORS.length]; }
   _byKey(key){ return this.state.pops.find((p)=>p.key===key) || this.state.customRefs.find((p)=>p.key===key); }
   _hexA(hex,a){ const h=hex.replace('#','');const r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);return 'rgba('+r+','+g+','+b+','+a+')'; }
-  _isZMode(){ return this.state.tolMode==='zscore' && (this.state.method==='tolerance'||this.state.method==='combined') && !!this._byKey(this.state.activeKey); }
+  _isZMode(){ return this.state.bivaMode==='classic' && this.state.tolMode==='zscore' && (this.state.method==='tolerance'||this.state.method==='combined') && !!this._byKey(this.state.activeKey); }
   _displayStats(p){
     const base=this._isZMode()?this._byKey(this.state.activeKey):null;
     if(!base) return{...p};
@@ -910,6 +977,10 @@ class Component extends DCLogic {
     const { pops, customRefs, fSex, fType, search } = this.state;
     const q = search.trim().toLowerCase();
     return [...customRefs, ...pops].filter((p)=>{
+      if(this.state.bivaMode==='specific' && !p.custom) return false;
+      if(p.custom && (p.metric||'classic')!==this.state.bivaMode) return false;
+      if(!p.custom && this.state.method==='confidence' && p.source!=='confidence') return false;
+      if(!p.custom && this.state.method==='tolerance' && p.source!=='tolerance') return false;
       if(fSex && p.sex!==fSex) return false;
       if(fType && p.type!==fType) return false;
       if(q && !(p.legend.toLowerCase().includes(q) || p.country.toLowerCase().includes(q) || p.equip.toLowerCase().includes(q))) return false;
@@ -938,8 +1009,8 @@ class Component extends DCLogic {
     const delta=this._pairedDeltaData();
     if(this.state.method==='confidence'&&this.state.comparisonMode==='paired'&&this.state.pairedView==='delta'&&delta) return[{kind:'delta',e:delta}];
     const items=[];
-    this.state.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p) items.push({kind:'ref',pop:p,color:this._refColor(k),mode:this._effMode(k)}); });
-    this.state.ellipses.forEach((e)=>{ if(e.visible) items.push({kind:'conf',e}); });
+    if(this.state.bivaMode==='classic')this.state.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p) items.push({kind:'ref',pop:p,color:this._refColor(k),mode:this._effMode(k)}); });
+    this.state.ellipses.forEach((e)=>{ if(e.visible&&(e.metric||'classic')===this.state.bivaMode) items.push({kind:'conf',e}); });
     return items;
   }
 
@@ -1071,12 +1142,13 @@ class Component extends DCLogic {
     this.state.annotations.forEach((a)=>{const size=Math.max(8,Math.min(48,+a.size||16)),lines=String(a.text||'').split(/\n/),x=W*(+a.x||0)/100,y=H*(+a.y||0)/100;ctx.font="600 "+size+"px '"+a.font+"',sans-serif";const tw=Math.max(...lines.map((line)=>ctx.measureText(line).width),20),lh=size*1.25,bw=tw+16,bh=lines.length*lh+12;ctx.fillStyle='rgba(255,255,255,.9)';ctx.strokeStyle=this._hexA(a.color,0.35);ctx.lineWidth=1;ctx.fillRect(x,y,bw,bh);ctx.strokeRect(x,y,bw,bh);ctx.fillStyle=a.color;ctx.textAlign='left';ctx.textBaseline='top';lines.forEach((line,i)=>ctx.fillText(line,x+8,y+6+i*lh));this._annotationBoxes.push({id:a.id,x,y,w:bw,h:bh});});
   }
 
-  _indivPoints(){ return this.state.measurements.map((m)=>({...m,x:m.rh,y:m.xc})); }
+  _indivPoints(){ return this.state.measurements.filter((m)=>(m.metric||'classic')===this.state.bivaMode).map((m)=>({...m,x:m.rh,y:m.xc})); }
   _indivPoint(){ const pts=this._indivPoints();return pts.length?this._displayPoint(pts[pts.length-1]):null; }
-  _latestMeasurement(){const a=this.state.measurements;return a.length?a[a.length-1]:null;}
+  _latestMeasurement(){const a=this.state.measurements.filter((m)=>(m.metric||'classic')===this.state.bivaMode);return a.length?a[a.length-1]:null;}
   // classify individual against active population's tolerance ellipses
   _classifyIndiv(){
     const pt=this._latestMeasurement(); if(!pt) return null;
+    if(this.state.bivaMode!=='classic') return {noPop:true};
     const p=this._byKey(this.state.activeKey); if(!p) return {noPop:true};
     const inv=this._inv2(this._covFromPop(p)); if(!inv) return {noPop:true};
     const d2=this._quad([pt.rh-p.rhMean,pt.xc-p.xcHMean],inv);
@@ -1088,7 +1160,7 @@ class Component extends DCLogic {
   _setF(patch){ this.setState(patch); }
   _defaultMode(){ return this.state.method==='tolerance' ? 'tolerance' : 'conf95'; }
   _enterMethod(m){
-    this.setState({ screen:'app', method:m, refKeys:[], refModes:{}, activeKey:null, ellipses:[], editingId:null, editDraft:null, editError:false, cmpA:'', cmpB:'', comparisonMode:'independent', pairedView:'linked', paired:{sdRh:'',sdXc:'',r:'',n:''}, indiv:{participant:'P1',time:'T1',rh:'',xc:'',color:'#e0662a',symbol:'circle'}, indivShown:false, measurements:[], tolMode:'classic', bounds:null, showNew:false, showAxisWin:false, showText:false, showAddRef:false, annotations:[], axisMode:'auto', axisNames:{x:'R/H',y:'Xc/H'}, axisUnits:{x:'Ω/m',y:'Ω/m'} });
+    this.setState({ screen:'app', method:m, refKeys:[], refModes:{}, activeKey:null, ellipses:[], editingId:null, editDraft:null, editError:false, cmpA:'', cmpB:'', comparisonMode:'independent', pairedView:'linked', paired:{sdRh:'',sdXc:'',r:'',n:'',referenceKey:''}, indiv:{participant:'P1',time:'T1',rh:'',xc:'',color:'#e0662a',symbol:'circle'}, indivShown:false, measurements:[], bivaMode:'classic', importStatus:{scope:'',type:'',text:''}, tolMode:'classic', bounds:null, showNew:false, showAxisWin:false, showText:false, showAddRef:false, annotations:[], axisMode:'auto', axisNames:{x:'R/H',y:'Xc/H'}, axisUnits:{x:'Ω/m',y:'Ω/m'} });
   }
   _migrateToCombined(){
     // preserve current selections; freeze each ref's current effective mode
@@ -1098,7 +1170,62 @@ class Component extends DCLogic {
   }
   _goHome(){ this.setState({ screen:'home' }); }
   _setLang(l){ this.setState({ lang:l }); }
+  _setBivaMode(mode){
+    const specific=mode==='specific';
+    this.setState({bivaMode:mode,newSource:specific?'manual':this.state.newSource,axisMode:'auto',axisNames:specific?{x:'Rsp',y:'Xcsp'}:{x:'R/H',y:'Xc/H'},axisUnits:specific?{x:'Ω·cm',y:'Ω·cm'}:{x:'Ω/m',y:'Ω/m'},tolMode:specific?'classic':this.state.tolMode,refKeys:specific?[]:this.state.refKeys,refModes:specific?{}:this.state.refModes,activeKey:specific?null:this.state.activeKey,cmpA:'',cmpB:'',bounds:null,importStatus:{scope:'',type:'',text:''}});
+  }
+  _headerKey(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');}
+  _batchValue(row,aliases){const keys=Object.keys(row);for(const alias of aliases){const key=keys.find((k)=>this._headerKey(k)===alias);if(key!==undefined&&row[key]!==''&&row[key]!=null)return row[key];}return '';}
+  _batchNumber(value){if(typeof value==='number')return value;const normalized=String(value??'').trim().replace(/\s/g,'').replace(',','.');return normalized===''?NaN:Number(normalized);}
+  _safeColor(value,fallback){const color=String(value||'').trim();return /^#[0-9a-f]{6}$/i.test(color)?color:fallback;}
+  _safeSymbol(value){const symbol=String(value||'').trim().toLowerCase();return ['circle','square','diamond','triangle'].includes(symbol)?symbol:'circle';}
+  _sampleStats(rows){
+    const n=rows.length,mx=rows.reduce((s,r)=>s+r.x,0)/n,my=rows.reduce((s,r)=>s+r.y,0)/n;let vx=0,vy=0,cov=0;
+    rows.forEach((r)=>{const dx=r.x-mx,dy=r.y-my;vx+=dx*dx;vy+=dy*dy;cov+=dx*dy;});
+    const sx=Math.sqrt(vx/(n-1)),sy=Math.sqrt(vy/(n-1)),corr=sx>0&&sy>0?(cov/(n-1))/(sx*sy):NaN;
+    return {n,rhMean:mx,rhSd:sx,xcHMean:my,xcHSd:sy,r:corr};
+  }
+  async _importParticipants(ev,scope){
+    const input=ev.target,file=input&&input.files&&input.files[0],t=this._T();if(!file)return;
+    this.setState({importStatus:{scope,type:'info',text:t.importReading}});
+    try{
+      if(!window.XLSX)throw new Error('SheetJS indisponível');
+      const book=window.XLSX.read(await file.arrayBuffer(),{type:'array'}),sheetName=book.SheetNames.find((n)=>this._headerKey(n)==='dados')||book.SheetNames[0],sheet=book.Sheets[sheetName],raw=window.XLSX.utils.sheet_to_json(sheet,{defval:'',raw:true});
+      if(!raw.length)throw new Error(t.importColumns);
+      const headerKeys=Object.keys(raw[0]).map((k)=>this._headerKey(k)),has=(list)=>list.some((key)=>headerKeys.includes(key));
+      if(!has(['grupo','group'])||!has(['r_ohm','r','resistencia','resistance'])||!has(['xc_ohm','xc','reatancia','reactance']))throw new Error(t.importColumns);
+      const aliases={group:['grupo','group'],n:['n','n_grupo','sample_size'],participant:['participante','participant','id'],time:['tempo','time','momento'],r:['r_ohm','r','resistencia','resistance'],xc:['xc_ohm','xc','reatancia','reactance'],h:['h_m','h','estatura','height'],arm:['braco_direito_cm','perimetro_braco_direito_cm','right_arm_cm','arm_cm'],waist:['cintura_cm','perimetro_cintura_cm','waist_cm'],calf:['panturrilha_direita_cm','perimetro_panturrilha_direita_cm','right_calf_cm','calf_cm'],color:['cor','color'],symbol:['simbolo','symbol']};
+      const rows=[];let missingH=false,missingPerimeters=false,invalidCore=false;
+      raw.forEach((row,index)=>{
+        const group=String(this._batchValue(row,aliases.group)||'').trim(),r=this._batchNumber(this._batchValue(row,aliases.r)),xc=this._batchNumber(this._batchValue(row,aliases.xc));
+        if(!group&&!Number.isFinite(r)&&!Number.isFinite(xc))return;
+        if(!group||!Number.isFinite(r)||!Number.isFinite(xc)){invalidCore=true;return;}
+        let h=this._batchNumber(this._batchValue(row,aliases.h));if(Number.isFinite(h)&&h>3)h/=100;
+        const arm=this._batchNumber(this._batchValue(row,aliases.arm)),waist=this._batchNumber(this._batchValue(row,aliases.waist)),calf=this._batchNumber(this._batchValue(row,aliases.calf));
+        if(!(h>0))missingH=true;if(this.state.bivaMode==='specific'&&(!(arm>0)||!(waist>0)||!(calf>0)))missingPerimeters=true;
+        let x=NaN,y=NaN;
+        if(h>0&&this.state.bivaMode==='classic'){x=r/h;y=xc/h;}
+        if(h>0&&arm>0&&waist>0&&calf>0&&this.state.bivaMode==='specific'){const area=(0.45*arm*arm+0.10*waist*waist+0.45*calf*calf)/(4*Math.PI),length=1.1*h*100;x=r*area/length;y=xc*area/length;}
+        rows.push({row:index+2,group,nExpected:this._batchNumber(this._batchValue(row,aliases.n)),participant:String(this._batchValue(row,aliases.participant)||'').trim(),time:String(this._batchValue(row,aliases.time)||'').trim(),r,xc,h,arm,waist,calf,x,y,color:String(this._batchValue(row,aliases.color)||''),symbol:String(this._batchValue(row,aliases.symbol)||'')});
+      });
+      if(invalidCore)throw new Error(t.importColumns);if(missingH)throw new Error(t.importHMissing);if(missingPerimeters)throw new Error(t.importPerimMissing);if(!rows.length)throw new Error(t.importColumns);
+      const groups={};rows.forEach((row)=>{(groups[row.group]||(groups[row.group]=[])).push(row);});
+      const stamp=Date.now();
+      if(scope==='confidence'){
+        const added=[];let skipped=0,mismatch=0;
+        Object.entries(groups).forEach(([name,list],index)=>{const stats=list.length>=3?this._sampleStats(list):null;if(!stats||!(stats.rhSd>0&&stats.xcHSd>0&&Number.isFinite(stats.r)&&Math.abs(stats.r)<1)){skipped++;return;}if(list.some((r)=>Number.isFinite(r.nExpected)&&r.nExpected!==list.length))mismatch++;const color=this._safeColor(list[0].color,this.CONF_COLORS[(this.state.ellipses.length+added.length)%this.CONF_COLORS.length]);added.push({id:'batch-'+stamp+'-'+index,name,color,stroke:'solid',width:2,visible:true,metric:this.state.bivaMode,imported:true,...stats});});
+        if(!added.length)throw new Error(t.importNoGroups);
+        const details=(skipped?(' '+skipped+' grupo(s) ignorado(s).'):'')+(mismatch?(' '+mismatch+' N informado(s) divergente(s); foi usado o N calculado.'):'');
+        this.setState({ellipses:[...this.state.ellipses,...added],showNew:false,bounds:null,importStatus:{scope,type:'success',text:added.length+' '+t.importConfOk+details}});
+      }else{
+        const groupStyles={};Object.keys(groups).forEach((name,index)=>{const first=groups[name][0];groupStyles[name]={color:this._safeColor(first.color,this.CONF_COLORS[index%this.CONF_COLORS.length]),symbol:this._safeSymbol(first.symbol)};});
+        const added=rows.map((row,index)=>({id:'batch-m-'+stamp+'-'+index,participant:row.participant||row.group+'-'+(index+1),time:row.time||'T1',group:row.group,rh:row.x,xc:row.y,color:groupStyles[row.group].color,symbol:groupStyles[row.group].symbol,order:this.state.measurements.length+index,metric:this.state.bivaMode,rawR:row.r,rawXc:row.xc,h:row.h,arm:row.arm,waist:row.waist,calf:row.calf,imported:true}));
+        this.setState({measurements:[...this.state.measurements,...added],indivShown:true,bounds:null,importStatus:{scope,type:'success',text:added.length+' '+t.importTolOk}});
+      }
+    }catch(error){this.setState({importStatus:{scope,type:'error',text:error&&error.message?error.message:String(error)}});}finally{if(input)input.value='';}
+  }
   _toggleRef(key){
+    if(this.state.bivaMode!=='classic')return;
     const s=this.state; const has=s.refKeys.includes(key);
     const refKeys=has?s.refKeys.filter((k)=>k!==key):[...s.refKeys,key];
     const refModes={...s.refModes};
@@ -1114,14 +1241,18 @@ class Component extends DCLogic {
     const v=this.state.indiv,rh=+v.rh,xc=+v.xc,participant=String(v.participant||'').trim(),time=String(v.time||'').trim();
     if(!participant||!time||!Number.isFinite(rh)||!Number.isFinite(xc))return;
     const previous=this.state.measurements.find((m)=>m.participant===participant);
-    const m={id:'m'+Date.now(),participant,time,rh,xc,color:previous?previous.color:v.color,symbol:previous?previous.symbol:v.symbol,order:this.state.measurements.length};
+    const m={id:'m'+Date.now(),participant,time,rh,xc,color:previous?previous.color:v.color,symbol:previous?previous.symbol:v.symbol,order:this.state.measurements.length,metric:this.state.bivaMode};
     this.setState({measurements:[...this.state.measurements,m],indiv:{...v,time:this._nextTime(time),rh:'',xc:'',color:m.color,symbol:m.symbol},indivShown:true,bounds:null});
   }
   _nextTime(time){const m=String(time).match(/^(.*?)(\d+)$/);return m?(m[1]+(+m[2]+1)):time;}
   _removeMeasurement(id){const measurements=this.state.measurements.filter((m)=>m.id!==id);this.setState({measurements,indivShown:!!measurements.length,bounds:null});}
   _clearIndiv(){ this.setState({indiv:{...this.state.indiv,rh:'',xc:''}, measurements:[],indivShown:false,bounds:null}); }
-  _setTolMode(mode){this.setState({tolMode:mode,axisMode:'auto',bounds:null});}
-  _setPaired(field,v){this.setState({paired:{...this.state.paired,[field]:v},bounds:null});}
+  _setTolMode(mode){if(mode==='zscore'&&this.state.bivaMode==='specific'){this.setState({importStatus:{scope:'tolerance',type:'error',text:this._T().zSpecificUnavailable}});return;}this.setState({tolMode:mode,axisMode:'auto',bounds:null});}
+  _setPaired(field,v){this.setState({paired:{...this.state.paired,[field]:v,referenceKey:''},bounds:null});}
+  _setPairedReference(key){
+    const ref=this.state.pairedRefs.find((p)=>p.key===key);
+    this.setState({paired:ref?{sdRh:String(ref.rhSd),sdXc:String(ref.xcHSd),r:String(ref.r),n:String(ref.n),referenceKey:key}:{sdRh:'',sdXc:'',r:'',n:'',referenceKey:''},bounds:null});
+  }
   _setComparisonMode(mode){this.setState({comparisonMode:mode,cmpA:'',cmpB:'',bounds:null});}
   _setAnnotation(field,v){this.setState({annotationDraft:{...this.state.annotationDraft,[field]:v}});}
   _addAnnotation(){const d=this.state.annotationDraft,text=String(d.text||'').trim();if(!text)return;const a={...d,text,id:'a'+Date.now(),x:Math.max(0,Math.min(95,+d.x||0)),y:Math.max(0,Math.min(95,+d.y||0)),size:Math.max(8,Math.min(48,+d.size||16))};this.setState({annotations:[...this.state.annotations,a],annotationDraft:{...d,text:'',y:String(Math.min(90,+d.y+10))}});}
@@ -1137,7 +1268,7 @@ class Component extends DCLogic {
       legend:(v.name||'Referência').trim()+(v.country?(' '+v.country):''), sex:v.sex, source:'custom' };
     const idx=this.state.pops.length+this.state.customRefs.length;
     const norm=this._normalize(rec, idx);
-    norm.key='custom:'+Date.now(); norm.custom=true;
+    norm.key='custom:'+Date.now(); norm.custom=true; norm.metric=this.state.bivaMode;
     if(v.type) norm.type=v.type;
     if(!this._keep(norm)) return;
     this.setState({ customRefs:[...this.state.customRefs, norm], showAddRef:false,
@@ -1152,7 +1283,7 @@ class Component extends DCLogic {
     const id='e'+Date.now();
     const color=this.CONF_COLORS[s.ellipses.length%this.CONF_COLORS.length];
     const name=s.newName.trim()||('Elipse '+(s.ellipses.length+1));
-    const e={id,name,color,stroke:'solid',width:2,visible:true,...src};
+    const e={id,name,color,stroke:'solid',width:2,visible:true,metric:s.bivaMode,...src};
     this.setState({ellipses:[...s.ellipses,e],showNew:false,newName:'',newVals:{rhMean:'',rhSd:'',xcHMean:'',xcHSd:'',r:'',n:''},bounds:null});
   }
   _updEllipse(id,patch){ this.setState({ellipses:this.state.ellipses.map((e)=>e.id===id?{...e,...patch}:e), bounds:patch.visible!==undefined?null:this.state.bounds}); }
@@ -1172,13 +1303,15 @@ class Component extends DCLogic {
 
   _resolveCmp(val){
     if(!val) return null;
-    if(val.indexOf('pop:')===0){ const p=this._byKey(val.slice(4)); return p?{...p,_label:'Pop '+p.code}:null; }
-    if(val.indexOf('ell:')===0){ const e=this.state.ellipses.find((x)=>x.id===val.slice(4)); return e?{rhMean:e.rhMean,rhSd:e.rhSd,xcHMean:e.xcHMean,xcHSd:e.xcHSd,r:e.r,n:e.n,_label:e.name}:null; }
+    if(val.indexOf('pop:')===0){ const p=this._byKey(val.slice(4)); return p&&this.state.bivaMode==='classic'?{...p,_label:'Pop '+p.code}:null; }
+    if(val.indexOf('ell:')===0){ const e=this.state.ellipses.find((x)=>x.id===val.slice(4)&&(x.metric||'classic')===this.state.bivaMode); return e?{rhMean:e.rhMean,rhSd:e.rhSd,xcHMean:e.xcHMean,xcHSd:e.xcHSd,r:e.r,n:e.n,_label:e.name}:null; }
     return null;
   }
   _pairedDeltaData(){
     if(this.state.comparisonMode!=='paired')return null;
     const A=this._resolveCmp(this.state.cmpA),B=this._resolveCmp(this.state.cmpB),p=this.state.paired;
+    const ref=this.state.pairedRefs.find((item)=>item.key===p.referenceKey);
+    if(ref){const d={name:ref.legend,color:'#0f9d8f',stroke:'solid',width:2.2,visible:true,rhMean:ref.rhMean,xcHMean:ref.xcHMean,rhSd:ref.rhSd,xcHSd:ref.xcHSd,r:ref.r,n:ref.n,reference:true};return d.rhSd>0&&d.xcHSd>0&&d.n>2&&Number.isFinite(d.r)&&Math.abs(d.r)<1?d:null;}
     if(!A||!B)return null;
     const d={name:'Δ '+A._label+' → '+B._label,color:'#0f9d8f',stroke:'solid',width:2.2,visible:true,rhMean:B.rhMean-A.rhMean,xcHMean:B.xcHMean-A.xcHMean,rhSd:+p.sdRh,xcHSd:+p.sdXc,r:+p.r,n:+p.n};
     return d.rhSd>0&&d.xcHSd>0&&d.n>2&&Number.isFinite(d.r)&&Math.abs(d.r)<1?d:null;
@@ -1198,15 +1331,17 @@ class Component extends DCLogic {
   }
   _exportExcel(){
     const entities=[];
-    this.state.refKeys.forEach((k)=>{const p=this._byKey(k);if(p)entities.push({...p,_label:(p.country+' '+p.sex).trim(),_source:'referência selecionada'});});
-    this.state.ellipses.forEach((e)=>entities.push({...e,_label:e.name,_source:'elipse adicionada'}));
-    const ellipseRows=[['Nome','Origem','R/H média','R/H DP','Xc/H média','Xc/H DP','Correlação','N','Cor','Traço','Espessura'],...entities.map((e)=>[e._label,e._source,e.rhMean,e.rhSd,e.xcHMean,e.xcHSd,e.r,e.n,e.color||'',e.stroke||'',e.width||''])];
+    if(this.state.bivaMode==='classic')this.state.refKeys.forEach((k)=>{const p=this._byKey(k);if(p)entities.push({...p,_label:(p.country+' '+p.sex).trim(),_source:'referência selecionada'});});
+    this.state.ellipses.filter((e)=>(e.metric||'classic')===this.state.bivaMode).forEach((e)=>entities.push({...e,_label:e.name,_source:'elipse adicionada'}));
+    const xName=this.state.bivaMode==='specific'?'Rsp':'R/H',yName=this.state.bivaMode==='specific'?'Xcsp':'Xc/H';
+    const ellipseRows=[['Nome','Origem','Métrica',xName+' média',xName+' DP',yName+' média',yName+' DP','Correlação','N','Cor','Traço','Espessura'],...entities.map((e)=>[e._label,e._source,this.state.bivaMode,e.rhMean,e.rhSd,e.xcHMean,e.xcHSd,e.r,e.n,e.color||'',e.stroke||'',e.width||''])];
     const pairRows=[['Elipse A','Elipse B','N A','N B','D de Mahalanobis','D²','Hotelling T²','F','gl1','gl2','p-valor','Status']];
     for(let i=0;i<entities.length;i++)for(let j=i+1;j<entities.length;j++){const A=entities[i],B=entities[j],r=this._hotelling(A,B);pairRows.push(r.error?[A._label,B._label,A.n,B.n,'','','','','','','',r.error]:[A._label,B._label,A.n,B.n,r.d,r.d2,r.t2,r.fValue,r.df1,r.df2,r.pValue,r.pValue<0.05?'significativo':'não significativo']);}
     const sheets=[{name:'Elipses',rows:ellipseRows},{name:'Comparações em pares',rows:pairRows}];
     const delta=this._pairedDeltaData();
-    if(delta){const r=this._hotellingPaired(delta);sheets.push({name:'Análise pareada',rows:[['T1','T2','Δ R/H','Δ Xc/H','DP ΔR/H','DP ΔXc/H','Correlação Δ','N','D','D²','Hotelling T²','F','gl1','gl2','p-valor'],[this._resolveCmp(this.state.cmpA)._label,this._resolveCmp(this.state.cmpB)._label,delta.rhMean,delta.xcHMean,delta.rhSd,delta.xcHSd,delta.r,delta.n,r.d,r.d2,r.t2,r.fValue,r.df1,r.df2,r.pValue]]});}
-    if(this.state.measurements.length)sheets.push({name:'Longitudinal tolerância',rows:[['Participante','Tempo','R/H','Xc/H','Cor','Símbolo'],...this.state.measurements.map((m)=>[m.participant,m.time,m.rh,m.xc,m.color,m.symbol])]});
+    if(delta){const r=this._hotellingPaired(delta),A=this._resolveCmp(this.state.cmpA),B=this._resolveCmp(this.state.cmpB);sheets.push({name:'Análise pareada',rows:[['T1','T2','Δ '+xName,'Δ '+yName,'DP Δ'+xName,'DP Δ'+yName,'Correlação Δ','N','D','D²','Hotelling T²','F','gl1','gl2','p-valor'],[A?A._label:'Referência publicada',B?B._label:delta.name,delta.rhMean,delta.xcHMean,delta.rhSd,delta.xcHSd,delta.r,delta.n,r.d,r.d2,r.t2,r.fValue,r.df1,r.df2,r.pValue]]});}
+    const currentMeasurements=this.state.measurements.filter((m)=>(m.metric||'classic')===this.state.bivaMode);
+    if(currentMeasurements.length)sheets.push({name:'Longitudinal tolerância',rows:[['Participante','Tempo',xName,yName,'Cor','Símbolo'],...currentMeasurements.map((m)=>[m.participant,m.time,m.rh,m.xc,m.color,m.symbol])]});
     if(this.state.annotations.length)sheets.push({name:'Anotações',rows:[['Texto','Fonte','Cor','Tamanho','X (%)','Y (%)'],...this.state.annotations.map((a)=>[a.text,a.font,a.color,a.size,a.x,a.y])]});
     this._downloadWorkbook('BIVA2-estatisticas-'+new Date().toISOString().slice(0,10),sheets);
   }
@@ -1215,6 +1350,10 @@ class Component extends DCLogic {
     const s=this.state;
     const t=this._T();
     const filtered=this._filtered();
+    const specific=s.bivaMode==='specific', axisX=specific?'Rsp':'R/H', axisY=specific?'Xcsp':'Xc/H';
+    const currentEllipses=s.ellipses.filter((e)=>(e.metric||'classic')===s.bivaMode);
+    const currentMeasurements=s.measurements.filter((m)=>(m.metric||'classic')===s.bivaMode);
+    const availableRefs=[...s.pops,...s.customRefs].filter((p)=>!specific&&(s.method==='confidence'?p.source==='confidence':(s.method==='tolerance'?p.source==='tolerance':true)));
 
     // filter buttons
     const segBase='flex:1;font:500 11.5px \'IBM Plex Sans\';padding:6px 4px;border-radius:8px;cursor:pointer;transition:.12s;';
@@ -1258,18 +1397,18 @@ class Component extends DCLogic {
     // legend
     const legendItems=[];
     s.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p){ const c=this._refColor(k); const md=this._effMode(k); legendItems.push({color:c,fill:this._hexA(c,0.12),label:p.country+' '+p.sex,kind:md==='tolerance'?t.tolTitleTol:t.tolTitle}); } });
-    s.ellipses.forEach((e)=>{ if(e.visible) legendItems.push({color:e.color,fill:this._hexA(e.color,0.12),label:e.name,kind:t.kindConf}); });
-    [...new Map(s.measurements.map((m)=>[m.participant,m])).values()].forEach((m)=>legendItems.push({color:m.color,fill:this._hexA(m.color,0.12),label:m.participant,kind:'longitudinal'}));
+    currentEllipses.forEach((e)=>{ if(e.visible) legendItems.push({color:e.color,fill:this._hexA(e.color,0.12),label:e.name,kind:t.kindConf}); });
+    [...new Map(currentMeasurements.map((m)=>[m.participant,m])).values()].forEach((m)=>legendItems.push({color:m.color,fill:this._hexA(m.color,0.12),label:m.participant,kind:'longitudinal'}));
 
     // ellipse list
-    const ellipses=s.ellipses.map((e)=>{
+    const ellipses=currentEllipses.map((e)=>{
       const editing=s.editingId===e.id;
       const draft=editing?(s.editDraft||{}):{};
-      const editDefs=[['rhMean',t.fRhMean,'0.1'],['rhSd',t.fRhSd,'0.1'],['xcHMean',t.fXcMean,'0.1'],['xcHSd',t.fXcSd,'0.1'],['r',t.fR,'0.01'],['n',t.fN,'1']];
+      const editDefs=[['rhMean',axisX+' média','0.1'],['rhSd',axisX+' DP','0.1'],['xcHMean',axisY+' média','0.1'],['xcHSd',axisY+' DP','0.1'],['r',t.fR,'0.01'],['n',t.fN,'1']];
       return {
         id:e.id, name:e.name, color:e.color, width:e.width, widthLabel:e.width.toFixed(1),
         swatchFill:e.visible?this._hexA(e.color,0.25):'transparent',
-        meta:'R/H '+this._fmt(e.rhMean,1)+' · Xc/H '+this._fmt(e.xcHMean,1)+' · N='+e.n,
+        meta:axisX+' '+this._fmt(e.rhMean,1)+' · '+axisY+' '+this._fmt(e.xcHMean,1)+' · N='+e.n,
         eyeIcon:e.visible?'●':'○',
         eyeStyle:'font-size:13px;line-height:1;width:26px;height:26px;border-radius:7px;cursor:pointer;flex:none;'+(e.visible?'color:#2f4fd6;background:#eef1fc;border:1px solid #d6def7':'color:#a39e8d;background:#f3f0e8;border:1px solid #e2ddd0'),
         editBtnStyle:'font-size:12px;line-height:1;width:26px;height:26px;border-radius:7px;cursor:pointer;'+(editing?'color:#fff;background:#e0662a;border:1px solid #e0662a':'color:#6f6b5d;background:#f3f0e8;border:1px solid #e2ddd0'),
@@ -1293,20 +1432,21 @@ class Component extends DCLogic {
     // new-ellipse form
     const activePop=this._byKey(s.activeKey);
     const manual=s.newSource==='manual';
-    const fieldDefs=[['rhMean',t.fRhMean,'0.1'],['rhSd',t.fRhSd,'0.1'],['xcHMean',t.fXcMean,'0.1'],['xcHSd',t.fXcSd,'0.1'],['r',t.fR,'0.01'],['n',t.fN,'1']];
+    const fieldDefs=[['rhMean',axisX+' média','0.1'],['rhSd',axisX+' DP','0.1'],['xcHMean',axisY+' média','0.1'],['xcHSd',axisY+' DP','0.1'],['r',t.fR,'0.01'],['n',t.fN,'1']];
     const newFields=fieldDefs.map(([f,label,step])=>({label,step,value:s.newVals[f],onInput:(ev)=>this._newVal(f,ev.target.value)}));
     const srcBtn=(active)=>'flex:1;font:500 11.5px \'IBM Plex Sans\';padding:7px;border-radius:8px;cursor:pointer;'+(active?'background:#e0662a;color:#fff;border:1px solid #e0662a':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5');
 
     // comparison options
     const cmpOptions=[];
     if(s.comparisonMode==='independent')s.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p) cmpOptions.push({value:'pop:'+k,label:'◆ '+p.country+' '+p.sex+' (N='+p.n+')'}); });
-    s.ellipses.forEach((e)=>{ cmpOptions.push({value:'ell:'+e.id,label:'● '+e.name+' (N='+e.n+')'}); });
+    currentEllipses.forEach((e)=>{ cmpOptions.push({value:'ell:'+e.id,label:'● '+e.name+' (N='+e.n+')'}); });
 
     // comparison result
     const A=this._resolveCmp(s.cmpA), B=this._resolveCmp(s.cmpB);
     let showResult=false, badgeText='',badgeIcon='',badgeBg='',badgeColor='',pText='',interpText='',statCells=[],warnText='',warnShow=false;
-    if(A&&B){
-      const delta=this._pairedDeltaData();
+    const pairedDelta=this._pairedDeltaData();
+    if((A&&B)||(s.comparisonMode==='paired'&&pairedDelta&&s.paired.referenceKey)){
+      const delta=pairedDelta;
       const res=s.comparisonMode==='paired'?(delta?this._hotellingPaired(delta):{error:'Informe os parâmetros das diferenças pareadas.'}):this._hotelling(A,B);
       showResult=true;
       if(res.error){
@@ -1322,18 +1462,18 @@ class Component extends DCLogic {
         badgeColor=sig?'#c2410c':'#0f7d55';
         pText=(res.pValue<0.001?'< 0.001':'= '+res.pValue.toFixed(3));
         const L=this.state.lang;
-        if(L==='en'){
-          interpText=sig
-            ? 'The mean vectors of '+A._label+' and '+B._label+' differ significantly (p'+pText+'). The separation between the two groups is '+mag+' (Mahalanobis D = '+D.toFixed(2)+'), indicating distinct body composition/hydration.'
-            : 'There is no evidence of a difference between the mean vectors of '+A._label+' and '+B._label+' (p'+pText+'). The two groups are statistically compatible in RXc position; the observed separation ('+mag+', D = '+D.toFixed(2)+') may be due to chance.';
+        if(s.comparisonMode==='paired'&&L==='en'){
+          interpText=sig?'The paired mean change differs significantly from zero (p'+pText+', Mahalanobis D = '+D.toFixed(2)+').':'There is no evidence that the paired mean change differs from zero (p'+pText+', D = '+D.toFixed(2)+').';
+        } else if(s.comparisonMode==='paired'&&L==='es'){
+          interpText=sig?'El cambio medio pareado difiere significativamente de cero (p'+pText+', D de Mahalanobis = '+D.toFixed(2)+').':'No hay evidencia de que el cambio medio pareado difiera de cero (p'+pText+', D = '+D.toFixed(2)+').';
+        } else if(s.comparisonMode==='paired') {
+          interpText=sig?'A mudança média pareada difere significativamente de zero (p'+pText+', D de Mahalanobis = '+D.toFixed(2)+').':'Não há evidência de que a mudança média pareada difira de zero (p'+pText+', D = '+D.toFixed(2)+').';
+        } else if(L==='en'){
+          interpText=sig?'The mean vectors of '+A._label+' and '+B._label+' differ significantly (p'+pText+', Mahalanobis D = '+D.toFixed(2)+').':'There is no evidence of a difference between '+A._label+' and '+B._label+' (p'+pText+', D = '+D.toFixed(2)+').';
         } else if(L==='es'){
-          interpText=sig
-            ? 'Los vectores medios de '+A._label+' y '+B._label+' difieren de forma significativa (p'+pText+'). La separación entre los dos grupos es '+mag+' (D de Mahalanobis = '+D.toFixed(2)+'), indicando composición/hidratación corporal distinta.'
-            : 'No hay evidencia de diferencia entre los vectores medios de '+A._label+' y '+B._label+' (p'+pText+'). Los dos grupos son estadísticamente compatibles en posición RXc; la separación observada ('+mag+', D = '+D.toFixed(2)+') puede deberse al azar.';
+          interpText=sig?'Los vectores medios de '+A._label+' y '+B._label+' difieren significativamente (p'+pText+', D de Mahalanobis = '+D.toFixed(2)+').':'No hay evidencia de diferencia entre '+A._label+' y '+B._label+' (p'+pText+', D = '+D.toFixed(2)+').';
         } else {
-          interpText=sig
-            ? 'Os vetores médios de '+A._label+' e '+B._label+' diferem de forma estatisticamente significativa (p'+pText+'). A separação entre os dois grupos é '+mag+' (D de Mahalanobis = '+D.toFixed(2)+'), indicando composição/hidratação corporal distinta.'
-            : 'Não há evidência de diferença entre os vetores médios de '+A._label+' e '+B._label+' (p'+pText+'). Os dois grupos são estatisticamente compatíveis na posição RXc; a separação observada ('+mag+', D = '+D.toFixed(2)+') pode ser devida ao acaso.';
+          interpText=sig?'Os vetores médios de '+A._label+' e '+B._label+' diferem significativamente (p'+pText+', D de Mahalanobis = '+D.toFixed(2)+').':'Não há evidência de diferença entre '+A._label+' e '+B._label+' (p'+pText+', D = '+D.toFixed(2)+').';
         }
         statCells=[
           {label:'p-value',value:res.pValue<0.001?'<0.001':res.pValue.toFixed(3)},
@@ -1341,7 +1481,7 @@ class Component extends DCLogic {
           {label:'Hotelling T²',value:res.t2.toFixed(1)},
           {label:'F ('+res.df1+', '+res.df2+')',value:res.fValue.toFixed(1)},
         ];
-        const minN=s.comparisonMode==='paired'?(+s.paired.n):Math.min(A.n,B.n);if(minN<30){ warnShow=true; warnText='⚠ '+t.warnSmall+minN+t.warnSmall2; }
+        const minN=s.comparisonMode==='paired'?delta.n:Math.min(A.n,B.n);if(minN<30){ warnShow=true; warnText='⚠ '+t.warnSmall+minN+t.warnSmall2; }
       }
     }
 
@@ -1369,7 +1509,7 @@ class Component extends DCLogic {
     ];
     const preBtn=(on)=>'font:600 10.5px \'IBM Plex Mono\';padding:4px 9px;border-radius:6px;cursor:pointer;'+(on?'background:#2f4fd6;color:#fff;border:1px solid #2f4fd6':'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5');
     const mkPresets=(setter,axis,list,cur)=>list.map((v)=>({label:v,style:preBtn(cur===v),onClick:()=>setter(axis,v)}));
-    const units=['Ω','Ω/m','Ωm'];
+    const units=['Ω','Ω/m','Ω·cm'];
     const axisNameRows=[
       {label:t.axisNameX,value:s.axisNames.x,presets:mkPresets((a,v)=>this._setAxisName(a,v),'x',['R','R/H','Rsp'],s.axisNames.x),onInput:(e)=>this._setAxisName('x',e.target.value),
         unitLbl:t.unitLbl, unitValue:s.axisUnits.x, unitPresets:mkPresets((a,v)=>this._setAxisUnit(a,v),'x',units,s.axisUnits.x), onUnit:(e)=>this._setAxisUnit('x',e.target.value)},
@@ -1378,6 +1518,10 @@ class Component extends DCLogic {
     ];
 
     const smallModeBtn=(on,accent)=>'font:600 10px \'IBM Plex Sans\';padding:5px 8px;border-radius:7px;cursor:pointer;white-space:nowrap;'+(on?'background:'+accent+';color:#fff;border:1px solid '+accent:'background:#fff;color:#6f6b5d;border:1px solid #d8d3c5');
+    const bivaModes=[
+      {label:t.bivaClassic,style:smallModeBtn(!specific,'#173f8a'),onClick:()=>this._setBivaMode('classic')},
+      {label:t.bivaSpecific,style:smallModeBtn(specific,'#173f8a'),onClick:()=>this._setBivaMode('specific')},
+    ];
     const toleranceModes=[
       {label:t.tolClassic,style:smallModeBtn(s.tolMode==='classic','#2f4fd6'),onClick:()=>this._setTolMode('classic')},
       {label:t.tolZ,style:smallModeBtn(s.tolMode==='zscore','#2f4fd6'),onClick:()=>this._setTolMode('zscore')},
@@ -1388,8 +1532,9 @@ class Component extends DCLogic {
       {label:t.pairedLinked,style:smallModeBtn(s.pairedView==='linked','#e0662a'),onClick:()=>this.setState({pairedView:'linked',bounds:null})},
       {label:t.pairedDelta,style:smallModeBtn(s.pairedView==='delta','#e0662a'),onClick:()=>this.setState({pairedView:'delta',axisMode:'auto',bounds:null})},
     ];
-    const pairedFields=[['sdRh',t.pairedSdRh,'0.1'],['sdXc',t.pairedSdXc,'0.1'],['r',t.pairedCorr,'0.01'],['n',t.pairedN,'1']].map(([f,label,step])=>({label,step,value:s.paired[f],onInput:(e)=>this._setPaired(f,e.target.value)}));
-    const measurements=s.measurements.map((m)=>({label:m.participant+' · '+m.time,coords:'R/H '+this._fmt(m.rh,1)+' · Xc/H '+this._fmt(m.xc,1),color:m.color,onRemove:()=>this._removeMeasurement(m.id)}));
+    const pairedFields=[['sdRh','DP Δ'+axisX,'0.1'],['sdXc','DP Δ'+axisY,'0.1'],['r',t.pairedCorr,'0.01'],['n',t.pairedN,'1']].map(([f,label,step])=>({label,step,value:s.paired[f],onInput:(e)=>this._setPaired(f,e.target.value)}));
+    const pairedReferenceOptions=specific?[]:s.pairedRefs.map((p)=>({value:p.key,label:p.legend+' (N='+p.n+')'}));
+    const measurements=currentMeasurements.map((m)=>({label:m.participant+' · '+m.time,coords:axisX+' '+this._fmt(m.rh,1)+' · '+axisY+' '+this._fmt(m.xc,1),color:m.color,onRemove:()=>this._removeMeasurement(m.id)}));
     const annotations=s.annotations.map((a)=>({...a,onRemove:()=>this._removeAnnotation(a.id)}));
     const fontOptions=[{value:'IBM Plex Sans',label:'Plex Sans'},{value:'IBM Plex Mono',label:'Plex Mono'},{value:'Georgia',label:'Georgia'},{value:'Arial',label:'Arial'}];
     const symbolOptions=[{value:'circle',label:'● Círculo'},{value:'square',label:'■ Quadrado'},{value:'diamond',label:'◆ Losango'},{value:'triangle',label:'▲ Triângulo'}];
@@ -1434,16 +1579,16 @@ class Component extends DCLogic {
       onRefCancel:()=>this.setState({showAddRef:false}),
       onRefSave:()=>this._addRef(),
 
-      popTotalLabel:(s.ready?(s.pops.length+s.customRefs.length):'…')+' '+(s.lang==='en'?'populations':(s.lang==='es'?'poblaciones':'populações')),
-      popCountLabel:filtered.length+' / '+((s.pops.length+s.customRefs.length)||'—'),
+      popTotalLabel:(s.ready?availableRefs.length:'…')+' '+(s.lang==='en'?'populations':(s.lang==='es'?'poblaciones':'populações')),
+      popCountLabel:filtered.length+' / '+(availableRefs.length||'—'),
       onSearch:(ev)=>this._setF({search:ev.target.value}),
       sexFilters, typeFilters, pops,
       emptyStyle:(s.ready&&!filtered.length)?'padding:24px 8px;text-align:center;font-size:12px;color:#a39e8d':'display:none',
 
       chartRef:(el)=>{ this._canvas=el; if(el) requestAnimationFrame(()=>this._draw()); },
-      chartSub:this._isZMode()?'Z(R/H) × Z(Xc/H)':((s.method==='confidence'&&s.comparisonMode==='paired'&&s.pairedView==='delta')?'ΔR/H × ΔXc/H':t.chartSubBase),
+      chartSub:this._isZMode()?'Z(R/H) × Z(Xc/H)':((s.method==='confidence'&&s.comparisonMode==='paired'&&s.pairedView==='delta')?'Δ'+axisX+' × Δ'+axisY:(specific?'Rsp × Xcsp (Ω·cm)':t.chartSubBase)),
       chartEmptyStyle:(legendItems.length||this._indivPoint())?'display:none':'position:absolute;inset:0;display:flex;align-items:center;justify-content:center',
-      chartEmptyText: s.method==='tolerance'?t.chartEmptyTol:t.chartEmpty,
+      chartEmptyText: specific?t.batchHint:(s.method==='tolerance'?t.chartEmptyTol:t.chartEmpty),
       legendItems,
       legendEmptyStyle:legendItems.length?'display:none':'font-size:11px;color:#a39e8d;font-style:italic',
       onExport:()=>this._exportPNG(),
@@ -1475,23 +1620,29 @@ class Component extends DCLogic {
       onNewSourceManual:()=>this.setState({newSource:'manual'}),
       srcActiveStyle:srcBtn(!manual), srcManualStyle:srcBtn(manual),
       newName:s.newName, onNewName:(ev)=>this.setState({newName:ev.target.value}),
-      newFields,
+      newFields,bivaModes,
+      specificNoteStyle:specific?'font-size:9.5px;color:#76540d;background:#fff8df;border:1px solid #eadca8;border-radius:7px;padding:7px 8px;margin-bottom:7px;line-height:1.4':'display:none',
+      confidenceImportStatus:s.importStatus.scope==='confidence'?s.importStatus.text:'',
+      confidenceImportStatusStyle:s.importStatus.scope==='confidence'&&s.importStatus.text?'font-size:10px;color:'+(s.importStatus.type==='error'?'#a33a2c':'#0b6b5d')+';margin-top:7px;line-height:1.4':'display:none',
+      toleranceImportStatus:s.importStatus.scope==='tolerance'?s.importStatus.text:'',
+      toleranceImportStatusStyle:s.importStatus.scope==='tolerance'&&s.importStatus.text?'font-size:10px;color:'+(s.importStatus.type==='error'?'#a33a2c':'#0b6b5d')+';margin-top:7px;line-height:1.4':'display:none',
+      onImportConfidence:(ev)=>this._importParticipants(ev,'confidence'),onImportTolerance:(ev)=>this._importParticipants(ev,'tolerance'),
       manualGridStyle:manual?'display:grid;grid-template-columns:1fr 1fr;gap:8px':'display:none',
-      activeSrcNoteStyle:!manual?'font-size:11px;color:#8a6a4f;background:#fbeadd;border:1px solid #f2d3bd;border-radius:8px;padding:8px 10px':'display:none',
+      activeSrcNoteStyle:!manual&&!specific?'font-size:11px;color:#8a6a4f;background:#fbeadd;border:1px solid #f2d3bd;border-radius:8px;padding:8px 10px':'display:none',
       activeSrcNote:activePop?((s.lang==='en'?'Source: ':(s.lang==='es'?'Origen: ':'Origem: '))+activePop.country+' '+activePop.sex+' — R/H '+this._fmt(activePop.rhMean,1)+', Xc/H '+this._fmt(activePop.xcHMean,1)+', N='+activePop.n):t.activeNoneNote,
       onAddEllipse:()=>this._addEllipse(),
       ellipses,
-      ellipseEmptyStyle:s.ellipses.length?'display:none':'padding:16px 8px;text-align:center;font-size:11.5px;color:#a39e8d;line-height:1.5',
+      ellipseEmptyStyle:currentEllipses.length?'display:none':'padding:16px 8px;text-align:center;font-size:11.5px;color:#a39e8d;line-height:1.5',
 
       // individual (tolerance)
       indivPanelStyle: showIndivPanel ? '' : 'display:none',
-      toleranceModes,indivRh:s.indiv.rh, indivXc:s.indiv.xc,indivParticipant:s.indiv.participant,indivTime:s.indiv.time,indivColor:s.indiv.color,indivSymbol:s.indiv.symbol,symbolOptions,
+      toleranceModes,indivAxisX:axisX,indivAxisY:axisY,indivRh:s.indiv.rh, indivXc:s.indiv.xc,indivParticipant:s.indiv.participant,indivTime:s.indiv.time,indivColor:s.indiv.color,indivSymbol:s.indiv.symbol,symbolOptions,
       onIndivRh:(ev)=>this._setIndiv('rh',ev.target.value),
       onIndivXc:(ev)=>this._setIndiv('xc',ev.target.value),
       onIndivParticipant:(ev)=>this._setIndiv('participant',ev.target.value),onIndivTime:(ev)=>this._setIndiv('time',ev.target.value),onIndivColor:(ev)=>this._setIndiv('color',ev.target.value),onIndivSymbol:(ev)=>this._setIndiv('symbol',ev.target.value),
       onPlotIndiv:()=>this._plotIndiv(), onClearIndiv:()=>this._clearIndiv(),
       indivNoPopStyle:(!activePop && s.indivShown)?'font-size:11px;color:#b45309;background:#fdf3e8;border:1px solid #f2ddc2;border-radius:8px;padding:8px 10px;margin-top:8px':'display:none',
-      indivResultStyle, iBadge, iBadgeBg, iBadgeColor, iBadgeIcon, iInterp, iCells,measurements,measurementListStyle:s.measurements.length?'display:flex;flex-direction:column;gap:6px;margin-top:10px;max-height:180px;overflow:auto':'display:none',
+      indivResultStyle, iBadge, iBadgeBg, iBadgeColor, iBadgeIcon, iInterp, iCells,measurements,measurementListStyle:currentMeasurements.length?'display:flex;flex-direction:column;gap:6px;margin-top:10px;max-height:180px;overflow:auto':'display:none',
 
       // comparison
       cmpOptions, cmpA:s.cmpA, cmpB:s.cmpB,
@@ -1503,7 +1654,7 @@ class Component extends DCLogic {
       warnText,
       cmpEmptyStyle:showResult?'display:none':'padding:18px 8px;text-align:center;font-size:11.5px;color:#a39e8d',
       comparisonModes,cmpLabelA:s.comparisonMode==='paired'?t.time1:t.grpA,cmpLabelB:s.comparisonMode==='paired'?t.time2:t.grpB,
-      pairedPanelStyle:s.comparisonMode==='paired'?'padding:10px;background:#fbf6f1;border:1px solid #f0dccd;border-radius:9px;margin-bottom:12px':'display:none',pairedViews,pairedFields,
+      pairedPanelStyle:s.comparisonMode==='paired'?'padding:10px;background:#fbf6f1;border:1px solid #f0dccd;border-radius:9px;margin-bottom:12px':'display:none',pairedViews,pairedFields,pairedReferenceKey:s.paired.referenceKey,pairedReferenceOptions,onPairedReference:(e)=>this._setPairedReference(e.target.value),
     };
   }
 }
