@@ -6,6 +6,7 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 
 - **index.html** - Entrada principal com redirecionamento para a Workspace
 - **BIVA2.html** - Workspace integrada para tolerância, confiança e análise mista
+- **BIVA2.dc.html** - Fonte editável do design atual da Workspace
 - **support.js** - Runtime local utilizado pela Workspace avançada
 - **reference_populations_final.json** - Base revisada com 166 populações (133 de confiança e 33 de tolerância)
 - **paired_reference_populations.json** - Oito conjuntos de referência para análise pareada
@@ -53,6 +54,7 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 - Português (Brasil)
 - Inglês
 - Espanhol
+- Italiano
 
 ## 📊 Populações de Referência
 
@@ -71,11 +73,12 @@ Cada população contém:
 ✅ Entrada de elipses e medidas individuais longitudinais
 ✅ Importação simultânea de vários participantes e grupos por Excel
 ✅ Modelo Excel para download com validação e colunas calculadas
+✅ Manual do modelo Excel em português, inglês, espanhol e italiano
 ✅ Cálculo automático de média, DP amostral, correlação de Pearson e N por grupo
 ✅ BIVA clássica (R/H, Xc/H) e específica (Rsp, Xcsp)
 ✅ Bloqueio da análise quando faltam estatura ou perímetros exigidos
 ✅ Gráfico RXc com elipses e fallback Canvas local
-✅ Interface exclusivamente em modo claro
+✅ Modos claro e escuro com alternância na página inicial e no workspace
 ✅ Tolerance tradicional deslocada ou centrada em z-score
 ✅ Eixos dos gráficos editáveis manualmente
 ✅ Atalho para abrir análise mista mantendo medições, elipses, estilos e eixos
@@ -91,7 +94,7 @@ Cada população contém:
 ✅ Nomes e legenda dentro da figura exportada
 ✅ Export PNG com fundo branco consistente
 ✅ Excel com abas de elipses, comparações em pares, análise pareada e dados longitudinais
-✅ Multi-idioma (PT-BR, EN, ES)
+✅ Multi-idioma (PT-BR, EN, ES, IT)
 ✅ Interface responsiva
 ✅ Workspace única com banco visual e eixos customizáveis
 
