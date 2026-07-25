@@ -236,7 +236,7 @@
                 <span class="mono" style="font-size:10px;color:var(--text-muted)">N={{ p.n }}</span>
               </div>
               <div style="font-size:10.5px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px">{{ p.subLine }}</div>
-              <div style="{{ p.referenceStyle }}"><span style="font-weight:600">{{ t.refArticle }}:</span> {{ p.referenceLabel }}</div>
+              <div style="{{ p.referenceStyle }}"><span style="font-weight:600">{{ t.refArticle }}:</span> {{ p.referenceAuthor }} ({{ p.referenceYear }}) · <a href="{{ p.referenceHref }}" target="_blank" rel="noopener noreferrer" onClick="{{ p.onDoiClick }}" style="color:var(--text-10);text-decoration:underline;text-underline-offset:2px">DOI: {{ p.referenceDoi }}</a></div>
               <div style="display:flex;gap:5px;flex-wrap:wrap">
                 <span style="{{ p.typeChip }}">{{ p.type }}</span>
                 <span style="font-size:9.5px;color:var(--text-muted);background:var(--bg-chip);padding:1px 6px;border-radius:5px">{{ p.age }}</span>
@@ -1027,22 +1027,23 @@ class Component extends DCLogic {
   _inferSex(p,l){const s=String(p.sex||'').toLowerCase();if(s==='m'||s==='f')return s.toUpperCase();if(/females?/i.test(l))return 'F';if(/males?/i.test(l))return 'M';return '—';}
   _referenceInfo(reference,legend){
     const r=String(reference||''),l=String(legend||'');
-    if(/NHANES III/i.test(l))return{author:'Piccoli et al.',doi:'10.1016/S0899-9007(01)00665-7',label:'Piccoli et al. · DOI: 10.1016/S0899-9007(01)00665-7'};
+    if(/NHANES III/i.test(l))return{author:'Piccoli et al.',year:'2002',doi:'10.1016/S0899-9007(01)00665-7',label:'Piccoli et al. (2002) · DOI: 10.1016/S0899-9007(01)00665-7'};
     const refs=[
-      [/61\s*:\s*269-270|Bivariate normal values/i,'Piccoli et al.','10.1093/ajcn/61.2.269'],
-      [/Kidney Int 53\s*:\s*1036-1043|dry weight prescription/i,'Piccoli et al.','10.1111/j.1523-1755.1998.00843.x'],
-      [/Int J Obes 22\s*:\s*97-104|Discriminating between body fat/i,'Piccoli et al.','10.1038/sj.ijo.0800551'],
-      [/Nut(?:r)?ition 16\s*:\s*120-124|Altered tissue electric properties/i,'Toso et al.','10.1016/S0899-9007(99)00230-0'],
-      [/Nutrition 18\s*:\s*153-167|Impedance vector distribution by sex/i,'Piccoli et al.','10.1016/S0899-9007(01)00665-7'],
-      [/Application of bioelectrical impedance analysis to elderly/i,'Roubenoff et al.','10.1093/gerona/52a.3.m129'],
-      [/Predictive accuracy of bioelectrical impedance.*Native American/i,'Stolarczyk et al.','10.1093/ajcn/59.5.964'],
-      [/Reference values of the bioelect.*impedance vector in neonates/i,'Piccoli et al.','10.1016/S0899-9007(02)00795-5'],
-      [/Normal values of the bioelectrical impedance vector in child/i,'De Palo et al.','10.1016/S0899-9007(00)00269-0'],
+      [/61\s*:\s*269-270|Bivariate normal values/i,'Piccoli et al.','1995','10.1093/ajcn/61.2.269'],
+      [/Kidney Int 53\s*:\s*1036-1043|dry weight prescription/i,'Piccoli et al.','1998','10.1111/j.1523-1755.1998.00843.x'],
+      [/Int J Obes 22\s*:\s*97-104|Discriminating between body fat/i,'Piccoli et al.','1998','10.1038/sj.ijo.0800551'],
+      [/Nut(?:r)?ition 16\s*:\s*120-124|Altered tissue electric properties/i,'Toso et al.','2000','10.1016/S0899-9007(99)00230-0'],
+      [/Nutrition 18\s*:\s*153-167|Impedance vector distribution by sex/i,'Piccoli et al.','2002','10.1016/S0899-9007(01)00665-7'],
+      [/Application of bioelectrical impedance analysis to elderly/i,'Roubenoff et al.','1997','10.1093/gerona/52a.3.m129'],
+      [/Predictive accuracy of bioelectrical impedance.*Native American/i,'Stolarczyk et al.','1994','10.1093/ajcn/59.5.964'],
+      [/Reference values of the bioelect.*impedance vector in neonates/i,'Piccoli et al.','2002','10.1016/S0899-9007(02)00795-5'],
+      [/Normal values of the bioelectrical impedance vector in child/i,'De Palo et al.','2000','10.1016/S0899-9007(00)00269-0'],
     ];
     const hit=refs.find((item)=>item[0].test(r));
-    if(hit)return{author:hit[1],doi:hit[2],label:hit[1]+' · DOI: '+hit[2]};
+    if(hit)return{author:hit[1],year:hit[2],doi:hit[3],label:hit[1]+' ('+hit[2]+') · DOI: '+hit[3]};
     const surname=(r.match(/^\s*([A-Za-zÀ-ÿ'-]+)/)||[])[1]||'';
-    return{author:surname?(surname+' et al.'):'',doi:'',label:surname?(surname+' et al.') : ''};
+    const year=(r.match(/\b(19|20)\d{2}\b/)||[])[0]||'';
+    return{author:surname?(surname+' et al.'):'',year,doi:'',label:surname?(surname+' et al.'+(year?' ('+year+')':'')) : ''};
   }
   _normalize(p,i){
     const legend=String(p.legend||('População '+(i+1))).replace(/\s+/g,' ').trim();
@@ -1054,7 +1055,7 @@ class Component extends DCLogic {
       code:p.code||i+1, legend, source,
       sex:this._inferSex(p,legend),
       countryRaw:country, country:this._ptCountry(country),
-      age:p.age||this._inferAge(legend), equip:p.equipment||this._inferEquip(legend), type:p.population||this._inferType(legend), reference:p.reference||'',referenceAuthor:ref.author,referenceDoi:ref.doi,referenceLabel:ref.label,
+      age:p.age||this._inferAge(legend), equip:p.equipment||this._inferEquip(legend), type:p.population||this._inferType(legend), reference:p.reference||'',referenceAuthor:ref.author,referenceYear:ref.year,referenceDoi:ref.doi,referenceLabel:ref.label,
       n:Number(p.n)||1,
       rhMean:Number(p.r_h_mean), rhSd:Number(p.r_h_sd),
       xcHMean:Number(p.xc_h_mean), xcHSd:Number(p.xc_h_sd),
@@ -1064,7 +1065,7 @@ class Component extends DCLogic {
   _normalizePaired(p,i){
     const legend=String(p.legend||('Pareada '+(i+1))).replace(/\s+/g,' ').trim();
     const ref=this._referenceInfo(p.reference,legend);
-    return {key:'paired:'+(p.code||i+1)+':'+i,code:p.code||i+1,legend,sex:this._inferSex(p,legend),country:this._ptCountry(p.country||this._inferCountry(legend)),equip:p.equipment||this._inferEquip(legend),type:p.population||this._inferType(legend),reference:p.reference||'',referenceAuthor:ref.author,referenceDoi:ref.doi,referenceLabel:ref.label,n:+p.n,rhMean:+p.dr_h_mean,rhSd:+p.dr_h_sd,xcHMean:+p.dxc_h_mean,xcHSd:+p.dxc_h_sd,r:Math.max(-0.999,Math.min(0.999,+p.correlation||0))};
+    return {key:'paired:'+(p.code||i+1)+':'+i,code:p.code||i+1,legend,sex:this._inferSex(p,legend),country:this._ptCountry(p.country||this._inferCountry(legend)),equip:p.equipment||this._inferEquip(legend),type:p.population||this._inferType(legend),reference:p.reference||'',referenceAuthor:ref.author,referenceYear:ref.year,referenceDoi:ref.doi,referenceLabel:ref.label,n:+p.n,rhMean:+p.dr_h_mean,rhSd:+p.dr_h_sd,xcHMean:+p.dxc_h_mean,xcHSd:+p.dxc_h_sd,r:Math.max(-0.999,Math.min(0.999,+p.correlation||0))};
   }
   _keepPaired(p){return this._keep(p);}
   _keep(p){
@@ -1542,7 +1543,7 @@ class Component extends DCLogic {
         confStyle:modeBtn(mode==='conf95'), tolStyle:modeBtn(mode==='tolerance'),
         onConf:(ev)=>{ if(ev)ev.stopPropagation(); this._setRefMode(p.key,'conf95'); },
         onTol:(ev)=>{ if(ev)ev.stopPropagation(); this._setRefMode(p.key,'tolerance'); },
-        key:p.key, legend:p.legend, cardTitle:p.legend+(p.referenceLabel?('\n'+p.referenceLabel):''), country:p.country, sex:p.sex, age:p.age, n:p.n, type:p.type,referenceLabel:p.referenceLabel,
+        key:p.key, legend:p.legend, cardTitle:p.legend+(p.referenceLabel?('\n'+p.referenceLabel):''), country:p.country, sex:p.sex, age:p.age, n:p.n, type:p.type,referenceLabel:p.referenceLabel,referenceAuthor:p.referenceAuthor,referenceYear:p.referenceYear,referenceDoi:p.referenceDoi,referenceHref:p.referenceDoi?('https://doi.org/'+p.referenceDoi):'#',onDoiClick:(ev)=>{if(ev)ev.stopPropagation();},
         onToggle:()=>this._toggleRef(p.key),
         sexLabel:p.sex, sexColor:p.sex==='F'?'#c0248f':(p.sex==='M'?'#2f4fd6':'#8a8676'),
         subLine:p.equip+' · '+p.age,
