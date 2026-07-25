@@ -221,7 +221,7 @@
 
       <div class="scr" style="flex:1;overflow-y:auto;padding:12px 12px 20px;display:flex;flex-direction:column;gap:9px">
         <sc-for list="{{ pops }}" as="p" hint-placeholder-count="7">
-          <div onClick="{{ p.onToggle }}" title="{{ p.legend }}" style="{{ p.cardStyle }}" style-hover="border-color:var(--border-hover);box-shadow:0 2px 8px rgba(0,0,0,.05)">
+          <div onClick="{{ p.onToggle }}" title="{{ p.cardTitle }}" style="{{ p.cardStyle }}" style-hover="border-color:var(--border-hover);box-shadow:0 2px 8px rgba(0,0,0,.05)">
             <div style="width:4px;flex:none;border-radius:4px;align-self:stretch;background:{{ p.accent }}"></div>
             <svg viewBox="0 0 60 44" style="width:56px;height:42px;flex:none;background:var(--bg-thumb);border:1px solid var(--border-4);border-radius:7px">
               <line x1="4" y1="40" x2="56" y2="40" stroke="var(--stroke-grid)" stroke-width="1"></line>
@@ -236,6 +236,7 @@
                 <span class="mono" style="font-size:10px;color:var(--text-muted)">N={{ p.n }}</span>
               </div>
               <div style="font-size:10.5px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px">{{ p.subLine }}</div>
+              <div style="{{ p.referenceStyle }}"><span style="font-weight:600">{{ t.refArticle }}:</span> {{ p.referenceLabel }}</div>
               <div style="display:flex;gap:5px;flex-wrap:wrap">
                 <span style="{{ p.typeChip }}">{{ p.type }}</span>
                 <span style="font-size:9.5px;color:var(--text-muted);background:var(--bg-chip);padding:1px 6px;border-radius:5px">{{ p.age }}</span>
@@ -774,7 +775,7 @@ class Component extends DCLogic {
       unitLbl:'Unidade', migrateBtn:'Migrar para Mista',
       addRef:'+ Nova referência', addRefTitle:'Adicionar referência ao banco',
       addRefHint:'Insira os parâmetros de uma nova população. Ela é adicionada à lista abaixo das referências publicadas (só nesta sessão).',
-      refName:'Nome / legenda', refCountry:'País', refSex:'Sexo', refType:'Tipo', refCancel:'Cancelar', refSave:'Adicionar ao banco',
+      refName:'Nome / legenda', refCountry:'País', refSex:'Sexo', refType:'Tipo', refCancel:'Cancelar', refSave:'Adicionar ao banco', refArticle:'Referência',
       refCustomTag:'sua referência',
       ellTitle:'Elipses de confiança', newAdd:'+ Nova', newClose:'Fechar',
       newHint:'Crie uma elipse de confiança (IC 95% da média) a partir da população ativa, ou insira os parâmetros manualmente.',
@@ -836,7 +837,7 @@ class Component extends DCLogic {
       unitLbl:'Unit', migrateBtn:'Switch to Combined',
       addRef:'+ New reference', addRefTitle:'Add reference to the bank',
       addRefHint:'Enter the parameters of a new population. It is added to the list below the published references (this session only).',
-      refName:'Name / legend', refCountry:'Country', refSex:'Sex', refType:'Type', refCancel:'Cancel', refSave:'Add to bank',
+      refName:'Name / legend', refCountry:'Country', refSex:'Sex', refType:'Type', refCancel:'Cancel', refSave:'Add to bank', refArticle:'Reference',
       refCustomTag:'your reference',
       ellTitle:'Confidence ellipses', newAdd:'+ New', newClose:'Close',
       newHint:'Create a confidence ellipse (95% CI of the mean) from the active population, or enter parameters manually.',
@@ -898,7 +899,7 @@ class Component extends DCLogic {
       unitLbl:'Unidad', migrateBtn:'Pasar a Mixta',
       addRef:'+ Nueva referencia', addRefTitle:'Añadir referencia al banco',
       addRefHint:'Introduce los parámetros de una nueva población. Se añade a la lista debajo de las referencias publicadas (solo esta sesión).',
-      refName:'Nombre / leyenda', refCountry:'País', refSex:'Sexo', refType:'Tipo', refCancel:'Cancelar', refSave:'Añadir al banco',
+      refName:'Nombre / leyenda', refCountry:'País', refSex:'Sexo', refType:'Tipo', refCancel:'Cancelar', refSave:'Añadir al banco', refArticle:'Referencia',
       refCustomTag:'tu referencia',
       ellTitle:'Elipses de confianza', newAdd:'+ Nueva', newClose:'Cerrar',
       newHint:'Crea una elipse de confianza (IC 95% de la media) desde la población activa, o introduce los parámetros manualmente.',
@@ -960,7 +961,7 @@ class Component extends DCLogic {
       unitLbl:'Unità', migrateBtn:'Passa a Mista',
       addRef:'+ Nuovo riferimento', addRefTitle:'Aggiungi riferimento al database',
       addRefHint:'Inserisci i parametri di una nuova popolazione. Viene aggiunta all\u2019elenco sotto i riferimenti pubblicati (solo in questa sessione).',
-      refName:'Nome / legenda', refCountry:'Paese', refSex:'Sesso', refType:'Tipo', refCancel:'Annulla', refSave:'Aggiungi al database',
+      refName:'Nome / legenda', refCountry:'Paese', refSex:'Sesso', refType:'Tipo', refCancel:'Annulla', refSave:'Aggiungi al database', refArticle:'Riferimento',
       refCustomTag:'tuo riferimento',
       ellTitle:'Ellissi di confidenza', newAdd:'+ Nuova', newClose:'Chiudi',
       newHint:'Crea un\u2019ellisse di confidenza (IC 95% della media) dalla popolazione attiva, oppure inserisci i parametri manualmente.',
@@ -1024,16 +1025,36 @@ class Component extends DCLogic {
   _inferEquip(l){const m=l.match(/\(([^)]*(?:Akern|RJL|BIA|Bodystat|InBody|Tanita|SEAC)[^)]*)\)/i);if(m)return m[1].replace(/\s+/g,' ').trim();if(/akern/i.test(l))return 'Akern-RJL';if(/rjl/i.test(l))return 'RJL Systems';return '—';}
   _inferType(l){if(/athlet|sport|endurance|velocity|power|team-sports/i.test(l))return 'Sport';if(/clinical|patient|disease|renal|cardiac|obese|cancer|sarcopen/i.test(l))return 'Clinical';if(/healthy|reference|adult|children|adolescent/i.test(l))return 'Healthy';return 'Other';}
   _inferSex(p,l){const s=String(p.sex||'').toLowerCase();if(s==='m'||s==='f')return s.toUpperCase();if(/females?/i.test(l))return 'F';if(/males?/i.test(l))return 'M';return '—';}
+  _referenceInfo(reference,legend){
+    const r=String(reference||''),l=String(legend||'');
+    if(/NHANES III/i.test(l))return{author:'Piccoli et al.',doi:'10.1016/S0899-9007(01)00665-7',label:'Piccoli et al. · DOI: 10.1016/S0899-9007(01)00665-7'};
+    const refs=[
+      [/61\s*:\s*269-270|Bivariate normal values/i,'Piccoli et al.','10.1093/ajcn/61.2.269'],
+      [/Kidney Int 53\s*:\s*1036-1043|dry weight prescription/i,'Piccoli et al.','10.1111/j.1523-1755.1998.00843.x'],
+      [/Int J Obes 22\s*:\s*97-104|Discriminating between body fat/i,'Piccoli et al.','10.1038/sj.ijo.0800551'],
+      [/Nut(?:r)?ition 16\s*:\s*120-124|Altered tissue electric properties/i,'Toso et al.','10.1016/S0899-9007(99)00230-0'],
+      [/Nutrition 18\s*:\s*153-167|Impedance vector distribution by sex/i,'Piccoli et al.','10.1016/S0899-9007(01)00665-7'],
+      [/Application of bioelectrical impedance analysis to elderly/i,'Roubenoff et al.','10.1093/gerona/52a.3.m129'],
+      [/Predictive accuracy of bioelectrical impedance.*Native American/i,'Stolarczyk et al.','10.1093/ajcn/59.5.964'],
+      [/Reference values of the bioelect.*impedance vector in neonates/i,'Piccoli et al.','10.1016/S0899-9007(02)00795-5'],
+      [/Normal values of the bioelectrical impedance vector in child/i,'De Palo et al.','10.1016/S0899-9007(00)00269-0'],
+    ];
+    const hit=refs.find((item)=>item[0].test(r));
+    if(hit)return{author:hit[1],doi:hit[2],label:hit[1]+' · DOI: '+hit[2]};
+    const surname=(r.match(/^\s*([A-Za-zÀ-ÿ'-]+)/)||[])[1]||'';
+    return{author:surname?(surname+' et al.'):'',doi:'',label:surname?(surname+' et al.') : ''};
+  }
   _normalize(p,i){
     const legend=String(p.legend||('População '+(i+1))).replace(/\s+/g,' ').trim();
     const source=['confidence','tolerance','custom'].includes(p.source)?p.source:'tolerance';
     const country=p.country||this._inferCountry(legend);
+    const ref=this._referenceInfo(p.reference,legend);
     return {
       key:source+':'+(p.code||i+1)+':'+i,
       code:p.code||i+1, legend, source,
       sex:this._inferSex(p,legend),
       countryRaw:country, country:this._ptCountry(country),
-      age:p.age||this._inferAge(legend), equip:p.equipment||this._inferEquip(legend), type:p.population||this._inferType(legend), reference:p.reference||'',
+      age:p.age||this._inferAge(legend), equip:p.equipment||this._inferEquip(legend), type:p.population||this._inferType(legend), reference:p.reference||'',referenceAuthor:ref.author,referenceDoi:ref.doi,referenceLabel:ref.label,
       n:Number(p.n)||1,
       rhMean:Number(p.r_h_mean), rhSd:Number(p.r_h_sd),
       xcHMean:Number(p.xc_h_mean), xcHSd:Number(p.xc_h_sd),
@@ -1042,7 +1063,8 @@ class Component extends DCLogic {
   }
   _normalizePaired(p,i){
     const legend=String(p.legend||('Pareada '+(i+1))).replace(/\s+/g,' ').trim();
-    return {key:'paired:'+(p.code||i+1)+':'+i,code:p.code||i+1,legend,sex:this._inferSex(p,legend),country:this._ptCountry(p.country||this._inferCountry(legend)),equip:p.equipment||this._inferEquip(legend),type:p.population||this._inferType(legend),reference:p.reference||'',n:+p.n,rhMean:+p.dr_h_mean,rhSd:+p.dr_h_sd,xcHMean:+p.dxc_h_mean,xcHSd:+p.dxc_h_sd,r:Math.max(-0.999,Math.min(0.999,+p.correlation||0))};
+    const ref=this._referenceInfo(p.reference,legend);
+    return {key:'paired:'+(p.code||i+1)+':'+i,code:p.code||i+1,legend,sex:this._inferSex(p,legend),country:this._ptCountry(p.country||this._inferCountry(legend)),equip:p.equipment||this._inferEquip(legend),type:p.population||this._inferType(legend),reference:p.reference||'',referenceAuthor:ref.author,referenceDoi:ref.doi,referenceLabel:ref.label,n:+p.n,rhMean:+p.dr_h_mean,rhSd:+p.dr_h_sd,xcHMean:+p.dxc_h_mean,xcHSd:+p.dxc_h_sd,r:Math.max(-0.999,Math.min(0.999,+p.correlation||0))};
   }
   _keepPaired(p){return this._keep(p);}
   _keep(p){
@@ -1111,7 +1133,7 @@ class Component extends DCLogic {
       if(!p.custom && this.state.method==='tolerance' && p.source!=='tolerance') return false;
       if(fSex && p.sex!==fSex) return false;
       if(fType && p.type!==fType) return false;
-      if(q && !(p.legend.toLowerCase().includes(q) || p.country.toLowerCase().includes(q) || p.equip.toLowerCase().includes(q))) return false;
+      if(q && !(p.legend.toLowerCase().includes(q) || p.country.toLowerCase().includes(q) || p.equip.toLowerCase().includes(q) || String(p.referenceLabel||'').toLowerCase().includes(q))) return false;
       return true;
     });
   }
@@ -1520,10 +1542,11 @@ class Component extends DCLogic {
         confStyle:modeBtn(mode==='conf95'), tolStyle:modeBtn(mode==='tolerance'),
         onConf:(ev)=>{ if(ev)ev.stopPropagation(); this._setRefMode(p.key,'conf95'); },
         onTol:(ev)=>{ if(ev)ev.stopPropagation(); this._setRefMode(p.key,'tolerance'); },
-        key:p.key, legend:p.legend, country:p.country, sex:p.sex, age:p.age, n:p.n, type:p.type,
+        key:p.key, legend:p.legend, cardTitle:p.legend+(p.referenceLabel?('\n'+p.referenceLabel):''), country:p.country, sex:p.sex, age:p.age, n:p.n, type:p.type,referenceLabel:p.referenceLabel,
         onToggle:()=>this._toggleRef(p.key),
         sexLabel:p.sex, sexColor:p.sex==='F'?'#c0248f':(p.sex==='M'?'#2f4fd6':'#8a8676'),
         subLine:p.equip+' · '+p.age,
+        referenceStyle:p.referenceLabel?'font-size:9.5px;line-height:1.35;color:var(--text-6);margin-bottom:6px;overflow-wrap:anywhere':'display:none',
         customTagStyle:p.custom?'font-size:9px;color:#fff;background:#e0662a;padding:1px 6px;border-radius:5px;font-weight:600':'display:none',
         accent: sel? (col||'#2f4fd6') : 'transparent',
         thumbPath:this._thumbPath(p),
@@ -1677,7 +1700,7 @@ class Component extends DCLogic {
       {label:t.pairedDelta,style:smallModeBtn(s.pairedView==='delta','#e0662a'),onClick:()=>this.setState({pairedView:'delta',axisMode:'auto',bounds:null})},
     ];
     const pairedFields=[['sdRh','DP Δ'+axisX,'0.1'],['sdXc','DP Δ'+axisY,'0.1'],['r',t.pairedCorr,'0.01'],['n',t.pairedN,'1']].map(([f,label,step])=>({label,step,value:s.paired[f],onInput:(e)=>this._setPaired(f,e.target.value)}));
-    const pairedReferenceOptions=specific?[]:s.pairedRefs.map((p)=>({value:p.key,label:p.legend+' (N='+p.n+')'}));
+    const pairedReferenceOptions=specific?[]:s.pairedRefs.map((p)=>({value:p.key,label:p.legend+' (N='+p.n+')'+(p.referenceLabel?' — '+p.referenceLabel:'')}));
     const symbolOptions=[{value:'circle',label:'● Círculo'},{value:'square',label:'■ Quadrado'},{value:'diamond',label:'◆ Losango'},{value:'triangle',label:'▲ Triângulo'}];
     const measurements=currentMeasurements.map((m)=>{const editing=s.editingMeasurementId===m.id,d=editing?(s.measurementDraft||{}):{};return{label:m.participant+' · '+m.time,coords:axisX+' '+this._fmt(m.rh,1)+' · '+axisY+' '+this._fmt(m.xc,1),color:m.color,axisX,axisY,editStyle:editing?'padding:9px;border-top:1px solid var(--border-5);background:var(--bg-drawer)':'display:none',editParticipant:d.participant||'',editTime:d.time||'',editRh:d.rh??'',editXc:d.xc??'',editColor:d.color||m.color,editSymbol:d.symbol||m.symbol,symbolOptions,onEdit:()=>this._startEditMeasurement(m),onEditParticipant:(e)=>this._setMeasurementDraft('participant',e.target.value),onEditTime:(e)=>this._setMeasurementDraft('time',e.target.value),onEditRh:(e)=>this._setMeasurementDraft('rh',e.target.value),onEditXc:(e)=>this._setMeasurementDraft('xc',e.target.value),onEditColor:(e)=>this._setMeasurementDraft('color',e.target.value),onEditSymbol:(e)=>this._setMeasurementDraft('symbol',e.target.value),editErrorStyle:editing&&s.measurementError?'font-size:9.5px;color:#b45309;margin-bottom:7px':'display:none',onCancelEdit:()=>this.setState({editingMeasurementId:null,measurementDraft:null,measurementError:false}),onSaveEdit:()=>this._saveMeasurement(m.id),onRemove:()=>this._removeMeasurement(m.id)};});
     const annotations=s.annotations.map((a)=>({...a,onRemove:()=>this._removeAnnotation(a.id)}));

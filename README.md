@@ -78,6 +78,7 @@ Cada população contém:
 ✅ BIVA clássica (R/H, Xc/H) e específica (Rsp, Xcsp)
 ✅ Bloqueio da análise quando faltam estatura ou perímetros exigidos
 ✅ Gráfico RXc com elipses e fallback Canvas local
+✅ Autor principal e DOI visíveis em cada população de referência
 ✅ Modos claro e escuro com alternância na página inicial e no workspace
 ✅ Tolerance tradicional deslocada ou centrada em z-score
 ✅ Eixos dos gráficos editáveis manualmente
