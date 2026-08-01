@@ -7,6 +7,7 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 - **index.html** - Entrada principal com redirecionamento para a Workspace
 - **BIVA2.html** - Workspace integrada para tolerância, confiança e análise mista
 - **BIVA2.dc.html** - Fonte editável do design atual da Workspace
+- **estimador-pearson.html** - Ferramenta complementar para estimar a correlação de Pearson pela geometria de elipses publicadas
 - **support.js** - Runtime local utilizado pela Workspace avançada
 - **reference_populations_final.json** - Base revisada com 166 populações (133 de confiança e 33 de tolerância)
 - **paired_reference_populations.json** - Oito conjuntos de referência para análise pareada
@@ -100,6 +101,7 @@ Cada população contém:
 ✅ Multi-idioma (PT-BR, EN, ES, IT)
 ✅ Interface responsiva
 ✅ Workspace única com banco visual e eixos customizáveis
+✅ Estimador complementar de correlação de Pearson a partir da geometria de elipses publicadas
 
 ## 🧪 Análise de Confiança
 

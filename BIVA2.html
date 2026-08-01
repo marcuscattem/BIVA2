@@ -26,6 +26,7 @@
     .chart-column{min-height:650px}
     .chart-stage{height:520px!important;flex:none!important;padding:10px!important}
     .analysis-panel{border-left:none!important;border-top:1px solid #ddd8cc}
+    .home-aux{width:min(100%,420px)!important;align-items:flex-start!important}
   }
   @media (max-width: 560px) {
     .workspace-topbar>div:first-child span{display:none}
@@ -128,7 +129,16 @@
             </div>
           </sc-for>
         </div>
-        <p style="margin:44px 0 0;font-size:11.5px;color:var(--text-3);text-align:center;max-width:520px;line-height:1.5">{{ t.hFoot }}</p>
+        <a class="home-aux" href="estimador-pearson.html" style="width:940px;margin-top:18px;background:var(--bg-panel);border:1px solid var(--border-3);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;color:var(--text-1);box-shadow:0 3px 12px rgba(27,30,38,.035);transition:.14s" style-hover="border-color:#b9b3a2;background:var(--bg-card-alt)">
+          <div class="mono" style="width:38px;height:38px;flex:none;border-radius:8px;background:var(--bg-info);color:#173f8a;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600">r</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:9.5px;font-weight:600;letter-spacing:.6px;color:var(--text-muted);margin-bottom:2px">{{ t.auxEyebrow }}</div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">{{ t.auxTitle }}</div>
+            <div style="font-size:11.5px;color:var(--text-3);line-height:1.4">{{ t.auxDesc }}</div>
+          </div>
+          <div style="font-size:11.5px;font-weight:600;color:#173f8a;white-space:nowrap">{{ t.auxOpen }} →</div>
+        </a>
+        <p style="margin:28px 0 0;font-size:11.5px;color:var(--text-3);text-align:center;max-width:520px;line-height:1.5">{{ t.hFoot }}</p>
       </div>
     </div>
   </div>
@@ -750,6 +760,7 @@ class Component extends DCLogic {
       mTolF:['Elipses 50·75·95%','Classificação individual','Interpretação em texto'],
       mConfF:['Elipse de confiança 95%','Teste de Hotelling T²','Comparação de grupos'],
       mCombF:['Todas as elipses','Indivíduos + grupos','Análise completa'],
+      auxEyebrow:'FERRAMENTA COMPLEMENTAR', auxTitle:'Estimador de correlação de Pearson', auxDesc:'Recupere r pela geometria de uma elipse publicada quando o artigo não informa a correlação.', auxOpen:'Abrir estimador',
       exportPng:'Exportar PNG', exportExcel:'Exportar Excel',
       batchTitle:'Importação em lote', batchHint:'Baixe o modelo, preencha os participantes e importe várias elipses ou pontos de uma vez.',
       downloadModel:'Baixar modelo Excel', importExcel:'Importar Excel', modeLabel:'NORMALIZAÇÃO', bivaClassic:'BIVA clássica', bivaSpecific:'BIVA específica',
@@ -812,6 +823,7 @@ class Component extends DCLogic {
       mTolF:['50·75·95% ellipses','Individual classification','Plain-text interpretation'],
       mConfF:['95% confidence ellipse','Hotelling T² test','Group comparison'],
       mCombF:['All ellipses','Individuals + groups','Full analysis'],
+      auxEyebrow:'COMPLEMENTARY TOOL', auxTitle:'Pearson correlation estimator', auxDesc:'Recover r from the geometry of a published ellipse when the article does not report the correlation.', auxOpen:'Open estimator',
       exportPng:'Export PNG', exportExcel:'Export Excel',
       batchTitle:'Batch import', batchHint:'Download the template, enter participants, and import multiple ellipses or points at once.',
       downloadModel:'Download Excel template', importExcel:'Import Excel', modeLabel:'NORMALIZATION', bivaClassic:'Classic BIVA', bivaSpecific:'Specific BIVA',
@@ -874,6 +886,7 @@ class Component extends DCLogic {
       mTolF:['Elipses 50·75·95%','Clasificación individual','Interpretación en texto'],
       mConfF:['Elipse de confianza 95%','Prueba de Hotelling T²','Comparación de grupos'],
       mCombF:['Todas las elipses','Individuos + grupos','Análisis completo'],
+      auxEyebrow:'HERRAMIENTA COMPLEMENTARIA', auxTitle:'Estimador de correlación de Pearson', auxDesc:'Recupere r mediante la geometría de una elipse publicada cuando el artículo no informa la correlación.', auxOpen:'Abrir estimador',
       exportPng:'Exportar PNG', exportExcel:'Exportar Excel',
       batchTitle:'Importación por lotes', batchHint:'Descarga el modelo, introduce los participantes e importa varias elipses o puntos a la vez.',
       downloadModel:'Descargar modelo Excel', importExcel:'Importar Excel', modeLabel:'NORMALIZACIÓN', bivaClassic:'BIVA clásica', bivaSpecific:'BIVA específica',
@@ -936,6 +949,7 @@ class Component extends DCLogic {
       mTolF:['Ellissi 50·75·95%','Classificazione individuale','Interpretazione testuale'],
       mConfF:['Ellisse di confidenza 95%','Test di Hotelling T²','Confronto tra gruppi'],
       mCombF:['Tutte le ellissi','Individui + gruppi','Analisi completa'],
+      auxEyebrow:'STRUMENTO COMPLEMENTARE', auxTitle:'Stimatore della correlazione di Pearson', auxDesc:'Ricava r dalla geometria di un’ellisse pubblicata quando l’articolo non riporta la correlazione.', auxOpen:'Apri stimatore',
       exportPng:'Esporta PNG', exportExcel:'Esporta Excel',
       batchTitle:'Importazione in blocco', batchHint:'Scarica il modello, inserisci i partecipanti e importa più ellissi o punti in una sola volta.',
       downloadModel:'Scarica modello Excel', importExcel:'Importa Excel', modeLabel:'NORMALIZZAZIONE', bivaClassic:'BIVA classica', bivaSpecific:'BIVA specifica',

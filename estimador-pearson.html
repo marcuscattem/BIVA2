@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIVA2 | Estimador de correlação de Pearson</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECEAE2; --panel:#FFFFFF; --ink:#1B1E26; --ink-2:#667085; --ink-3:#8A8676;
+  --line:#D8D3C5; --line-2:#EEEAE0; --accent:#2F4FD6; --accent-soft:#EEF1FC;
+  --live:#E0662A; --warn:#B45309; --warn-soft:#FDF3E8; --ok:#0F8A7C; --ok-soft:#EAF6F3;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --r:8px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+.app{display:flex;flex-direction:column;height:100vh}
+
+/* ---------- barra superior com o resultado sempre visível ---------- */
+.topbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  padding:8px 18px;background:#14161C;color:#F4F2EC;border-bottom:1px solid #000}
+.brand-wrap{display:flex;align-items:center;gap:10px}
+.back{width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#C8CCD6;text-decoration:none;border-radius:6px;font-size:18px}
+.back:hover{background:#242833;color:#fff}
+.brand-logo{width:36px;height:36px;object-fit:contain;display:block}
+.brand h1{margin:0;font-size:14.5px;font-weight:600;letter-spacing:0}
+.brand p{margin:0;color:#8A8F9C;font-size:11.5px}
+.topbar .spacer{flex:1}
+.topbar .chip{background:#262A35;color:#C8CCD6}
+.liveR{display:flex;align-items:center;gap:11px;background:#1E222E;color:#fff;border:1px solid #2B2F3B;
+  border-radius:8px;padding:6px 8px 6px 14px}
+.liveR .lab{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#93A4BF;
+  font-weight:700;line-height:1.25}
+.liveR .lab b{display:block;color:#C8CCD6;font-size:10px;letter-spacing:0;text-transform:none;font-weight:500}
+.liveR .num{font-family:var(--mono);font-size:27px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.liveR .num.na{color:#5D7E8B;font-size:20px}
+.liveR .tag{font-size:9.5px;background:var(--live);color:#fff;padding:1px 6px;border-radius:20px;
+  font-weight:700;letter-spacing:.04em}
+.iconbtn{background:#2B2F3B;border:1px solid #333845;color:#C8CCD6;border-radius:6px;
+  padding:5px 8px;font-size:11px;cursor:pointer}
+.iconbtn:hover{background:rgba(255,255,255,.24);color:#fff}
+
+.main{flex:1;display:grid;grid-template-columns:336px 1fr 322px;min-height:0}
+.col{overflow-y:auto;overflow-x:hidden}
+.left{background:#F7F5EF;border-right:1px solid var(--line)}
+.right{background:#F7F5EF;border-left:1px solid var(--line)}
+.stage{position:relative;min-width:0;overflow:hidden;background:
+  linear-gradient(0deg,rgba(0,0,0,.035) 1px,transparent 1px) 0 0/22px 22px,
+  linear-gradient(90deg,rgba(0,0,0,.035) 1px,transparent 1px) 0 0/22px 22px,var(--paper)}
+canvas{display:block;cursor:crosshair}
+
+/* ---------- blocos ---------- */
+.block{border-bottom:1px solid var(--line-2);padding:14px 18px 16px}
+.block h2{margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:8px}
+.hint{color:var(--ink-2);font-size:12.5px;margin:0 0 10px}
+.hint code{font-family:var(--mono);font-size:11.5px;background:var(--line-2);padding:1px 4px;border-radius:3px}
+.hint:last-child{margin-bottom:0}
+
+/* ---------- próximo passo ---------- */
+.next{margin:0;padding:13px 18px;background:var(--accent-soft);border-bottom:1px solid var(--line-2);
+  display:flex;gap:11px;align-items:flex-start}
+.next.done{background:var(--ok-soft)}
+.next .n{flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px}
+.next.done .n{background:var(--ok)}
+.next .t{font-size:12.5px;color:var(--ink);min-width:0}
+.next .t b{display:block;font-size:13px;margin-bottom:1px}
+
+.check{list-style:none;margin:0;padding:0}
+.check li{display:flex;gap:9px;align-items:center;padding:5px 0;font-size:12.5px;color:var(--ink-3)}
+.check li.ok{color:var(--ink)}
+.check .bx{flex:0 0 auto;width:16px;height:16px;border-radius:4px;border:1.5px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff}
+.check li.ok .bx{background:var(--ok);border-color:var(--ok)}
+.check .go{margin-left:auto;font-size:11px;color:var(--accent);background:0;border:0;cursor:pointer;
+  font-weight:600;padding:2px 4px;border-radius:4px}
+.check .go:hover{background:var(--accent-soft)}
+
+/* ---------- controles ---------- */
+.btn{appearance:none;border:1px solid var(--line);background:#fff;border-radius:var(--r);
+  padding:7px 11px;font-size:13px;cursor:pointer;transition:.13s;font-weight:500}
+.btn:hover{border-color:var(--ink-3);background:#FAFCFD}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#2039A8}
+.btn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--ink-2);padding:5px 7px}
+.btn.ghost:hover{background:var(--line-2)}
+.btn.sm{padding:4px 8px;font-size:12px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn:focus-visible,input:focus-visible,select:focus-visible,.go:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.row+.row{margin-top:8px}
+.seg{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.seg .btn{border:0;border-radius:0;flex:1;text-align:center;padding:7px 6px;font-size:12.5px}
+.seg .btn+.btn{border-left:1px solid var(--line)}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:10.5px;color:var(--ink-3);
+  font-weight:600;letter-spacing:.03em;text-transform:uppercase;flex:1;min-width:0}
+input[type=number],input[type=text],select{border:1px solid var(--line);border-radius:5px;
+  padding:6px 8px;background:#fff;font-family:var(--mono);font-size:12.5px;width:100%;min-width:0}
+input.need{border-color:var(--warn);background:#FFFCF8}
+input[type=file]{font-size:12px;width:100%}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+.kv{display:flex;justify-content:space-between;gap:10px;padding:5px 0;
+  border-bottom:1px dotted var(--line);font-size:13px}
+.kv:last-child{border-bottom:0}
+.kv span{color:var(--ink-2)}
+.kv b{font-family:var(--mono);font-weight:600;letter-spacing:-.02em}
+
+/* ---------- herói ---------- */
+.hero{background:#14161C;color:#fff;border-radius:8px;
+  padding:14px 16px 12px}
+.hero .lab{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#93A4BF;font-weight:700}
+.hero .sub{font-size:11px;color:#8A8F9C;margin-top:1px}
+.hero .val{font-family:var(--mono);font-size:42px;font-weight:700;letter-spacing:-.03em;
+  line-height:1.05;margin:4px 0 8px}
+.hero .val.na{font-size:22px;color:#5D7E8B;letter-spacing:0}
+.hero .val small{font-size:14px;color:#9DC5D2;font-weight:500;letter-spacing:0}
+.meter{position:relative;height:26px;margin-top:2px}
+.meter .track{position:absolute;top:9px;left:0;right:0;height:4px;border-radius:2px;
+  background:linear-gradient(90deg,#7FB0F5,#2A3F4C 50%,#EFA078)}
+.meter .zero{position:absolute;top:4px;left:50%;width:1px;height:14px;background:rgba(255,255,255,.45)}
+.meter .pin{position:absolute;top:2px;width:2px;height:18px;background:#fff;border-radius:1px;
+  box-shadow:0 0 0 3px rgba(255,255,255,.18);transition:left .18s ease}
+.meter .ends{position:absolute;top:16px;left:0;right:0;display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:9.5px;color:#6E96A5}
+.hero .strength{margin-top:12px;font-size:11.5px;color:#B7D6E0}
+
+.chip{display:inline-block;font-size:11px;font-family:var(--mono);padding:2px 7px;border-radius:20px;
+  background:var(--line-2);color:var(--ink-2)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.live{background:#FBE4F5;color:var(--live)}
+.empty{color:var(--ink-3);font-size:12.5px;padding:10px 0;text-align:center}
+
+.eitem{border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;margin-bottom:7px;cursor:pointer}
+.eitem.sel{border-color:var(--accent);background:var(--accent-soft)}
+.eitem .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.eitem .nm{font-weight:600;font-size:13px}
+.eitem .rr{font-family:var(--mono);font-size:13.5px;font-weight:700;color:var(--accent)}
+.eitem .sub{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:2px}
+
+details summary{cursor:pointer;font-size:12px;color:var(--accent);font-weight:600;list-style:none;padding:2px 0}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:'▸ ';font-size:10px}
+details[open] summary::before{content:'▾ '}
+details[open] summary{margin-bottom:8px}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:#fff;
+  padding:9px 16px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:.22s;z-index:50}
+.toast.show{opacity:1}
+.overlay-hint{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(19,26,34,.92);
+  color:#fff;padding:7px 15px;border-radius:20px;font-size:12.5px;pointer-events:none;
+  white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
+.zoombar{position:absolute;right:12px;bottom:12px;display:flex;gap:6px;background:var(--panel);
+  border:1px solid var(--line);border-radius:var(--r);padding:4px}
+.legend{position:absolute;left:12px;bottom:12px;background:rgba(255,255,255,.92);
+  border:1px solid var(--line);border-radius:var(--r);padding:6px 10px;font-size:11px;color:var(--ink-2)}
+.legend b{font-family:var(--mono);font-weight:600;color:var(--ink)}
+
+@media (max-width:1100px){
+  .main{grid-template-columns:1fr;grid-template-rows:auto 56vh auto auto}
+  .stage{order:1} .left{order:2} .right{order:3}
+  .left,.right{border:0;border-top:1px solid var(--line)}
+}
+@media (max-width:640px){
+  .liveR .num{font-size:23px} .brand p{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand-wrap">
+      <a class="back" href="BIVA2.html" title="Voltar ao BIVA2" aria-label="Voltar ao BIVA2">←</a>
+      <img class="brand-logo" src="biva2-logo.png" alt="BIVA2.0">
+      <div class="brand">
+        <h1>Correlação de Pearson a partir de elipses</h1>
+        <p>ferramenta complementar do BIVA2.0</p>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <span class="chip" id="scaleChip">sem calibração</span>
+    <div class="liveR">
+      <div class="lab">r de Pearson<b id="liveSrc">aguardando</b></div>
+      <div class="num na" id="liveNum">—</div>
+      <span class="tag" id="liveTag" style="display:none">prévia</span>
+      <button class="iconbtn" id="btnCopyR" title="Copiar o valor de r">copiar</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ============ ESQUERDA ============ -->
+    <div class="col left">
+
+      <div class="next" id="nextBox">
+        <div class="n" id="nextN">1</div>
+        <div class="t"><b id="nextT">Carregue a imagem do gráfico</b><span id="nextD">Ou abra o exemplo pronto para ver como funciona.</span></div>
+      </div>
+
+      <div class="block">
+        <h2>O que falta</h2>
+        <ul class="check" id="check"></ul>
+      </div>
+
+      <div class="block">
+        <h2>Imagem do gráfico</h2>
+        <input type="file" id="file" accept="image/*">
+        <div class="row" style="margin-top:8px">
+          <button class="btn primary sm" id="btnDemo">Abrir exemplo</button>
+          <button class="btn ghost sm" id="btnPaste">Colar imagem</button>
+        </div>
+        <p class="hint" style="margin:9px 0 0">Também dá para colar direto com <code>Ctrl+V</code>.</p>
+      </div>
+
+      <div class="block">
+        <h2>Escalas dos eixos</h2>
+        <p class="hint">Clique em duas marcas conhecidas de cada eixo e digite os valores. A razão entre as duas escalas é o que determina <i>r</i>.</p>
+
+        <div class="row">
+          <button class="btn" id="btnCalX">Marcar eixo X</button>
+          <span class="chip" id="chipX">0 / 2</span>
+        </div>
+        <div class="grid2" style="margin-top:8px">
+          <label class="f">X do 1º ponto<input type="number" id="xv0" step="any" placeholder="ex. 200"></label>
+          <label class="f">X do 2º ponto<input type="number" id="xv1" step="any" placeholder="ex. 400"></label>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <button class="btn" id="btnCalY">Marcar eixo Y</button>
+          <span class="chip" id="chipY">0 / 2</span>
+        </div>
+        <div class="grid2" style="margin-top:8px">
+          <label class="f">Y do 1º ponto<input type="number" id="yv0" step="any" placeholder="ex. 20"></label>
+          <label class="f">Y do 2º ponto<input type="number" id="yv1" step="any" placeholder="ex. 50"></label>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn ghost sm" id="btnCalReset">Refazer calibração</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>Marcar a elipse</h2>
+        <div class="seg">
+          <button class="btn" data-mode="contour" id="mCont">Contorno</button>
+          <button class="btn" data-mode="four" id="mFour">4 pontas</button>
+          <button class="btn" data-mode="edit" id="mEdit">Editar</button>
+        </div>
+        <p class="hint" id="modeHelp" style="margin-top:9px"></p>
+        <div class="row">
+          <button class="btn primary" id="btnMake" disabled>Criar elipse</button>
+          <button class="btn ghost sm" id="btnUndoPt">Desfazer ponto</button>
+          <button class="btn ghost sm" id="btnClearPts">Limpar</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>Elipses marcadas</h2>
+        <div id="elist"><div class="empty">Nenhuma elipse ainda.</div></div>
+        <div class="row">
+          <button class="btn ghost sm" id="btnDup">Duplicar</button>
+          <button class="btn ghost sm" id="btnDel">Excluir</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>Ajuste fino</h2>
+        <p class="hint">Arraste as alças no gráfico, use as setas do teclado, ou digite os valores em pixels.</p>
+        <div class="row">
+          <button class="btn sm" data-nudge="rot-">↺ girar</button>
+          <button class="btn sm" data-nudge="rot+">↻ girar</button>
+          <button class="btn sm" data-nudge="a-">a −</button>
+          <button class="btn sm" data-nudge="a+">a +</button>
+          <button class="btn sm" data-nudge="b-">b −</button>
+          <button class="btn sm" data-nudge="b+">b +</button>
+        </div>
+        <div class="grid2" style="margin-top:10px">
+          <label class="f">Centro X<input type="number" id="pcx" step="any"></label>
+          <label class="f">Centro Y<input type="number" id="pcy" step="any"></label>
+          <label class="f">Semieixo 1<input type="number" id="pa" step="any"></label>
+          <label class="f">Semieixo 2<input type="number" id="pb" step="any"></label>
+        </div>
+        <label class="f" style="margin-top:8px">Rotação na tela (graus)<input type="number" id="pphi" step="any"></label>
+      </div>
+    </div>
+
+    <!-- ============ PALCO ============ -->
+    <div class="stage" id="stage">
+      <canvas id="cv"></canvas>
+      <div class="overlay-hint" id="ohint">Carregue uma imagem ou abra o exemplo</div>
+      <div class="legend" id="legend" style="display:none">
+        setas movem · <b>[</b> <b>]</b> giram · roda dá zoom · <b>Shift</b>+arrastar move a tela
+      </div>
+      <div class="zoombar">
+        <button class="btn ghost" id="zOut">−</button>
+        <button class="btn ghost" id="zFit">ajustar</button>
+        <button class="btn ghost" id="zIn">+</button>
+      </div>
+    </div>
+
+    <!-- ============ DIREITA ============ -->
+    <div class="col right">
+
+      <div class="block">
+        <h2>Resultado</h2>
+        <div class="hero">
+          <div class="lab">coeficiente de correlação</div>
+          <div class="sub">r de Pearson entre os dois eixos</div>
+          <div class="val na" id="rhoVal">—</div>
+          <div class="meter">
+            <div class="track"></div><div class="zero"></div>
+            <div class="pin" id="rhoPin" style="left:50%"></div>
+            <div class="ends"><span>−1</span><span>0</span><span>+1</span></div>
+          </div>
+          <div class="strength" id="strength"></div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>Geometria em unidades do gráfico</h2>
+        <div id="geo"><div class="empty">Complete os passos ao lado.</div></div>
+      </div>
+
+      <div class="block">
+        <h2>Desvios-padrão</h2>
+        <p class="hint"><i>r</i> não depende disto. Os desvios-padrão sim: precisam saber qual elipse foi desenhada.</p>
+        <label class="f">Tipo de elipse
+          <select id="etype">
+            <option value="pop">Tolerância populacional (n grande)</option>
+            <option value="tol">Tolerância de Piccoli (n finito)</option>
+            <option value="mean">Confiança da média</option>
+          </select>
+        </label>
+        <div class="grid2" style="margin-top:8px">
+          <label class="f">Cobertura
+            <select id="epct"><option value="0.95">95%</option><option value="0.75">75%</option><option value="0.50">50%</option></select>
+          </label>
+          <label class="f">n<input type="number" id="en" value="100" min="5" step="1"></label>
+        </div>
+        <div style="margin-top:10px" id="sdOut"><div class="empty">—</div></div>
+      </div>
+
+      <div class="block">
+        <h2>Calculadora direta</h2>
+        <p class="hint">Já tem os semieixos em unidades do gráfico? Calcule <i>r</i> sem imagem nenhuma.</p>
+        <div class="grid3">
+          <label class="f">Semieixo a<input type="number" id="da" step="any" placeholder="128"></label>
+          <label class="f">Semieixo b<input type="number" id="db" step="any" placeholder="13,5"></label>
+          <label class="f">Ângulo °<input type="number" id="dth" step="any" placeholder="6,4"></label>
+        </div>
+        <div class="kv" style="margin-top:10px"><span>r de Pearson</span><b id="dOut">—</b></div>
+      </div>
+
+      <div class="block">
+        <h2>Exportar</h2>
+        <div class="row">
+          <button class="btn" id="btnCopy">Copiar tabela</button>
+          <button class="btn" id="btnJson">Baixar JSON</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <details>
+          <summary>Como o cálculo é feito</summary>
+          <p class="hint">Uma elipse com semieixos <code>a</code>, <code>b</code> e rotação <code>φ</code> corresponde à matriz de covariância <code>M = R·diag(a²,b²)·Rᵀ</code>, a menos de um fator de escala.</p>
+          <p class="hint">Ao converter de pixels para unidades do gráfico, cada eixo recebe sua própria escala: <code>M'₁₁ = sx²·M₁₁</code>, <code>M'₂₂ = sy²·M₂₂</code>, <code>M'₁₂ = sx·sy·M₁₂</code>.</p>
+          <p class="hint">Daí <code>r = M'₁₂ / √(M'₁₁·M'₂₂)</code>. O fator de cobertura da elipse some na divisão — por isso as elipses de 50%, 75% e 95% do mesmo conjunto devolvem exatamente o mesmo <i>r</i>. Teste isso no exemplo.</p>
+          <p class="hint">O modo contorno resolve a cônica geral <code>Ax²+Bxy+Cy²+Dx+Ey+F=0</code> por mínimos quadrados sobre os pontos clicados.</p>
+          <p class="hint"><b>Limites:</b> vale para eixos lineares e ortogonais. Escala logarítmica ou figura em perspectiva quebram a suposição. E <i>r</i> vem da elipse desenhada, então herda qualquer imprecisão dela.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+const $ = s => document.querySelector(s);
+const cv = $('#cv'), ctx = cv.getContext('2d'), stage = $('#stage');
+
+const S = { img:null, z:1, ox:0, oy:0, mode:'contour', calX:[], calY:[],
+            pts:[], preview:null, els:[], sel:-1, drag:null, pan:null, counter:0,
+            pending:null, demoR:null };
+
+let tt; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show');
+  clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2100); }
+
+/* =========== visualização =========== */
+function resize(){
+  const r=stage.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
+  cv.style.width=r.width+'px'; cv.style.height=r.height+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0); draw();
+}
+function fit(){
+  if(!S.img) return;
+  const r=stage.getBoundingClientRect();
+  S.z=Math.min((r.width-40)/S.img.width,(r.height-40)/S.img.height);
+  S.ox=(r.width-S.img.width*S.z)/2; S.oy=(r.height-S.img.height*S.z)/2; draw();
+}
+const toS = p => ({x:p.x*S.z+S.ox, y:p.y*S.z+S.oy});
+function toI(e){ const r=cv.getBoundingClientRect();
+  return {x:(e.clientX-r.left-S.ox)/S.z, y:(e.clientY-r.top-S.oy)/S.z}; }
+
+/* =========== matemática =========== */
+const num = sel => { const v=parseFloat($(sel).value); return isFinite(v)?v:null; };
+function scales(){
+  if(S.calX.length<2||S.calY.length<2) return null;
+  const x0=num('#xv0'),x1=num('#xv1'),y0=num('#yv0'),y1=num('#yv1');
+  if([x0,x1,y0,y1].some(v=>v===null)) return null;
+  const dpx=S.calX[1].x-S.calX[0].x, dpy=S.calY[1].y-S.calY[0].y;
+  if(!dpx||!dpy||x1===x0||y1===y0) return null;
+  const sx=(x1-x0)/dpx, sy=(y1-y0)/dpy;
+  return {sx,sy,bx:x0-S.calX[0].x*sx, by:y0-S.calY[0].y*sy};
+}
+function eig2(m11,m12,m22){
+  const tr=(m11+m22)/2, d=Math.hypot((m11-m22)/2,m12);
+  return {l1:tr+d, l2:Math.max(tr-d,0), ang:0.5*Math.atan2(2*m12,m11-m22)};
+}
+function analyze(e,sc){
+  if(!sc||!e) return null;
+  const c=Math.cos(e.phi), s=Math.sin(e.phi), a2=e.a*e.a, b2=e.b*e.b;
+  const M11=a2*c*c+b2*s*s, M22=a2*s*s+b2*c*c, M12=(a2-b2)*s*c;
+  const m11=sc.sx*sc.sx*M11, m22=sc.sy*sc.sy*M22, m12=sc.sx*sc.sy*M12;
+  const den=Math.sqrt(m11*m22); if(!(den>0)) return null;
+  const E=eig2(m11,m12,m22);
+  return { r:Math.max(-1,Math.min(1,m12/den)), m11,m22,m12,
+    cx:e.cx*sc.sx+sc.bx, cy:e.cy*sc.sy+sc.by,
+    A:Math.sqrt(E.l1), B:Math.sqrt(E.l2), theta:E.ang*180/Math.PI,
+    sdxU:Math.sqrt(m11), sdyU:Math.sqrt(m22) };
+}
+function kFactor(){
+  const p=parseFloat($('#epct').value), t=$('#etype').value, n=parseFloat($('#en').value);
+  if(t==='pop') return Math.sqrt(-2*Math.log(1-p));
+  if(!isFinite(n)||n<5) return null;
+  const base=Math.pow(1-p,-2/(n-2))-1;          // F(2,d) tem forma fechada
+  return t==='tol' ? Math.sqrt((n*n-1)/n*base) : Math.sqrt((n-1)/n*base);
+}
+function strengthWord(r){
+  const a=Math.abs(r), dir=r<0?'negativa':'positiva';
+  const m = a<.1?'desprezível': a<.3?'fraca': a<.5?'moderada': a<.7?'forte':
+            a<.9?'muito forte':'quase perfeita';
+  return m+' e '+dir+' · r² = '+fmt(r*r,3);
+}
+
+/* --- ajuste de cônica --- */
+function solveLin(A,b,n){
+  const M=A.map((r,i)=>r.concat([b[i]]));
+  for(let i=0;i<n;i++){
+    let p=i; for(let k=i+1;k<n;k++) if(Math.abs(M[k][i])>Math.abs(M[p][i])) p=k;
+    if(Math.abs(M[p][i])<1e-12) return null;
+    [M[i],M[p]]=[M[p],M[i]];
+    for(let k=i+1;k<n;k++){ const f=M[k][i]/M[i][i];
+      for(let j=i;j<=n;j++) M[k][j]-=f*M[i][j]; }
+  }
+  const x=new Array(n).fill(0);
+  for(let i=n-1;i>=0;i--){ let s=M[i][n];
+    for(let j=i+1;j<n;j++) s-=M[i][j]*x[j]; x[i]=s/M[i][i]; }
+  return x;
+}
+function fitEllipse(pts){
+  if(pts.length<5) return null;
+  const mx=pts.reduce((s,p)=>s+p.x,0)/pts.length, my=pts.reduce((s,p)=>s+p.y,0)/pts.length;
+  let sc=0; pts.forEach(p=>sc=Math.max(sc,Math.hypot(p.x-mx,p.y-my)));
+  if(sc<=0) return null;
+  const q=pts.map(p=>({x:(p.x-mx)/sc,y:(p.y-my)/sc}));
+  const rows=q.map(p=>[p.x*p.x,p.x*p.y,p.y*p.y,p.x,p.y]);
+  const N=[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]], rhs=[0,0,0,0,0];
+  rows.forEach(r=>{ for(let i=0;i<5;i++){ rhs[i]+=r[i];
+    for(let j=0;j<5;j++) N[i][j]+=r[i]*r[j]; } });
+  const v=solveLin(N,rhs,5); if(!v) return null;
+  const [A,B,C,D,E]=v, F=-1, den=4*A*C-B*B;
+  if(den<=0) return null;
+  const x0=(B*E-2*C*D)/den, y0=(B*D-2*A*E)/den, Fc=F+(D*x0+E*y0)/2;
+  if(Fc>=0) return null;
+  const eg=eig2(A,B/2,C); if(eg.l2<=0) return null;
+  return { cx:mx+x0*sc, cy:my+y0*sc,
+           a:Math.sqrt(-Fc/eg.l2)*sc, b:Math.sqrt(-Fc/eg.l1)*sc, phi:eg.ang+Math.PI/2 };
+}
+function fitFour(p){
+  if(p.length<4) return null;
+  const c={x:(p[0].x+p[1].x)/2, y:(p[0].y+p[1].y)/2};
+  const a=Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y)/2;
+  const phi=Math.atan2(p[1].y-p[0].y,p[1].x-p[0].x);
+  const nx=-Math.sin(phi), ny=Math.cos(phi);   // distância perpendicular tolera clique torto
+  const d1=Math.abs((p[2].x-c.x)*nx+(p[2].y-c.y)*ny);
+  const d2=Math.abs((p[3].x-c.x)*nx+(p[3].y-c.y)*ny);
+  const b=(d1+d2)/2;
+  return (a>0&&b>0) ? {cx:c.x,cy:c.y,a,b,phi} : null;
+}
+
+/* =========== desenho =========== */
+function drawEllipse(e,color,w,dash){
+  const c=toS({x:e.cx,y:e.cy});
+  ctx.save(); ctx.setLineDash(dash||[]); ctx.strokeStyle=color; ctx.lineWidth=w;
+  ctx.beginPath(); ctx.ellipse(c.x,c.y,Math.max(e.a*S.z,.5),Math.max(e.b*S.z,.5),e.phi,0,Math.PI*2);
+  ctx.stroke(); ctx.restore();
+}
+function dot(p,color,r,fill){
+  const s=toS(p); ctx.save(); ctx.beginPath(); ctx.arc(s.x,s.y,r,0,Math.PI*2);
+  ctx.fillStyle=fill||'#fff'; ctx.fill(); ctx.strokeStyle=color; ctx.lineWidth=2; ctx.stroke(); ctx.restore();
+}
+function badge(sx,sy,text,bg){
+  ctx.save(); ctx.font='700 12px ui-monospace,monospace';
+  const w=ctx.measureText(text).width+14;
+  ctx.fillStyle=bg; ctx.beginPath();
+  if(ctx.roundRect) ctx.roundRect(sx-w/2,sy-9,w,19,10); else ctx.rect(sx-w/2,sy-9,w,19);
+  ctx.fill(); ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(text,sx,sy+1); ctx.restore();
+}
+function handlesOf(e){ return {
+  c:{x:e.cx,y:e.cy},
+  a:{x:e.cx+e.a*Math.cos(e.phi), y:e.cy+e.a*Math.sin(e.phi)},
+  b:{x:e.cx-e.b*Math.sin(e.phi), y:e.cy+e.b*Math.cos(e.phi)} };
+}
+function draw(){
+  const R=stage.getBoundingClientRect();
+  ctx.clearRect(0,0,R.width,R.height);
+  if(S.img){ ctx.imageSmoothingQuality='high';
+    ctx.drawImage(S.img,S.ox,S.oy,S.img.width*S.z,S.img.height*S.z); }
+
+  ctx.save(); ctx.strokeStyle='#0B6E8A'; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+  if(S.calX.length===2){ const a=toS(S.calX[0]),b=toS(S.calX[1]);
+    ctx.beginPath(); ctx.moveTo(a.x,0); ctx.lineTo(a.x,R.height);
+    ctx.moveTo(b.x,0); ctx.lineTo(b.x,R.height); ctx.stroke(); }
+  if(S.calY.length===2){ const a=toS(S.calY[0]),b=toS(S.calY[1]);
+    ctx.beginPath(); ctx.moveTo(0,a.y); ctx.lineTo(R.width,a.y);
+    ctx.moveTo(0,b.y); ctx.lineTo(R.width,b.y); ctx.stroke(); }
+  ctx.restore();
+  S.calX.concat(S.calY).forEach(p=>dot(p,'#0B6E8A',4));
+
+  const sc=scales();
+  S.els.forEach((e,i)=>{
+    const on=i===S.sel;
+    drawEllipse(e,on?'#0B6E8A':'#5B6B77',on?2.4:1.6);
+    if(on&&S.mode==='edit'){
+      const h=handlesOf(e), c=toS(h.c), ha=toS(h.a), hb=toS(h.b);
+      ctx.save(); ctx.strokeStyle='rgba(11,110,138,.5)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(c.x,c.y); ctx.lineTo(ha.x,ha.y);
+      ctx.moveTo(c.x,c.y); ctx.lineTo(hb.x,hb.y); ctx.stroke(); ctx.restore();
+      dot(h.c,'#0B6E8A',5); dot(h.a,'#0B6E8A',6,'#0B6E8A'); dot(h.b,'#0B6E8A',6,'#fff');
+    }
+    const an=analyze(e,sc), cs=toS({x:e.cx,y:e.cy});
+    badge(cs.x, cs.y - Math.max(e.b*S.z,e.a*S.z) - 16,
+      e.name+'  r = '+(an?fmt(an.r,3):'?'), on?'#0B6E8A':'rgba(74,86,97,.85)');
+  });
+
+  S.pts.forEach((p,i)=>{ dot(p,'#C2189B',4.5); const s=toS(p);
+    ctx.save(); ctx.fillStyle='#C2189B'; ctx.font='600 10px ui-monospace,monospace';
+    ctx.fillText(i+1,s.x+7,s.y-6); ctx.restore(); });
+  if(S.preview){
+    drawEllipse(S.preview,'#C2189B',2,[7,5]);
+    const an=analyze(S.preview,sc), cs=toS({x:S.preview.cx,y:S.preview.cy});
+    badge(cs.x, cs.y-Math.max(S.preview.b*S.z,S.preview.a*S.z)-16,
+      'prévia  r = '+(an?fmt(an.r,3):'?'), '#C2189B');
+  }
+}
+
+/* =========== interação =========== */
+function hit(e,ip){
+  const h=handlesOf(e), tol=10/S.z;
+  if(Math.hypot(ip.x-h.a.x,ip.y-h.a.y)<tol) return 'a';
+  if(Math.hypot(ip.x-h.b.x,ip.y-h.b.y)<tol) return 'b';
+  if(Math.hypot(ip.x-h.c.x,ip.y-h.c.y)<tol) return 'c';
+  return null;
+}
+function inside(e,ip){
+  const dx=ip.x-e.cx, dy=ip.y-e.cy, c=Math.cos(-e.phi), s=Math.sin(-e.phi);
+  const u=dx*c-dy*s, v=dx*s+dy*c;
+  return (u*u)/(e.a*e.a)+(v*v)/(e.b*e.b)<=1.15;
+}
+cv.addEventListener('mousedown', ev=>{
+  if(ev.button===1||ev.shiftKey){ S.pan={x:ev.clientX,y:ev.clientY,ox:S.ox,oy:S.oy}; ev.preventDefault(); return; }
+  if(!S.img) return;
+  const ip=toI(ev);
+  if(S.pending==='X'||S.pending==='Y'){
+    const arr = S.pending==='X'?S.calX:S.calY;
+    arr.push(ip); if(arr.length>2) arr.splice(0,arr.length-2);
+    if(arr.length===2){ const was=S.pending; S.pending=null;
+      const el=$(was==='X'?'#xv0':'#yv0'); el.focus(); el.select();
+      toast('Agora digite os dois valores do eixo '+was); }
+    sync(); return;
+  }
+  if(S.mode==='contour'||S.mode==='four'){
+    if(S.mode==='four'&&S.pts.length>=4) return;
+    S.pts.push(ip); updatePreview(); sync(); return;
+  }
+  if(S.sel>=0){ const k=hit(S.els[S.sel],ip); if(k){ S.drag={i:S.sel,k}; return; } }
+  for(let i=S.els.length-1;i>=0;i--) if(inside(S.els[i],ip)){
+    S.sel=i; S.drag={i,k:'c',ox:ip.x-S.els[i].cx,oy:ip.y-S.els[i].cy}; sync(); return; }
+  S.sel=-1; sync();
+});
+window.addEventListener('mousemove', ev=>{
+  if(S.pan){ S.ox=S.pan.ox+(ev.clientX-S.pan.x); S.oy=S.pan.oy+(ev.clientY-S.pan.y); draw(); return; }
+  if(!S.drag) return;
+  const e=S.els[S.drag.i], ip=toI(ev);
+  if(S.drag.k==='c'){ e.cx=ip.x-(S.drag.ox||0); e.cy=ip.y-(S.drag.oy||0); }
+  else{ const dx=ip.x-e.cx, dy=ip.y-e.cy, d=Math.hypot(dx,dy);
+    if(S.drag.k==='a'){ e.a=Math.max(d,1); e.phi=Math.atan2(dy,dx); } else e.b=Math.max(d,1); }
+  sync();
+});
+window.addEventListener('mouseup',()=>{S.drag=null;S.pan=null;});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+cv.addEventListener('wheel', ev=>{
+  if(!S.img) return; ev.preventDefault();
+  const r=cv.getBoundingClientRect(), mx=ev.clientX-r.left, my=ev.clientY-r.top;
+  const nz=Math.max(.05,Math.min(20,S.z*Math.exp(-ev.deltaY*0.0016)));
+  S.ox=mx-(mx-S.ox)*(nz/S.z); S.oy=my-(my-S.oy)*(nz/S.z); S.z=nz; draw();
+},{passive:false});
+
+function updatePreview(){
+  S.preview = S.mode==='contour' ? fitEllipse(S.pts)
+            : S.mode==='four'    ? fitFour(S.pts) : null;
+}
+
+/* =========== modos e botões =========== */
+function setMode(m){
+  S.mode=m; S.pts=[]; S.preview=null; S.pending=null;
+  ['mEdit','mCont','mFour'].forEach(id=>$('#'+id).classList.remove('on'));
+  $({edit:'#mEdit',contour:'#mCont',four:'#mFour'}[m]).classList.add('on');
+  $('#modeHelp').textContent={
+    edit:'Clique numa elipse para selecioná-la. Arraste o ponto cheio para mudar tamanho e giro; o vazado muda o outro semieixo.',
+    contour:'Clique em 5 pontos ou mais espalhados pelo contorno. O r aparece na prévia magenta enquanto você clica.',
+    four:'Clique nas duas pontas do eixo maior e depois nas duas pontas do eixo menor, nessa ordem.'
+  }[m];
+  sync();
+}
+$('#mEdit').onclick=()=>setMode('edit');
+$('#mCont').onclick=()=>setMode('contour');
+$('#mFour').onclick=()=>setMode('four');
+$('#btnCalX').onclick=()=>{S.pending='X';S.calX=[];sync();};
+$('#btnCalY').onclick=()=>{S.pending='Y';S.calY=[];sync();};
+$('#btnCalReset').onclick=()=>{S.calX=[];S.calY=[];S.pending=null;sync();};
+$('#btnUndoPt').onclick=()=>{S.pts.pop();updatePreview();sync();};
+$('#btnClearPts').onclick=()=>{S.pts=[];S.preview=null;sync();};
+$('#btnMake').onclick=()=>{
+  if(!S.preview) return;
+  const e=Object.assign({},S.preview); e.name='E'+(++S.counter);
+  S.els.push(e); S.sel=S.els.length-1; S.pts=[]; S.preview=null; setMode('edit');
+  const an=analyze(e,scales());
+  toast(an? e.name+' criada — r = '+fmt(an.r,3) : e.name+' criada — falta calibrar os eixos');
+  sync();
+};
+$('#btnDel').onclick=()=>{ if(S.sel<0) return; S.els.splice(S.sel,1); S.sel=S.els.length?0:-1; sync(); };
+$('#btnDup').onclick=()=>{ if(S.sel<0) return;
+  const e=Object.assign({},S.els[S.sel]); e.name='E'+(++S.counter); e.cx+=12; e.cy+=12;
+  S.els.push(e); S.sel=S.els.length-1; sync(); };
+document.querySelectorAll('[data-nudge]').forEach(b=>b.onclick=()=>{
+  if(S.sel<0) return toast('Selecione uma elipse primeiro.');
+  const e=S.els[S.sel], k=b.dataset.nudge;
+  if(k==='rot-') e.phi-=Math.PI/180; if(k==='rot+') e.phi+=Math.PI/180;
+  if(k==='a-') e.a=Math.max(e.a-1,1); if(k==='a+') e.a+=1;
+  if(k==='b-') e.b=Math.max(e.b-1,1); if(k==='b+') e.b+=1;
+  sync();
+});
+['pcx','pcy','pa','pb','pphi'].forEach(id=>$('#'+id).addEventListener('input',()=>{
+  if(S.sel<0) return; const e=S.els[S.sel], v=parseFloat($('#'+id).value);
+  if(!isFinite(v)) return;
+  if(id==='pcx')e.cx=v; else if(id==='pcy')e.cy=v;
+  else if(id==='pa')e.a=Math.max(v,.5); else if(id==='pb')e.b=Math.max(v,.5);
+  else e.phi=v*Math.PI/180;
+  sync(true);
+}));
+['xv0','xv1','yv0','yv1','etype','epct','en'].forEach(id=>$('#'+id).addEventListener('input',()=>sync()));
+['da','db','dth'].forEach(id=>$('#'+id).addEventListener('input',direct));
+$('#zIn').onclick=()=>{S.z*=1.25;draw()}; $('#zOut').onclick=()=>{S.z/=1.25;draw()}; $('#zFit').onclick=fit;
+
+/* =========== imagem =========== */
+function adopt(img,name){ S.img=img; fit(); sync(); if(name) toast(name); }
+function loadImage(src){
+  const im=new Image();
+  im.onload=()=>adopt(im,'Imagem carregada: '+im.width+'×'+im.height+' px');
+  im.onerror=()=>toast('Não deu para ler essa imagem. Tente PNG ou JPG.');
+  im.src=src;
+}
+$('#file').onchange=e=>{ const f=e.target.files[0]; if(!f) return;
+  const rd=new FileReader(); rd.onload=()=>loadImage(rd.result); rd.readAsDataURL(f); };
+$('#btnPaste').onclick=async()=>{
+  try{ const items=await navigator.clipboard.read();
+    for(const it of items) for(const t of it.types) if(t.startsWith('image/')){
+      loadImage(URL.createObjectURL(await it.getType(t))); return; }
+    toast('Nenhuma imagem na área de transferência.');
+  }catch(e){ toast('O navegador bloqueou a leitura. Use o seletor de arquivo.'); }
+};
+window.addEventListener('paste', e=>{
+  const it=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith('image/'));
+  if(it) loadImage(URL.createObjectURL(it.getAsFile()));
+});
+
+/* =========== exemplo embutido =========== */
+function buildDemo(){
+  const W=900,H=620,c=document.createElement('canvas'); c.width=W; c.height=H;
+  const g=c.getContext('2d');
+  const X0=95,X1=855,Y0=45,Y1=560, xmin=180,xmax=460, ymin=12,ymax=62;
+  const px=v=>X0+(v-xmin)/(xmax-xmin)*(X1-X0);
+  const py=v=>Y1-(v-ymin)/(ymax-ymin)*(Y1-Y0);
+  g.fillStyle='#fff'; g.fillRect(0,0,W,H);
+  // grade e eixos
+  g.strokeStyle='#E4E9ED'; g.lineWidth=1;
+  for(let v=200;v<=460;v+=40){ g.beginPath(); g.moveTo(px(v),Y0); g.lineTo(px(v),Y1); g.stroke(); }
+  for(let v=20;v<=60;v+=10){ g.beginPath(); g.moveTo(X0,py(v)); g.lineTo(X1,py(v)); g.stroke(); }
+  g.strokeStyle='#33414D'; g.lineWidth=1.6;
+  g.beginPath(); g.moveTo(X0,Y0); g.lineTo(X0,Y1); g.lineTo(X1,Y1); g.stroke();
+  g.fillStyle='#33414D'; g.font='13px sans-serif'; g.textAlign='center';
+  for(let v=200;v<=460;v+=40){ g.beginPath(); g.moveTo(px(v),Y1); g.lineTo(px(v),Y1+6); g.stroke();
+    g.fillText(v,px(v),Y1+22); }
+  g.textAlign='right';
+  for(let v=20;v<=60;v+=10){ g.beginPath(); g.moveTo(X0,py(v)); g.lineTo(X0-6,py(v)); g.stroke();
+    g.fillText(v,X0-11,py(v)+4); }
+  g.textAlign='center'; g.font='600 14px sans-serif';
+  g.fillText('R/H  (Ω/m)',(X0+X1)/2,H-14);
+  g.save(); g.translate(24,(Y0+Y1)/2); g.rotate(-Math.PI/2); g.fillText('Xc/H  (Ω/m)',0,0); g.restore();
+
+  // dados: r verdadeiro = 0,68
+  const mx=318,my=38.5,sdx=44,sdy=6.2,rr=0.68;
+  let seed=20260727; const rnd=()=>{seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff;};
+  const nrm=()=>Math.sqrt(-2*Math.log(rnd()||1e-9))*Math.cos(2*Math.PI*rnd());
+  g.fillStyle='rgba(11,110,138,.42)';
+  for(let i=0;i<150;i++){ const z1=nrm(), z2=nrm();
+    const X=mx+sdx*z1, Y=my+sdy*(rr*z1+Math.sqrt(1-rr*rr)*z2);
+    g.beginPath(); g.arc(px(X),py(Y),2.6,0,Math.PI*2); g.fill(); }
+  // elipses 50 / 75 / 95 %
+  const C11=sdx*sdx,C22=sdy*sdy,C12=rr*sdx*sdy;
+  const tr=(C11+C22)/2,dd=Math.hypot((C11-C22)/2,C12);
+  const l1=tr+dd,l2=tr-dd, ang=0.5*Math.atan2(2*C12,C11-C22);
+  g.strokeStyle='#0B3D4C'; g.lineWidth=1.9;
+  [[0.50,[6,5]],[0.75,[3,4]],[0.95,[]]].forEach(([p,dash])=>{
+    const k=Math.sqrt(-2*Math.log(1-p)); g.setLineDash(dash); g.beginPath();
+    for(let i=0;i<=240;i++){ const t=i/240*2*Math.PI;
+      const u=k*Math.sqrt(l1)*Math.cos(t), v=k*Math.sqrt(l2)*Math.sin(t);
+      const X=mx+u*Math.cos(ang)-v*Math.sin(ang), Y=my+u*Math.sin(ang)+v*Math.cos(ang);
+      i?g.lineTo(px(X),py(Y)):g.moveTo(px(X),py(Y)); }
+    g.closePath(); g.stroke();
+  });
+  g.setLineDash([]); g.textAlign='left'; g.font='12px sans-serif'; g.fillStyle='#5B6B77';
+  g.fillText('elipses de tolerância 50% · 75% · 95%',X0+8,Y0+18);
+  return {canvas:c, cal:{x:[px(200),px(440)], xv:[200,440], y:[py(20),py(60)], yv:[20,60]}, r:rr};
+}
+$('#btnDemo').onclick=()=>{
+  const d=buildDemo();
+  S.calX=[{x:d.cal.x[0],y:0},{x:d.cal.x[1],y:0}];
+  S.calY=[{x:0,y:d.cal.y[0]},{x:0,y:d.cal.y[1]}];
+  $('#xv0').value=d.cal.xv[0]; $('#xv1').value=d.cal.xv[1];
+  $('#yv0').value=d.cal.yv[0]; $('#yv1').value=d.cal.yv[1];
+  S.els=[]; S.sel=-1; S.pts=[]; S.preview=null; S.counter=0; S.demoR=d.r;
+  adopt(d.canvas); setMode('contour');
+  toast('Exemplo aberto e já calibrado. Contorne qualquer uma das três elipses — todas dão r = 0,680.');
+};
+
+/* =========== calculadora direta =========== */
+function direct(){
+  const a=num('#da'),b=num('#db'),th=num('#dth');
+  if(a===null||b===null||th===null||a<=0||b<=0){ $('#dOut').textContent='—'; return; }
+  const t=th*Math.PI/180,c=Math.cos(t),s=Math.sin(t),a2=a*a,b2=b*b;
+  const m11=a2*c*c+b2*s*s,m22=a2*s*s+b2*c*c,m12=(a2-b2)*s*c;
+  $('#dOut').textContent=fmt(m12/Math.sqrt(m11*m22),3);
+}
+
+/* =========== render =========== */
+const fmt=(v,d)=>(v===null||v===undefined||!isFinite(v))?'—'
+  :(Math.abs(v)>=1e5||(Math.abs(v)<1e-3&&v!==0)?v.toExponential(2):v.toFixed(d===undefined?2:d));
+const kv=(a,b)=>'<div class="kv"><span>'+a+'</span><b>'+b+'</b></div>';
+
+function sync(skipInputs){
+  const sc=scales();
+  const valsOK = ['#xv0','#xv1','#yv0','#yv1'].every(s=>num(s)!==null);
+  ['#xv0','#xv1','#yv0','#yv1'].forEach(s=>
+    $(s).classList.toggle('need', (S.calX.length===2||S.calY.length===2)&&num(s)===null));
+
+  // checklist
+  const steps=[
+    {ok:!!S.img, t:'Carregar a imagem do gráfico', go:()=>$('#file').click()},
+    {ok:S.calX.length===2, t:'Marcar 2 pontos no eixo X', go:()=>$('#btnCalX').click()},
+    {ok:S.calY.length===2, t:'Marcar 2 pontos no eixo Y', go:()=>$('#btnCalY').click()},
+    {ok:valsOK, t:'Digitar os 4 valores dos eixos', go:()=>{$('#xv0').focus();$('#xv0').select();}},
+    {ok:S.els.length>0, t:'Marcar ao menos uma elipse', go:()=>setMode('contour')}
+  ];
+  const C=$('#check');
+  C.innerHTML=steps.map((s,i)=>'<li class="'+(s.ok?'ok':'')+'"><span class="bx">'+(s.ok?'✓':'')+'</span>'+
+    s.t+(s.ok?'':'<button class="go" data-go="'+i+'">ir</button>')+'</li>').join('');
+  C.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>steps[+b.dataset.go].go());
+
+  const firstMissing=steps.findIndex(s=>!s.ok);
+  const NB=$('#nextBox');
+  if(firstMissing<0){
+    NB.classList.add('done'); $('#nextN').textContent='✓';
+    $('#nextT').textContent='Pronto — o r está no alto da tela e sobre cada elipse';
+    $('#nextD').textContent = S.demoR!==null
+      ? 'Neste exemplo o r verdadeiro é 0,680. Compare com o seu.'
+      : 'Refine a elipse arrastando as alças; o r acompanha em tempo real.';
+  }else{
+    NB.classList.remove('done'); $('#nextN').textContent=firstMissing+1;
+    $('#nextT').textContent=steps[firstMissing].t;
+    $('#nextD').textContent=[
+      'Escolha um arquivo ou abra o exemplo pronto.',
+      'Duas marcas do eixo horizontal, bem afastadas uma da outra.',
+      'Duas marcas do eixo vertical, bem afastadas uma da outra.',
+      'Os números que aparecem impressos naquelas marcas.',
+      'Contorne a elipse com 5 cliques ou mais e confirme.'
+    ][firstMissing];
+  }
+
+  $('#chipX').textContent=S.calX.length+' / 2';
+  $('#chipY').textContent=S.calY.length+' / 2';
+  $('#chipX').className='chip'+(S.calX.length===2?' ok':'');
+  $('#chipY').className='chip'+(S.calY.length===2?' ok':'');
+  $('#scaleChip').textContent=sc?'escala '+fmt(Math.abs(sc.sx),4)+' × '+fmt(Math.abs(sc.sy),4)+' un/px':'sem calibração';
+  $('#scaleChip').className='chip'+(sc?' ok':' warn');
+
+  $('#legend').style.display=S.img?'':'none';
+  const showHint=!S.img||S.pending||S.mode!=='edit';
+  $('#ohint').style.display=showHint?'':'none';
+  $('#ohint').textContent = !S.img?'Carregue uma imagem ou abra o exemplo'
+    : S.pending==='X'?'Clique em duas marcas do eixo X ('+S.calX.length+'/2)'
+    : S.pending==='Y'?'Clique em duas marcas do eixo Y ('+S.calY.length+'/2)'
+    : S.mode==='contour'?'Contorno: '+S.pts.length+' ponto(s) — mínimo 5'
+    : S.mode==='four'?'Eixo maior e depois eixo menor: '+S.pts.length+'/4' : '';
+  $('#btnMake').disabled=!S.preview;
+
+  // lista
+  const L=$('#elist');
+  if(!S.els.length) L.innerHTML='<div class="empty">Nenhuma elipse ainda.</div>';
+  else L.innerHTML=S.els.map((e,i)=>{ const an=analyze(e,sc);
+    return '<div class="eitem'+(i===S.sel?' sel':'')+'" data-i="'+i+'"><div class="top">'+
+      '<span class="nm">'+e.name+'</span><span class="rr">r = '+(an?fmt(an.r,3):'—')+'</span></div>'+
+      '<div class="sub">'+(an?'a '+fmt(an.A,2)+' · b '+fmt(an.B,2)+' · θ '+fmt(an.theta,1)+'°':'calibre os eixos')+
+      '</div></div>'; }).join('');
+  L.querySelectorAll('.eitem').forEach(el=>el.onclick=()=>{S.sel=+el.dataset.i;sync();});
+
+  if(!skipInputs){
+    const e=S.sel>=0?S.els[S.sel]:null;
+    $('#pcx').value=e?e.cx.toFixed(1):''; $('#pcy').value=e?e.cy.toFixed(1):'';
+    $('#pa').value=e?e.a.toFixed(1):'';   $('#pb').value=e?e.b.toFixed(1):'';
+    $('#pphi').value=e?(e.phi*180/Math.PI).toFixed(2):'';
+  }
+
+  // resultado: prévia tem prioridade, senão a elipse selecionada
+  const useEl = S.preview || (S.sel>=0?S.els[S.sel]:null);
+  const isPrev = !!S.preview;
+  const an = analyze(useEl, sc);
+  const H=$('#rhoVal'), N=$('#liveNum');
+  if(an){
+    H.className='val'; H.innerHTML=fmt(an.r,3)+'<small> &nbsp;'+(isPrev?'prévia':useEl.name)+'</small>';
+    N.className='num'; N.textContent=fmt(an.r,3);
+    $('#liveSrc').textContent=isPrev?'prévia em traçado':(useEl.name||'');
+    $('#liveTag').style.display=isPrev?'':'none';
+    $('#rhoPin').style.left=((an.r+1)/2*100)+'%';
+    $('#strength').textContent=strengthWord(an.r);
+    $('#geo').innerHTML =
+      kv('Centro','('+fmt(an.cx,2)+' , '+fmt(an.cy,2)+')')+
+      kv('Semieixo maior',fmt(an.A,3)+' × k')+
+      kv('Semieixo menor',fmt(an.B,3)+' × k')+
+      kv('Ângulo do eixo maior',fmt(an.theta,2)+'°')+
+      kv('Razão dos eixos',fmt(an.B>0?an.A/an.B:Infinity,2))+
+      kv('r²',fmt(an.r*an.r,3));
+  }else{
+    const why = !S.img?'carregue a imagem' : !sc?'falta calibrar os eixos'
+              : !S.els.length?'marque uma elipse':'selecione uma elipse';
+    H.className='val na'; H.textContent=why;
+    N.className='num na'; N.textContent='—';
+    $('#liveSrc').textContent=why; $('#liveTag').style.display='none';
+    $('#rhoPin').style.left='50%'; $('#strength').textContent='';
+    $('#geo').innerHTML='<div class="empty">'+why.charAt(0).toUpperCase()+why.slice(1)+'.</div>';
+  }
+
+  const k=kFactor();
+  $('#en').disabled = $('#etype').value==='pop';
+  $('#sdOut').innerHTML = (an&&k)
+    ? kv('k',fmt(k,4))+kv('DP em X',fmt(an.sdxU/k,3))+kv('DP em Y',fmt(an.sdyU/k,3))+
+      kv('Covariância',fmt(an.m12/(k*k),3))+kv('DP eixo maior',fmt(an.A/k,3))+kv('DP eixo menor',fmt(an.B/k,3))
+    : '<div class="empty">'+(an?'Informe um n ≥ 5.':'—')+'</div>';
+
+  draw();
+}
+
+/* =========== exportar =========== */
+function rows(){
+  const sc=scales();
+  return S.els.map(e=>{ const a=analyze(e,sc); return {
+    nome:e.name, r_pearson:a?+a.r.toFixed(4):null, r2:a?+(a.r*a.r).toFixed(4):null,
+    centro_x:a?+a.cx.toFixed(4):null, centro_y:a?+a.cy.toFixed(4):null,
+    semieixo_maior:a?+a.A.toFixed(4):null, semieixo_menor:a?+a.B.toFixed(4):null,
+    angulo_graus:a?+a.theta.toFixed(3):null,
+    px:{cx:+e.cx.toFixed(2),cy:+e.cy.toFixed(2),a:+e.a.toFixed(2),b:+e.b.toFixed(2),
+        phi_graus:+(e.phi*180/Math.PI).toFixed(3)} };});
+}
+$('#btnCopyR').onclick=async()=>{
+  const t=$('#liveNum').textContent;
+  if(t==='—') return toast('Ainda não há r para copiar.');
+  try{ await navigator.clipboard.writeText(t); toast('r = '+t+' copiado'); }
+  catch(e){ toast('O navegador bloqueou a cópia.'); }
+};
+$('#btnCopy').onclick=async()=>{
+  const R=rows(); if(!R.length) return toast('Nada para copiar ainda.');
+  const head='nome\tr_pearson\tr2\tcentro_x\tcentro_y\tsemieixo_maior\tsemieixo_menor\tangulo_graus';
+  const body=R.map(r=>[r.nome,r.r_pearson,r.r2,r.centro_x,r.centro_y,r.semieixo_maior,r.semieixo_menor,r.angulo_graus].join('\t')).join('\n');
+  try{ await navigator.clipboard.writeText(head+'\n'+body); toast('Tabela copiada'); }
+  catch(e){ toast('O navegador bloqueou a cópia.'); }
+};
+$('#btnJson').onclick=()=>{
+  const blob=new Blob([JSON.stringify({escalas:scales(),elipses:rows()},null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='elipses-pearson.json'; a.click(); URL.revokeObjectURL(a.href);
+};
+
+/* =========== teclado =========== */
+window.addEventListener('keydown', ev=>{
+  if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if(ev.key==='Escape'){ S.pending=null; S.pts=[]; S.preview=null; sync(); return; }
+  if(ev.key==='Enter'&&S.preview){ $('#btnMake').click(); return; }
+  if(S.sel<0) return;
+  const e=S.els[S.sel], st=ev.shiftKey?5:1;
+  const mv={ArrowLeft:[-st,0],ArrowRight:[st,0],ArrowUp:[0,-st],ArrowDown:[0,st]}[ev.key];
+  if(mv){ e.cx+=mv[0]; e.cy+=mv[1]; ev.preventDefault(); sync(); }
+  if(ev.key==='[') { e.phi-=Math.PI/180; sync(); }
+  if(ev.key===']') { e.phi+=Math.PI/180; sync(); }
+  if(ev.key==='Delete'||ev.key==='Backspace'){ S.els.splice(S.sel,1); S.sel=-1; sync(); }
+});
+
+new ResizeObserver(resize).observe(stage);
+setMode('contour'); resize(); sync();
+})();
+</script>
+</body>
+</html>
