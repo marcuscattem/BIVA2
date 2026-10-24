@@ -236,7 +236,7 @@
             <svg viewBox="0 0 60 44" style="width:56px;height:42px;flex:none;background:var(--bg-thumb);border:1px solid var(--border-4);border-radius:7px">
               <line x1="4" y1="40" x2="56" y2="40" stroke="var(--stroke-grid)" stroke-width="1"></line>
               <line x1="6" y1="4" x2="6" y2="40" stroke="var(--stroke-grid)" stroke-width="1"></line>
-              <path d="{{ p.thumbPath }}" fill="{{ p.thumbFill }}" stroke="{{ p.thumbStroke }}" stroke-width="1.4"></path>
+              <ellipse cx="31" cy="22" rx="23" ry="11" transform="rotate(-25 31 22)" fill="{{ p.thumbFill }}" stroke="{{ p.thumbStroke }}" stroke-width="1.4"></ellipse>
             </svg>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
@@ -244,15 +244,17 @@
                 <span style="font-size:12px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">{{ p.country }}</span>
                 <span style="{{ p.customTagStyle }}">★</span>
                 <span class="mono" style="font-size:10px;color:var(--text-muted)">N={{ p.n }}</span>
+                <button onClick="{{ p.onToggle }}" title="{{ p.selectTitle }}" aria-label="{{ p.selectTitle }}" style="{{ p.selectStyle }}">{{ p.selectIcon }}</button>
               </div>
               <div style="font-size:10.5px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px">{{ p.subLine }}</div>
-              <div style="{{ p.referenceStyle }}"><span style="font-weight:600">{{ t.refArticle }}:</span> {{ p.referenceAuthor }} ({{ p.referenceYear }}) · <a href="{{ p.referenceHref }}" target="_blank" rel="noopener noreferrer" onClick="{{ p.onDoiClick }}" style="color:var(--text-10);text-decoration:underline;text-underline-offset:2px">DOI: {{ p.referenceDoi }}</a></div>
+              <div style="{{ p.referenceStyle }}"><span style="font-weight:600">{{ t.refArticle }}:</span> {{ p.referenceAuthor }} ({{ p.referenceYear }}) <a href="{{ p.referenceHref }}" target="_blank" rel="noopener noreferrer" onClick="{{ p.onDoiClick }}" style="{{ p.doiStyle }}">· DOI: {{ p.referenceDoi }}</a></div>
+              <div style="{{ p.noteStyle }}">{{ p.noteText }}</div>
               <div style="display:flex;gap:5px;flex-wrap:wrap">
                 <span style="{{ p.typeChip }}">{{ p.type }}</span>
                 <span style="font-size:9.5px;color:var(--text-muted);background:var(--bg-chip);padding:1px 6px;border-radius:5px">{{ p.age }}</span>
               </div>
               <div style="{{ p.statRow }}">
-                <span class="mono">R/H {{ p.rhText }}</span><span style="color:var(--text-12)">·</span><span class="mono">Xc/H {{ p.xcText }}</span>
+                <span class="mono">{{ p.axisX }} {{ p.rhText }}</span><span style="color:var(--text-12)">·</span><span class="mono">{{ p.axisY }} {{ p.xcText }}</span>
               </div>
               <div style="{{ p.modeRow }}">
                 <button onClick="{{ p.onConf }}" style="{{ p.confStyle }}">{{ t.modeConf }}</button>
@@ -410,9 +412,9 @@
           <div style="font-size:9.5px;color:var(--text-9);line-height:1.4;margin-bottom:8px">{{ t.batchHint }}</div>
           <div style="font-size:9px;color:var(--text-9);letter-spacing:.3px;margin-bottom:5px">{{ t.modeLabel }}</div>
           <div style="display:flex;gap:5px;margin-bottom:7px">
-            <sc-for list="{{ bivaModes }}" as="m" hint-placeholder-count="2"><button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button></sc-for>
+            <sc-for list="{{ bivaModes }}" as="m" hint-placeholder-count="3"><button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button></sc-for>
           </div>
-          <div style="{{ specificNoteStyle }}">{{ t.specificNote }}</div>
+          <div style="{{ metricNoteStyle }}">{{ metricNote }}</div>
           <div style="display:flex;gap:6px;align-items:center">
             <a href="BIVA2-modelo-importacao.xlsx" download style="flex:1;text-align:center;font-size:10.5px;font-weight:600;color:var(--text-10);background:var(--bg-panel);border:1px solid var(--border-info2);padding:7px 8px;border-radius:7px;text-decoration:none">{{ t.downloadModel }}</a>
             <label style="flex:1;text-align:center;font-size:10.5px;font-weight:600;color:#fff;background:#173f8a;border:1px solid #173f8a;padding:7px 8px;border-radius:7px;cursor:pointer">{{ t.importExcel }}
@@ -519,9 +521,9 @@
             <div style="font-size:9.5px;color:var(--text-9);line-height:1.4;margin-bottom:8px">{{ t.batchHint }}</div>
             <div style="font-size:9px;color:var(--text-9);letter-spacing:.3px;margin-bottom:5px">{{ t.modeLabel }}</div>
             <div style="display:flex;gap:5px;margin-bottom:7px">
-              <sc-for list="{{ bivaModes }}" as="m" hint-placeholder-count="2"><button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button></sc-for>
+              <sc-for list="{{ bivaModes }}" as="m" hint-placeholder-count="3"><button onClick="{{ m.onClick }}" style="{{ m.style }}">{{ m.label }}</button></sc-for>
             </div>
-            <div style="{{ specificNoteStyle }}">{{ t.specificNote }}</div>
+            <div style="{{ metricNoteStyle }}">{{ metricNote }}</div>
             <div style="display:flex;gap:6px;align-items:center">
               <a href="BIVA2-modelo-importacao.xlsx" download style="flex:1;text-align:center;font-size:10.5px;font-weight:600;color:var(--text-10);background:var(--bg-panel);border:1px solid var(--border-info2);padding:7px 8px;border-radius:7px;text-decoration:none">{{ t.downloadModel }}</a>
               <label style="flex:1;text-align:center;font-size:10.5px;font-weight:600;color:#fff;background:#173f8a;border:1px solid #173f8a;padding:7px 8px;border-radius:7px;cursor:pointer">{{ t.importExcel }}
@@ -728,7 +730,7 @@ class Component extends DCLogic {
     editingMeasurementId: null,
     measurementDraft: null,
     measurementError: false,
-    bivaMode: 'classic',          // 'classic' | 'specific'
+    bivaMode: 'classic',          // 'classic' | 'specific' | 'h2'
     importStatus: { scope:'', type:'', text:'' },
     // axis window
     showAxisWin: false,
@@ -763,12 +765,14 @@ class Component extends DCLogic {
       auxEyebrow:'FERRAMENTA COMPLEMENTAR', auxTitle:'Estimador de correlação de Pearson', auxDesc:'Recupere r pela geometria de uma elipse publicada quando o artigo não informa a correlação.', auxOpen:'Abrir estimador',
       exportPng:'Exportar PNG', exportExcel:'Exportar Excel',
       batchTitle:'Importação em lote', batchHint:'Baixe o modelo, preencha os participantes e importe várias elipses ou pontos de uma vez.',
-      downloadModel:'Baixar modelo Excel', importExcel:'Importar Excel', modeLabel:'NORMALIZAÇÃO', bivaClassic:'BIVA clássica', bivaSpecific:'BIVA específica',
+      downloadModel:'Baixar modelo Excel', importExcel:'Importar Excel', modeLabel:'NORMALIZAÇÃO', bivaClassic:'BIVA clássica', bivaSpecific:'BIVA específica', bivaH2:'Índices H²/Z',
       specificNote:'Rsp e Xcsp usam estatura e perímetros de braço direito, cintura e panturrilha direita.',
+      h2Note:'H²/R e H²/Xc usam a estatura ao quadrado e mantêm os eixos próprios do índice de impedância.',
       importHMissing:'A importação foi bloqueada: todas as linhas precisam de estatura (H).', importPerimMissing:'A importação foi bloqueada: BIVA específica exige os três perímetros em todas as linhas.',
       importColumns:'A planilha precisa conter Grupo, R_ohm e Xc_ohm.', importNoGroups:'Nenhum grupo válido foi encontrado. Confiança exige ao menos 3 participantes por grupo.',
       importReading:'Lendo planilha…', importConfOk:'elipses calculadas e adicionadas.', importTolOk:'pontos calculados e adicionados.', zSpecificUnavailable:'Z-score requer referência clássica R/H e Xc/H; use BIVA clássica.',
       popTitle:'Populações de referência', searchPh:'Buscar por país, sexo, equipamento…',
+      selectAdd:'Adicionar ao gráfico', selectRemove:'Remover do gráfico',
       noneFound:'Nenhuma população encontrada com esses filtros.',
       sexAll:'Todos', sexM:'Masc', sexF:'Fem',
       tAll:'Todas', tHealthy:'Saudável', tSport:'Atletas', tClinical:'Clínica',
@@ -826,12 +830,14 @@ class Component extends DCLogic {
       auxEyebrow:'COMPLEMENTARY TOOL', auxTitle:'Pearson correlation estimator', auxDesc:'Recover r from the geometry of a published ellipse when the article does not report the correlation.', auxOpen:'Open estimator',
       exportPng:'Export PNG', exportExcel:'Export Excel',
       batchTitle:'Batch import', batchHint:'Download the template, enter participants, and import multiple ellipses or points at once.',
-      downloadModel:'Download Excel template', importExcel:'Import Excel', modeLabel:'NORMALIZATION', bivaClassic:'Classic BIVA', bivaSpecific:'Specific BIVA',
+      downloadModel:'Download Excel template', importExcel:'Import Excel', modeLabel:'NORMALIZATION', bivaClassic:'Classic BIVA', bivaSpecific:'Specific BIVA', bivaH2:'H²/Z indices',
       specificNote:'Rsp and Xcsp use height and right-arm, waist, and right-calf circumferences.',
+      h2Note:'H²/R and H²/Xc use squared height and retain the impedance-index axes.',
       importHMissing:'Import blocked: every row must include height (H).', importPerimMissing:'Import blocked: specific BIVA requires all three circumferences in every row.',
       importColumns:'The spreadsheet must contain Grupo, R_ohm, and Xc_ohm.', importNoGroups:'No valid group was found. Confidence requires at least 3 participants per group.',
       importReading:'Reading spreadsheet…', importConfOk:'ellipses calculated and added.', importTolOk:'points calculated and added.', zSpecificUnavailable:'Z-score requires a classic R/H and Xc/H reference; use classic BIVA.',
       popTitle:'Reference populations', searchPh:'Search by country, sex, device…',
+      selectAdd:'Add to chart', selectRemove:'Remove from chart',
       noneFound:'No population matches these filters.',
       sexAll:'All', sexM:'Male', sexF:'Female',
       tAll:'All', tHealthy:'Healthy', tSport:'Athletes', tClinical:'Clinical',
@@ -889,12 +895,14 @@ class Component extends DCLogic {
       auxEyebrow:'HERRAMIENTA COMPLEMENTARIA', auxTitle:'Estimador de correlación de Pearson', auxDesc:'Recupere r mediante la geometría de una elipse publicada cuando el artículo no informa la correlación.', auxOpen:'Abrir estimador',
       exportPng:'Exportar PNG', exportExcel:'Exportar Excel',
       batchTitle:'Importación por lotes', batchHint:'Descarga el modelo, introduce los participantes e importa varias elipses o puntos a la vez.',
-      downloadModel:'Descargar modelo Excel', importExcel:'Importar Excel', modeLabel:'NORMALIZACIÓN', bivaClassic:'BIVA clásica', bivaSpecific:'BIVA específica',
+      downloadModel:'Descargar modelo Excel', importExcel:'Importar Excel', modeLabel:'NORMALIZACIÓN', bivaClassic:'BIVA clásica', bivaSpecific:'BIVA específica', bivaH2:'Índices H²/Z',
       specificNote:'Rsp y Xcsp usan estatura y perímetros de brazo derecho, cintura y pantorrilla derecha.',
+      h2Note:'H²/R y H²/Xc usan la estatura al cuadrado y conservan los ejes propios del índice de impedancia.',
       importHMissing:'Importación bloqueada: todas las filas deben incluir estatura (H).', importPerimMissing:'Importación bloqueada: BIVA específica exige los tres perímetros en todas las filas.',
       importColumns:'La hoja debe contener Grupo, R_ohm y Xc_ohm.', importNoGroups:'No se encontró ningún grupo válido. Confianza exige al menos 3 participantes por grupo.',
       importReading:'Leyendo la hoja…', importConfOk:'elipses calculadas y añadidas.', importTolOk:'puntos calculados y añadidos.', zSpecificUnavailable:'Z-score exige una referencia clásica R/H y Xc/H; usa BIVA clásica.',
       popTitle:'Poblaciones de referencia', searchPh:'Buscar por país, sexo, equipo…',
+      selectAdd:'Añadir al gráfico', selectRemove:'Quitar del gráfico',
       noneFound:'Ninguna población coincide con estos filtros.',
       sexAll:'Todos', sexM:'Masc', sexF:'Fem',
       tAll:'Todas', tHealthy:'Sana', tSport:'Atletas', tClinical:'Clínica',
@@ -952,12 +960,14 @@ class Component extends DCLogic {
       auxEyebrow:'STRUMENTO COMPLEMENTARE', auxTitle:'Stimatore della correlazione di Pearson', auxDesc:'Ricava r dalla geometria di un’ellisse pubblicata quando l’articolo non riporta la correlazione.', auxOpen:'Apri stimatore',
       exportPng:'Esporta PNG', exportExcel:'Esporta Excel',
       batchTitle:'Importazione in blocco', batchHint:'Scarica il modello, inserisci i partecipanti e importa più ellissi o punti in una sola volta.',
-      downloadModel:'Scarica modello Excel', importExcel:'Importa Excel', modeLabel:'NORMALIZZAZIONE', bivaClassic:'BIVA classica', bivaSpecific:'BIVA specifica',
+      downloadModel:'Scarica modello Excel', importExcel:'Importa Excel', modeLabel:'NORMALIZZAZIONE', bivaClassic:'BIVA classica', bivaSpecific:'BIVA specifica', bivaH2:'Indici H²/Z',
       specificNote:'Rsp e Xcsp usano statura e circonferenze di braccio destro, vita e polpaccio destro.',
+      h2Note:'H²/R e H²/Xc usano la statura al quadrato e mantengono gli assi propri dell’indice di impedenza.',
       importHMissing:'Importazione bloccata: tutte le righe devono includere la statura (H).', importPerimMissing:'Importazione bloccata: la BIVA specifica richiede tutte e tre le circonferenze in ogni riga.',
       importColumns:'Il foglio deve contenere Grupo, R_ohm e Xc_ohm.', importNoGroups:'Nessun gruppo valido trovato. La confidenza richiede almeno 3 partecipanti per gruppo.',
       importReading:'Lettura del foglio…', importConfOk:'ellissi calcolate e aggiunte.', importTolOk:'punti calcolati e aggiunti.', zSpecificUnavailable:'Lo z-score richiede un riferimento classico R/H e Xc/H; usa la BIVA classica.',
       popTitle:'Popolazioni di riferimento', searchPh:'Cerca per paese, sesso, strumento…',
+      selectAdd:'Aggiungi al grafico', selectRemove:'Rimuovi dal grafico',
       noneFound:'Nessuna popolazione corrisponde a questi filtri.',
       sexAll:'Tutti', sexM:'Masch', sexF:'Femm',
       tAll:'Tutte', tHealthy:'Sana', tSport:'Atleti', tClinical:'Clinica',
@@ -1017,7 +1027,7 @@ class Component extends DCLogic {
     this._onResize = () => this._draw();
     window.addEventListener('resize', this._onResize);
   }
-  componentWillUnmount() { window.removeEventListener('resize', this._onResize); }
+  componentWillUnmount() { window.removeEventListener('resize', this._onResize); if(this._phaseFrame)cancelAnimationFrame(this._phaseFrame); }
   componentDidUpdate() { this._draw(); }
 
   _load(tries) {
@@ -1033,13 +1043,13 @@ class Component extends DCLogic {
   }
 
   // ---------- normalization ----------
-  _inferCountry(l){const c=['Italy','USA','Brazil','Mexico','Spain','France','Germany','Portugal'];return c.find((x)=>new RegExp('\\b'+x+'\\b','i').test(l))||'—';}
-  _ptCountry(c){const m={Italy:'Itália',USA:'EUA',Brazil:'Brasil',Mexico:'México',Spain:'Espanha',France:'França',Germany:'Alemanha',Portugal:'Portugal'};return m[c]||c;}
+  _inferCountry(l){const c=['Italy','USA','Brazil','Mexico','Spain','France','Germany','Portugal','South Korea','Poland','Slovakia','Cuba','India','Taiwan','Lebanon','Netherlands','Japan','Turkey'];return c.find((x)=>new RegExp('\\b'+x+'\\b','i').test(l))||'—';}
+  _ptCountry(c){const m={Italy:'Itália',USA:'EUA',Brazil:'Brasil',Mexico:'México',Spain:'Espanha',France:'França',Germany:'Alemanha',Portugal:'Portugal','South Korea':'Coreia do Sul',Poland:'Polônia',Slovakia:'Eslováquia',Cuba:'Cuba',India:'Índia',Taiwan:'Taiwan',Lebanon:'Líbano',Netherlands:'Países Baixos',Japan:'Japão',Turkey:'Turquia'};return m[c]||c;}
   _inferAge(l){const r=l.match(/(\d+)\s*age\s*(\d+)\s*(yr|years?|days?)/i);if(r)return r[1]+'–'+r[2]+' anos';const s=l.match(/age\s*(\d+)/i);if(s)return s[1]+' anos';if(/adult/i.test(l))return 'Adultos';return '—';}
   _inferEquip(l){const m=l.match(/\(([^)]*(?:Akern|RJL|BIA|Bodystat|InBody|Tanita|SEAC)[^)]*)\)/i);if(m)return m[1].replace(/\s+/g,' ').trim();if(/akern/i.test(l))return 'Akern-RJL';if(/rjl/i.test(l))return 'RJL Systems';return '—';}
   _inferType(l){if(/athlet|sport|endurance|velocity|power|team-sports/i.test(l))return 'Sport';if(/clinical|patient|disease|renal|cardiac|obese|cancer|sarcopen/i.test(l))return 'Clinical';if(/healthy|reference|adult|children|adolescent/i.test(l))return 'Healthy';return 'Other';}
   _inferSex(p,l){const s=String(p.sex||'').toLowerCase();if(s==='m'||s==='f')return s.toUpperCase();if(/females?/i.test(l))return 'F';if(/males?/i.test(l))return 'M';return '—';}
-  _referenceInfo(reference,legend){
+  _referenceInfo(reference,legend,knownDoi){
     const r=String(reference||''),l=String(legend||'');
     if(/NHANES III/i.test(l))return{author:'Piccoli et al.',year:'2002',doi:'10.1016/S0899-9007(01)00665-7',label:'Piccoli et al. (2002) · DOI: 10.1016/S0899-9007(01)00665-7'};
     const refs=[
@@ -1054,22 +1064,25 @@ class Component extends DCLogic {
       [/Normal values of the bioelectrical impedance vector in child/i,'De Palo et al.','2000','10.1016/S0899-9007(00)00269-0'],
     ];
     const hit=refs.find((item)=>item[0].test(r));
-    if(hit)return{author:hit[1],year:hit[2],doi:hit[3],label:hit[1]+' ('+hit[2]+') · DOI: '+hit[3]};
+    if(hit)return{author:hit[1],year:hit[2],doi:knownDoi||hit[3],label:hit[1]+' ('+hit[2]+') · DOI: '+(knownDoi||hit[3])};
     const surname=(r.match(/^\s*([A-Za-zÀ-ÿ'-]+)/)||[])[1]||'';
     const year=(r.match(/\b(19|20)\d{2}\b/)||[])[0]||'';
-    return{author:surname?(surname+' et al.'):'',year,doi:'',label:surname?(surname+' et al.'+(year?' ('+year+')':'')) : ''};
+    const doi=knownDoi||((r.match(/10\.\d{4,9}\/[-._;()/:A-Z0-9]+/i)||[])[0]||'').replace(/[.,;]+$/,'');
+    return{author:surname?(surname+' et al.'):'',year,doi,label:surname?(surname+' et al.'+(year?' ('+year+')':'')+(doi?' · DOI: '+doi:'')) : ''};
   }
   _normalize(p,i){
     const legend=String(p.legend||('População '+(i+1))).replace(/\s+/g,' ').trim();
-    const source=['confidence','tolerance','custom'].includes(p.source)?p.source:'tolerance';
+    const source=['confidence','tolerance','both','custom'].includes(p.source)?p.source:'tolerance';
+    const metric=['classic','specific','h2'].includes(p.metric)?p.metric:'classic';
     const country=p.country||this._inferCountry(legend);
-    const ref=this._referenceInfo(p.reference,legend);
+    const ref=this._referenceInfo(p.reference,legend,p.doi);
     return {
       key:source+':'+(p.code||i+1)+':'+i,
-      code:p.code||i+1, legend, source,
+      code:p.code||i+1, legend, source, metric,
       sex:this._inferSex(p,legend),
       countryRaw:country, country:this._ptCountry(country),
       age:p.age||this._inferAge(legend), equip:p.equipment||this._inferEquip(legend), type:p.population||this._inferType(legend), reference:p.reference||'',referenceAuthor:ref.author,referenceYear:ref.year,referenceDoi:ref.doi,referenceLabel:ref.label,
+      note:p.note||'',foundIn:p.found_in||'',ellipseUse:p.ellipse_use||'',provenance:Array.isArray(p.provenance)?p.provenance:[],
       n:Number(p.n)||1,
       rhMean:Number(p.r_h_mean), rhSd:Number(p.r_h_sd),
       xcHMean:Number(p.xc_h_mean), xcHSd:Number(p.xc_h_sd),
@@ -1124,6 +1137,9 @@ class Component extends DCLogic {
 
   // ---------- helpers ----------
   _fmt(x,d){ if(!Number.isFinite(x))return '—'; return x.toFixed(d==null?1:d); }
+  _metricAxes(mode){if(mode==='specific')return{x:'Rsp',y:'Xcsp',ux:'Ω·cm',uy:'Ω·cm'};if(mode==='h2')return{x:'H²/R',y:'H²/Xc',ux:'cm²/Ω',uy:'cm²/Ω'};return{x:'R/H',y:'Xc/H',ux:'Ω/m',uy:'Ω/m'};}
+  _phaseAngle(x,y){return(this.state.bivaMode==='h2'?Math.atan2(x,y):Math.atan2(y,x))*180/Math.PI;}
+  _phaseAllowed(){return !this._isZMode()&&!(this.state.method==='confidence'&&this.state.comparisonMode==='paired'&&this.state.pairedView==='delta');}
   _refColor(key){ const i=this.state.refKeys.indexOf(key); return i<0?null:this.REF_COLORS[i%this.REF_COLORS.length]; }
   _byKey(key){ return this.state.pops.find((p)=>p.key===key) || this.state.customRefs.find((p)=>p.key===key); }
   _hexA(hex,a){ const h=hex.replace('#','');const r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);return 'rgba('+r+','+g+','+b+','+a+')'; }
@@ -1142,10 +1158,9 @@ class Component extends DCLogic {
     const { pops, customRefs, fSex, fType, search } = this.state;
     const q = search.trim().toLowerCase();
     return [...customRefs, ...pops].filter((p)=>{
-      if(this.state.bivaMode==='specific' && !p.custom) return false;
-      if(p.custom && (p.metric||'classic')!==this.state.bivaMode) return false;
-      if(!p.custom && this.state.method==='confidence' && p.source!=='confidence') return false;
-      if(!p.custom && this.state.method==='tolerance' && p.source!=='tolerance') return false;
+      if((p.metric||'classic')!==this.state.bivaMode) return false;
+      if(!p.custom && this.state.method==='confidence' && !['confidence','both'].includes(p.source)) return false;
+      if(!p.custom && this.state.method==='tolerance' && !['tolerance','both'].includes(p.source)) return false;
       if(fSex && p.sex!==fSex) return false;
       if(fType && p.type!==fType) return false;
       if(q && !(p.legend.toLowerCase().includes(q) || p.country.toLowerCase().includes(q) || p.equip.toLowerCase().includes(q) || String(p.referenceLabel||'').toLowerCase().includes(q))) return false;
@@ -1154,9 +1169,9 @@ class Component extends DCLogic {
   }
 
   _thumbPath(p){
-    const w=this.THUMB_WIN, pts=this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd,p.xcHSd,p.r,this.CHI.t95);
-    const mapx=(x)=>6+(x-w.xmin)/(w.xmax-w.xmin)*50;
-    const mapy=(y)=>40-(y-w.ymin)/(w.ymax-w.ymin)*36;
+    const pts=this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd,p.xcHSd,p.r,this.CHI.t95),xs=pts.map((pt)=>pt.x),ys=pts.map((pt)=>pt.y),xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys),dx=xmax-xmin||1,dy=ymax-ymin||1;
+    const mapx=(x)=>6+(x-xmin)/dx*50;
+    const mapy=(y)=>40-(y-ymin)/dy*36;
     let d='';
     pts.forEach((pt,i)=>{ d+=(i?'L':'M')+mapx(pt.x).toFixed(1)+' '+mapy(pt.y).toFixed(1)+' '; });
     return d+'Z';
@@ -1174,7 +1189,7 @@ class Component extends DCLogic {
     const delta=this._pairedDeltaData();
     if(this.state.method==='confidence'&&this.state.comparisonMode==='paired'&&this.state.pairedView==='delta'&&delta) return[{kind:'delta',e:delta}];
     const items=[];
-    if(this.state.bivaMode==='classic')this.state.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p) items.push({kind:'ref',pop:p,color:this._refColor(k),mode:this._effMode(k)}); });
+    this.state.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p&&(p.metric||'classic')===this.state.bivaMode) items.push({kind:'ref',pop:p,color:this._refColor(k),mode:this._effMode(k)}); });
     this.state.ellipses.forEach((e)=>{ if(e.visible&&(e.metric||'classic')===this.state.bivaMode) items.push({kind:'conf',e}); });
     return items;
   }
@@ -1197,7 +1212,7 @@ class Component extends DCLogic {
       const ax=Math.max(Math.abs(xmin),Math.abs(xmax),1)+px,ay=Math.max(Math.abs(ymin),Math.abs(ymax),1)+py;
       return{xmin:-ax,xmax:ax,ymin:-ay,ymax:ay};
     }
-    if(this.state.showPhase)return{xmin:Math.min(0,xmin-px),xmax:xmax+px,ymin:Math.min(0,ymin-py),ymax:ymax+py};
+    if(this.state.showPhase&&this._phaseAllowed())return{xmin:Math.min(0,xmin-px),xmax:xmax+px,ymin:Math.min(0,ymin-py),ymax:ymax+py};
     return { xmin:xmin-px, xmax:xmax+px, ymin:Math.max(0,ymin-py), ymax:ymax+py };
   }
 
@@ -1273,6 +1288,16 @@ class Component extends DCLogic {
       if(fill){ctx.fillStyle=fill;ctx.fill();}
       ctx.setLineDash(dash||[]); ctx.strokeStyle=stroke; ctx.lineWidth=lw; ctx.stroke(); ctx.setLineDash([]);
     };
+    const phaseOn=this.state.showPhase&&this._phaseAllowed()&&b.xmin<=0&&b.xmax>=0&&b.ymin<=0&&b.ymax>=0;
+    const phaseProgress=phaseOn&&this._phaseStart?Math.min(1,(performance.now()-this._phaseStart)/260):1;
+    let phaseIndex=0;
+    const drawPhase=(x,y,color,label)=>{
+      if(!phaseOn)return;
+      const ox=px(0),oy=py(0),tx=px(x),ty=py(y),ex=ox+(tx-ox)*phaseProgress,ey=oy+(ty-oy)*phaseProgress,angle=this._phaseAngle(x,y);
+      ctx.save();ctx.strokeStyle=this._hexA(color,0.72);ctx.setLineDash([5,4]);ctx.lineWidth=1.35;ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ex,ey);ctx.stroke();ctx.setLineDash([]);
+      if(phaseProgress>.82){const text='φ '+angle.toFixed(1)+'°';ctx.font="600 10px 'IBM Plex Mono',monospace";const tw=ctx.measureText(text).width+12,mx=ox+(tx-ox)*.62,my=oy+(ty-oy)*.62,lx=Math.max(4,Math.min(W-tw-4,mx+7)),ly=Math.max(13,Math.min(H-5,my-8+(phaseIndex%3)*15));ctx.fillStyle=cp.legendBg;ctx.strokeStyle=this._hexA(color,.55);ctx.lineWidth=1;ctx.beginPath();ctx.roundRect?ctx.roundRect(lx,ly-12,tw,16,4):ctx.rect(lx,ly-12,tw,16);ctx.fill();ctx.stroke();ctx.fillStyle=color;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(text,lx+6,ly-4);}
+      ctx.restore();phaseIndex++;
+    };
     items.forEach((it)=>{
       if(it.kind==='ref'){
         const p=this._displayStats(it.pop),col=it.color;
@@ -1287,12 +1312,13 @@ class Component extends DCLogic {
         // center
         const cx=px(p.rhMean),cy=py(p.xcHMean);
         ctx.fillStyle=col; ctx.beginPath(); ctx.arc(cx,cy,3.2,0,7); ctx.fill();
-        if(this.state.showPhase&&b.xmin<=0&&b.xmax>=0&&b.ymin<=0&&b.ymax>=0){ const angle=Math.atan2(p.xcHMean,p.rhMean)*180/Math.PI;ctx.strokeStyle=this._hexA(col,0.6); ctx.setLineDash([4,3]); ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(px(0),py(0)); ctx.lineTo(cx,cy); ctx.stroke(); ctx.setLineDash([]);ctx.fillStyle=col;ctx.font="600 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(angle.toFixed(1)+'°',cx+5,cy-4); }
-        ctx.fillStyle=col;ctx.font="600 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText((it.pop.country+' '+it.pop.sex).trim(),cx+6,cy-5);
+        drawPhase(p.rhMean,p.xcHMean,col,it.pop.legend);
+        ctx.fillStyle=col;ctx.font="600 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText((it.pop.country+' '+it.pop.sex).trim(),cx+6,cy-5,Math.max(40,W-cx-pad.r-10));
       } else {
         const e=this._displayStats(it.e), se=(sd,n)=>sd/Math.sqrt(n);
         drawEl(this._ellipsePts(e.rhMean,e.xcHMean,se(e.rhSd,e.n),se(e.xcHSd,e.n),e.r,this.CHI.c95),e.color,this._hexA(e.color,0.10),e.width,e.stroke==='dashed'?[6,4]:[]);
         const cx=px(e.rhMean),cy=py(e.xcHMean); ctx.fillStyle=e.color; ctx.beginPath(); ctx.arc(cx,cy,3,0,7); ctx.fill();
+        drawPhase(e.rhMean,e.xcHMean,e.color,e.name);
         ctx.fillStyle=e.color;ctx.font="600 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(e.name,cx+6,cy-5);
       }
     });
@@ -1307,16 +1333,18 @@ class Component extends DCLogic {
     const groups={};indivs.forEach((m)=>{(groups[m.participant]||(groups[m.participant]=[])).push(m);});
     Object.values(groups).forEach((list)=>{if(list.length<2)return;ctx.strokeStyle=this._hexA(list[0].color,0.65);ctx.lineWidth=1.6;ctx.beginPath();list.forEach((raw,i)=>{const p=this._displayPoint(raw),X=px(p.x),Y=py(p.y);if(i)ctx.lineTo(X,Y);else ctx.moveTo(X,Y);});ctx.stroke();});
     const drawSymbol=(X,Y,m)=>{ctx.save();ctx.fillStyle=cp.symbolFill;ctx.strokeStyle=m.color;ctx.lineWidth=2.2;ctx.beginPath();if(m.symbol==='square')ctx.rect(X-5,Y-5,10,10);else if(m.symbol==='diamond'){ctx.moveTo(X,Y-7);ctx.lineTo(X+7,Y);ctx.lineTo(X,Y+7);ctx.lineTo(X-7,Y);ctx.closePath();}else if(m.symbol==='triangle'){ctx.moveTo(X,Y-7);ctx.lineTo(X+7,Y+6);ctx.lineTo(X-7,Y+6);ctx.closePath();}else ctx.arc(X,Y,6,0,7);ctx.fill();ctx.stroke();ctx.restore();};
-    indivs.forEach((raw)=>{const indiv=this._displayPoint(raw),X=px(indiv.x),Y=py(indiv.y);drawSymbol(X,Y,raw);ctx.fillStyle=raw.color;ctx.font="600 9.5px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(raw.participant+' · '+raw.time,X+8,Y-5);});
+    indivs.forEach((raw)=>{const indiv=this._displayPoint(raw),X=px(indiv.x),Y=py(indiv.y);drawSymbol(X,Y,raw);drawPhase(indiv.x,indiv.y,raw.color,raw.participant+' · '+raw.time);ctx.fillStyle=raw.color;ctx.font="600 9.5px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(raw.participant+' · '+raw.time,X+8,Y-5);});
 
     // movable legend inside the figure and PNG export
-    const legend=[];items.forEach((it)=>{if(it.kind==='ref')legend.push({color:it.color,label:(it.pop.country+' '+it.pop.sex).trim()});else legend.push({color:it.e.color,label:it.e.name});});
-    Object.values(groups).forEach((list)=>{if(list[0])legend.push({color:list[0].color,label:list[0].participant});});
+    const phaseSuffix=(x,y)=>phaseOn?(' · φ '+this._phaseAngle(x,y).toFixed(1)+'°'):'';
+    const legend=[];items.forEach((it)=>{if(it.kind==='ref')legend.push({color:it.color,label:it.pop.legend+phaseSuffix(it.pop.rhMean,it.pop.xcHMean)});else legend.push({color:it.e.color,label:it.e.name+phaseSuffix(it.e.rhMean,it.e.xcHMean)});});
+    Object.values(groups).forEach((list)=>{if(list[0])legend.push({color:list[0].color,label:list[0].participant+phaseSuffix(list[0].x,list[0].y)});});
     if(legend.length&&this.state.legendVisible){ctx.font="500 10px 'IBM Plex Sans'";const boxW=Math.min(220,Math.max(...legend.map((l)=>ctx.measureText(l.label).width))+42),boxH=legend.length*17+25,pos=this.state.legendPos||{x:72,y:4},bx=Math.max(0,Math.min(W-boxW,W*(+pos.x||0)/100)),by=Math.max(0,Math.min(H-boxH,H*(+pos.y||0)/100));ctx.fillStyle=cp.legendBg;ctx.strokeStyle=cp.legendBorder;ctx.lineWidth=1;ctx.fillRect(bx,by,boxW,boxH);ctx.strokeRect(bx,by,boxW,boxH);ctx.fillStyle=cp.legendText;ctx.font="600 9px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(this._T().legendControl.toUpperCase(),bx+9,by+10);ctx.font="600 14px 'IBM Plex Sans'";ctx.textAlign='center';ctx.fillText('×',bx+boxW-10,by+10);legend.forEach((l,i)=>{const yy=by+24+i*17;ctx.strokeStyle=l.color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx+9,yy);ctx.lineTo(bx+24,yy);ctx.stroke();ctx.fillStyle=cp.legendText;ctx.font="500 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(l.label,bx+29,yy,boxW-36);});this._legendBox={x:bx,y:by,w:boxW,h:boxH,close:{x:bx+boxW-22,y:by,w:22,h:22}};}
 
     // user text boxes, also included in PNG export
     this._annotationBoxes=[];
     this.state.annotations.forEach((a)=>{const size=Math.max(8,Math.min(48,+a.size||16)),lines=String(a.text||'').split(/\n/),x=W*(+a.x||0)/100,y=H*(+a.y||0)/100;ctx.font="600 "+size+"px '"+a.font+"',sans-serif";const tw=Math.max(...lines.map((line)=>ctx.measureText(line).width),20),lh=size*1.25,bw=tw+16,bh=lines.length*lh+12;ctx.fillStyle=cp.annoBg;ctx.strokeStyle=this._hexA(a.color,0.35);ctx.lineWidth=1;ctx.fillRect(x,y,bw,bh);ctx.strokeRect(x,y,bw,bh);ctx.fillStyle=a.color;ctx.textAlign='left';ctx.textBaseline='top';lines.forEach((line,i)=>ctx.fillText(line,x+8,y+6+i*lh));this._annotationBoxes.push({id:a.id,x,y,w:bw,h:bh});});
+    if(phaseOn&&phaseProgress<1){if(this._phaseFrame)cancelAnimationFrame(this._phaseFrame);this._phaseFrame=requestAnimationFrame(()=>this._draw());}
   }
 
   _indivPoints(){ return this.state.measurements.filter((m)=>(m.metric||'classic')===this.state.bivaMode).map((m)=>({...m,x:m.rh,y:m.xc})); }
@@ -1325,7 +1353,6 @@ class Component extends DCLogic {
   // classify individual against active population's tolerance ellipses
   _classifyIndiv(){
     const pt=this._latestMeasurement(); if(!pt) return null;
-    if(this.state.bivaMode!=='classic') return {noPop:true};
     const p=this._byKey(this.state.activeKey); if(!p) return {noPop:true};
     const inv=this._inv2(this._covFromPop(p)); if(!inv) return {noPop:true};
     const d2=this._quad([pt.rh-p.rhMean,pt.xc-p.xcHMean],inv);
@@ -1348,9 +1375,11 @@ class Component extends DCLogic {
   _goHome(){ this.setState({ screen:'home' }); }
   _setLang(l){ this.setState({ lang:l }); try{ localStorage.setItem('biva2-lang', l); }catch(e){} }
   _toggleTheme(){ this.setState((s)=>{ const next = s.theme==='dark'?'light':'dark'; try{ localStorage.setItem('biva2-theme', next); }catch(e){} return { theme: next }; }); }
+  _togglePhase(){if(this.state.showPhase){this._phaseStart=0;if(this._phaseFrame)cancelAnimationFrame(this._phaseFrame);this.setState({showPhase:false,bounds:null});return;}if(!this._phaseAllowed())return;this._phaseStart=performance.now();this.setState({showPhase:true,bounds:null});}
   _setBivaMode(mode){
     const specific=mode==='specific';
-    this.setState({bivaMode:mode,newSource:specific?'manual':this.state.newSource,axisMode:'auto',axisNames:specific?{x:'Rsp',y:'Xcsp'}:{x:'R/H',y:'Xc/H'},axisUnits:specific?{x:'Ω·cm',y:'Ω·cm'}:{x:'Ω/m',y:'Ω/m'},tolMode:specific?'classic':this.state.tolMode,refKeys:specific?[]:this.state.refKeys,refModes:specific?{}:this.state.refModes,activeKey:specific?null:this.state.activeKey,cmpA:'',cmpB:'',bounds:null,importStatus:{scope:'',type:'',text:''}});
+    const axes=this._metricAxes(mode),nonClassic=mode!=='classic';
+    this.setState({bivaMode:mode,newSource:this.state.newSource,axisMode:'auto',axisNames:{x:axes.x,y:axes.y},axisUnits:{x:axes.ux,y:axes.uy},tolMode:nonClassic?'classic':this.state.tolMode,refKeys:[],refModes:{},activeKey:null,cmpA:'',cmpB:'',showPhase:false,bounds:null,importStatus:{scope:'',type:'',text:''}});
   }
   _headerKey(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');}
   _batchValue(row,aliases){const keys=Object.keys(row);for(const alias of aliases){const key=keys.find((k)=>this._headerKey(k)===alias);if(key!==undefined&&row[key]!==''&&row[key]!=null)return row[key];}return '';}
@@ -1384,6 +1413,7 @@ class Component extends DCLogic {
         let x=NaN,y=NaN;
         if(h>0&&this.state.bivaMode==='classic'){x=r/h;y=xc/h;}
         if(h>0&&arm>0&&waist>0&&calf>0&&this.state.bivaMode==='specific'){const area=(0.45*arm*arm+0.10*waist*waist+0.45*calf*calf)/(4*Math.PI),length=1.1*h*100;x=r*area/length;y=xc*area/length;}
+        if(h>0&&this.state.bivaMode==='h2'){const hcm=h*100;x=hcm*hcm/r;y=hcm*hcm/xc;}
         rows.push({row:index+2,group,nExpected:this._batchNumber(this._batchValue(row,aliases.n)),participant:String(this._batchValue(row,aliases.participant)||'').trim(),time:String(this._batchValue(row,aliases.time)||'').trim(),r,xc,h,arm,waist,calf,x,y,color:String(this._batchValue(row,aliases.color)||''),symbol:String(this._batchValue(row,aliases.symbol)||'')});
       });
       if(invalidCore)throw new Error(t.importColumns);if(missingH)throw new Error(t.importHMissing);if(missingPerimeters)throw new Error(t.importPerimMissing);if(!rows.length)throw new Error(t.importColumns);
@@ -1403,7 +1433,7 @@ class Component extends DCLogic {
     }catch(error){this.setState({importStatus:{scope,type:'error',text:error&&error.message?error.message:String(error)}});}finally{if(input)input.value='';}
   }
   _toggleRef(key){
-    if(this.state.bivaMode!=='classic')return;
+    const pop=this._byKey(key);if(!pop||(pop.metric||'classic')!==this.state.bivaMode)return;
     const s=this.state; const has=s.refKeys.includes(key);
     const refKeys=has?s.refKeys.filter((k)=>k!==key):[...s.refKeys,key];
     const refModes={...s.refModes};
@@ -1428,7 +1458,7 @@ class Component extends DCLogic {
   _nextTime(time){const m=String(time).match(/^(.*?)(\d+)$/);return m?(m[1]+(+m[2]+1)):time;}
   _removeMeasurement(id){const measurements=this.state.measurements.filter((m)=>m.id!==id);this.setState({measurements,indivShown:!!measurements.length,editingMeasurementId:this.state.editingMeasurementId===id?null:this.state.editingMeasurementId,measurementDraft:this.state.editingMeasurementId===id?null:this.state.measurementDraft,measurementError:false,bounds:null});}
   _clearIndiv(){ this.setState({indiv:{...this.state.indiv,rh:'',xc:''}, measurements:[],indivShown:false,editingMeasurementId:null,measurementDraft:null,measurementError:false,bounds:null}); }
-  _setTolMode(mode){if(mode==='zscore'&&this.state.bivaMode==='specific'){this.setState({importStatus:{scope:'tolerance',type:'error',text:this._T().zSpecificUnavailable}});return;}this.setState({tolMode:mode,axisMode:'auto',bounds:null});}
+  _setTolMode(mode){if(mode==='zscore'&&this.state.bivaMode!=='classic'){this.setState({importStatus:{scope:'tolerance',type:'error',text:this._T().zSpecificUnavailable}});return;}this.setState({tolMode:mode,showPhase:mode==='zscore'?false:this.state.showPhase,axisMode:'auto',bounds:null});}
   _setPaired(field,v){this.setState({paired:{...this.state.paired,[field]:v,referenceKey:''},bounds:null});}
   _setPairedReference(key){
     const ref=this.state.pairedRefs.find((p)=>p.key===key);
@@ -1484,7 +1514,7 @@ class Component extends DCLogic {
 
   _resolveCmp(val){
     if(!val) return null;
-    if(val.indexOf('pop:')===0){ const p=this._byKey(val.slice(4)); return p&&this.state.bivaMode==='classic'?{...p,_label:'Pop '+p.code}:null; }
+    if(val.indexOf('pop:')===0){ const p=this._byKey(val.slice(4)); return p&&(p.metric||'classic')===this.state.bivaMode?{...p,_label:'Pop '+p.code}:null; }
     if(val.indexOf('ell:')===0){ const e=this.state.ellipses.find((x)=>x.id===val.slice(4)&&(x.metric||'classic')===this.state.bivaMode); return e?{rhMean:e.rhMean,rhSd:e.rhSd,xcHMean:e.xcHMean,xcHSd:e.xcHSd,r:e.r,n:e.n,_label:e.name}:null; }
     return null;
   }
@@ -1512,9 +1542,9 @@ class Component extends DCLogic {
   }
   _exportExcel(){
     const entities=[];
-    if(this.state.bivaMode==='classic')this.state.refKeys.forEach((k)=>{const p=this._byKey(k);if(p)entities.push({...p,_label:(p.country+' '+p.sex).trim(),_source:'referência selecionada'});});
+    this.state.refKeys.forEach((k)=>{const p=this._byKey(k);if(p&&(p.metric||'classic')===this.state.bivaMode)entities.push({...p,_label:p.legend,_source:'referência selecionada'});});
     this.state.ellipses.filter((e)=>(e.metric||'classic')===this.state.bivaMode).forEach((e)=>entities.push({...e,_label:e.name,_source:'elipse adicionada'}));
-    const xName=this.state.bivaMode==='specific'?'Rsp':'R/H',yName=this.state.bivaMode==='specific'?'Xcsp':'Xc/H';
+    const metricAxes=this._metricAxes(this.state.bivaMode),xName=metricAxes.x,yName=metricAxes.y;
     const ellipseRows=[['Nome','Origem','Métrica',xName+' média',xName+' DP',yName+' média',yName+' DP','Correlação','N','Cor','Traço','Espessura'],...entities.map((e)=>[e._label,e._source,this.state.bivaMode,e.rhMean,e.rhSd,e.xcHMean,e.xcHSd,e.r,e.n,e.color||'',e.stroke||'',e.width||''])];
     const pairRows=[['Elipse A','Elipse B','N A','N B','D de Mahalanobis','D²','Hotelling T²','F','gl1','gl2','p-valor','Status']];
     for(let i=0;i<entities.length;i++)for(let j=i+1;j<entities.length;j++){const A=entities[i],B=entities[j],r=this._hotelling(A,B);pairRows.push(r.error?[A._label,B._label,A.n,B.n,'','','','','','','',r.error]:[A._label,B._label,A.n,B.n,r.d,r.d2,r.t2,r.fValue,r.df1,r.df2,r.pValue,r.pValue<0.05?'significativo':'não significativo']);}
@@ -1531,10 +1561,10 @@ class Component extends DCLogic {
     const s=this.state;
     const t=this._T();
     const filtered=this._filtered();
-    const specific=s.bivaMode==='specific', axisX=specific?'Rsp':'R/H', axisY=specific?'Xcsp':'Xc/H';
+    const specific=s.bivaMode==='specific',h2=s.bivaMode==='h2',metricAxes=this._metricAxes(s.bivaMode),axisX=metricAxes.x,axisY=metricAxes.y;
     const currentEllipses=s.ellipses.filter((e)=>(e.metric||'classic')===s.bivaMode);
     const currentMeasurements=s.measurements.filter((m)=>(m.metric||'classic')===s.bivaMode);
-    const availableRefs=[...s.pops,...s.customRefs].filter((p)=>!specific&&(s.method==='confidence'?p.source==='confidence':(s.method==='tolerance'?p.source==='tolerance':true)));
+    const availableRefs=[...s.pops,...s.customRefs].filter((p)=>(p.metric||'classic')===s.bivaMode&&(p.custom||s.method==='combined'||(s.method==='confidence'?['confidence','both'].includes(p.source):['tolerance','both'].includes(p.source))));
 
     // filter buttons
     const segBase='flex:1;font:500 11.5px \'IBM Plex Sans\';padding:6px 4px;border-radius:8px;cursor:pointer;transition:.12s;';
@@ -1557,11 +1587,16 @@ class Component extends DCLogic {
         confStyle:modeBtn(mode==='conf95'), tolStyle:modeBtn(mode==='tolerance'),
         onConf:(ev)=>{ if(ev)ev.stopPropagation(); this._setRefMode(p.key,'conf95'); },
         onTol:(ev)=>{ if(ev)ev.stopPropagation(); this._setRefMode(p.key,'tolerance'); },
-        key:p.key, legend:p.legend, cardTitle:p.legend+(p.referenceLabel?('\n'+p.referenceLabel):''), country:p.country, sex:p.sex, age:p.age, n:p.n, type:p.type,referenceLabel:p.referenceLabel,referenceAuthor:p.referenceAuthor,referenceYear:p.referenceYear,referenceDoi:p.referenceDoi,referenceHref:p.referenceDoi?('https://doi.org/'+p.referenceDoi):'#',onDoiClick:(ev)=>{if(ev)ev.stopPropagation();},
-        onToggle:()=>this._toggleRef(p.key),
+        key:p.key, legend:p.legend, cardTitle:[p.legend,p.referenceLabel,p.note,p.foundIn,p.ellipseUse].filter(Boolean).join('\n'), country:p.country, sex:p.sex, age:p.age, n:p.n, type:p.type,referenceLabel:p.referenceLabel,referenceAuthor:p.referenceAuthor,referenceYear:p.referenceYear,referenceDoi:p.referenceDoi,referenceHref:p.referenceDoi?('https://doi.org/'+p.referenceDoi):'#',onDoiClick:(ev)=>{if(ev)ev.stopPropagation();},
+        onToggle:(ev)=>{if(ev)ev.stopPropagation();this._toggleRef(p.key);},
+        selectTitle:sel?t.selectRemove:t.selectAdd,selectIcon:sel?'✓':'+',
+        selectStyle:'width:23px;height:23px;flex:none;border-radius:6px;cursor:pointer;font:700 13px \'IBM Plex Sans\';line-height:1;'+(sel?'color:#fff;background:'+(col||'#2f4fd6')+';border:1px solid transparent':'color:#2f4fd6;background:var(--bg-panel);border:1px solid var(--border-2)'),
         sexLabel:p.sex, sexColor:p.sex==='F'?'#c0248f':(p.sex==='M'?'#2f4fd6':'#8a8676'),
         subLine:p.equip+' · '+p.age,
         referenceStyle:p.referenceLabel?'font-size:9.5px;line-height:1.35;color:var(--text-6);margin-bottom:6px;overflow-wrap:anywhere':'display:none',
+        doiStyle:p.referenceDoi?'color:var(--text-10);text-decoration:underline;text-underline-offset:2px':'display:none',
+        noteText:[p.note,p.foundIn?('Fonte: '+p.foundIn):'',p.ellipseUse?('Uso: '+p.ellipseUse):''].filter(Boolean).join(' · '),
+        noteStyle:(p.note||p.foundIn||p.ellipseUse)?'font-size:9px;line-height:1.35;color:var(--text-muted);margin:-1px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis':'display:none',
         customTagStyle:p.custom?'font-size:9px;color:#fff;background:#e0662a;padding:1px 6px;border-radius:5px;font-weight:600':'display:none',
         accent: sel? (col||'#2f4fd6') : 'transparent',
         thumbPath:this._thumbPath(p),
@@ -1570,7 +1605,7 @@ class Component extends DCLogic {
         typeChip:'font-size:9.5px;color:#fff;background:'+(typeColor[p.type]||'#8a8676')+';padding:1px 6px;border-radius:5px;font-weight:500',
         cardStyle:'display:flex;gap:10px;padding:9px;border-radius:12px;cursor:pointer;transition:.12s;align-items:stretch;'
           +(sel?'background:var(--bg-panel);border:1.5px solid '+(active?'var(--strong-bg)':(col||'#2f4fd6'))+';box-shadow:0 1px 4px rgba(0,0,0,.05)':'background:var(--bg-card-alt);border:1px solid var(--border-3)'),
-        rhText:this._fmt(p.rhMean,1)+' ±'+this._fmt(p.rhSd,1),
+        axisX,axisY,rhText:this._fmt(p.rhMean,1)+' ±'+this._fmt(p.rhSd,1),
         xcText:this._fmt(p.xcHMean,1)+' ±'+this._fmt(p.xcHSd,1),
         statRow: sel?'margin-top:6px;padding-top:6px;border-top:1px dashed #e6e1d5;display:flex;gap:6px;align-items:center;font-size:10.5px;color:#5f5b4d':'display:none',
       };
@@ -1578,9 +1613,9 @@ class Component extends DCLogic {
 
     // legend
     const legendItems=[];
-    s.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p){ const c=this._refColor(k); const md=this._effMode(k); legendItems.push({color:c,fill:this._hexA(c,0.12),label:p.country+' '+p.sex,kind:md==='tolerance'?t.tolTitleTol:t.tolTitle}); } });
-    currentEllipses.forEach((e)=>{ if(e.visible) legendItems.push({color:e.color,fill:this._hexA(e.color,0.12),label:e.name,kind:t.kindConf}); });
-    [...new Map(currentMeasurements.map((m)=>[m.participant,m])).values()].forEach((m)=>legendItems.push({color:m.color,fill:this._hexA(m.color,0.12),label:m.participant,kind:'longitudinal'}));
+    s.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p){ const c=this._refColor(k); const md=this._effMode(k),phase=s.showPhase&&this._phaseAllowed()?(' · φ '+this._fmt(this._phaseAngle(p.rhMean,p.xcHMean),1)+'°'):''; legendItems.push({color:c,fill:this._hexA(c,0.12),label:p.legend,kind:(md==='tolerance'?t.tolTitleTol:t.tolTitle)+phase}); } });
+    currentEllipses.forEach((e)=>{ if(e.visible){const phase=s.showPhase&&this._phaseAllowed()?(' · φ '+this._fmt(this._phaseAngle(e.rhMean,e.xcHMean),1)+'°'):'';legendItems.push({color:e.color,fill:this._hexA(e.color,0.12),label:e.name,kind:t.kindConf+phase});} });
+    [...new Map(currentMeasurements.map((m)=>[m.participant,m])).values()].forEach((m)=>{const phase=s.showPhase&&this._phaseAllowed()?(' · φ '+this._fmt(this._phaseAngle(m.rh,m.xc),1)+'°'):'';legendItems.push({color:m.color,fill:this._hexA(m.color,0.12),label:m.participant,kind:'longitudinal'+phase});});
 
     // ellipse list
     const ellipses=currentEllipses.map((e)=>{
@@ -1620,7 +1655,7 @@ class Component extends DCLogic {
 
     // comparison options
     const cmpOptions=[];
-    if(s.comparisonMode==='independent')s.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p) cmpOptions.push({value:'pop:'+k,label:'◆ '+p.country+' '+p.sex+' (N='+p.n+')'}); });
+    if(s.comparisonMode==='independent')s.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p) cmpOptions.push({value:'pop:'+k,label:'◆ '+p.legend+' (N='+p.n+')'}); });
     currentEllipses.forEach((e)=>{ cmpOptions.push({value:'ell:'+e.id,label:'● '+e.name+' (N='+e.n+')'}); });
 
     // comparison result
@@ -1691,18 +1726,19 @@ class Component extends DCLogic {
     ];
     const preBtn=(on)=>'font:600 10.5px \'IBM Plex Mono\';padding:4px 9px;border-radius:6px;cursor:pointer;'+(on?'background:#2f4fd6;color:#fff;border:1px solid #2f4fd6':'background:var(--bg-panel);color:var(--text-6);border:1px solid var(--border-2)');
     const mkPresets=(setter,axis,list,cur)=>list.map((v)=>({label:v,style:preBtn(cur===v),onClick:()=>setter(axis,v)}));
-    const units=['Ω','Ω/m','Ω·cm'];
+    const units=['Ω','Ω/m','Ω·cm','cm²/Ω'];
     const axisNameRows=[
-      {label:t.axisNameX,value:s.axisNames.x,presets:mkPresets((a,v)=>this._setAxisName(a,v),'x',['R','R/H','Rsp'],s.axisNames.x),onInput:(e)=>this._setAxisName('x',e.target.value),
+      {label:t.axisNameX,value:s.axisNames.x,presets:mkPresets((a,v)=>this._setAxisName(a,v),'x',['R','R/H','Rsp','H²/R'],s.axisNames.x),onInput:(e)=>this._setAxisName('x',e.target.value),
         unitLbl:t.unitLbl, unitValue:s.axisUnits.x, unitPresets:mkPresets((a,v)=>this._setAxisUnit(a,v),'x',units,s.axisUnits.x), onUnit:(e)=>this._setAxisUnit('x',e.target.value)},
-      {label:t.axisNameY,value:s.axisNames.y,presets:mkPresets((a,v)=>this._setAxisName(a,v),'y',['Xc','Xc/H','Xcsp'],s.axisNames.y),onInput:(e)=>this._setAxisName('y',e.target.value),
+      {label:t.axisNameY,value:s.axisNames.y,presets:mkPresets((a,v)=>this._setAxisName(a,v),'y',['Xc','Xc/H','Xcsp','H²/Xc'],s.axisNames.y),onInput:(e)=>this._setAxisName('y',e.target.value),
         unitLbl:t.unitLbl, unitValue:s.axisUnits.y, unitPresets:mkPresets((a,v)=>this._setAxisUnit(a,v),'y',units,s.axisUnits.y), onUnit:(e)=>this._setAxisUnit('y',e.target.value)},
     ];
 
     const smallModeBtn=(on,accent)=>'font:600 10px \'IBM Plex Sans\';padding:5px 8px;border-radius:7px;cursor:pointer;white-space:nowrap;'+(on?'background:'+accent+';color:#fff;border:1px solid '+accent:'background:var(--bg-panel);color:var(--text-6);border:1px solid var(--border-2)');
     const bivaModes=[
-      {label:t.bivaClassic,style:smallModeBtn(!specific,'#173f8a'),onClick:()=>this._setBivaMode('classic')},
+      {label:t.bivaClassic,style:smallModeBtn(s.bivaMode==='classic','#173f8a'),onClick:()=>this._setBivaMode('classic')},
       {label:t.bivaSpecific,style:smallModeBtn(specific,'#173f8a'),onClick:()=>this._setBivaMode('specific')},
+      {label:t.bivaH2,style:smallModeBtn(h2,'#173f8a'),onClick:()=>this._setBivaMode('h2')},
     ];
     const toleranceModes=[
       {label:t.tolClassic,style:smallModeBtn(s.tolMode==='classic','#2f4fd6'),onClick:()=>this._setTolMode('classic')},
@@ -1712,10 +1748,10 @@ class Component extends DCLogic {
     if(showEllipsePanel)comparisonModes.push({label:t.paired,style:smallModeBtn(s.comparisonMode==='paired','#0f9d8f'),onClick:()=>this._setComparisonMode('paired')});
     const pairedViews=[
       {label:t.pairedLinked,style:smallModeBtn(s.pairedView==='linked','#e0662a'),onClick:()=>this.setState({pairedView:'linked',bounds:null})},
-      {label:t.pairedDelta,style:smallModeBtn(s.pairedView==='delta','#e0662a'),onClick:()=>this.setState({pairedView:'delta',axisMode:'auto',bounds:null})},
+      {label:t.pairedDelta,style:smallModeBtn(s.pairedView==='delta','#e0662a'),onClick:()=>this.setState({pairedView:'delta',showPhase:false,axisMode:'auto',bounds:null})},
     ];
     const pairedFields=[['sdRh','DP Δ'+axisX,'0.1'],['sdXc','DP Δ'+axisY,'0.1'],['r',t.pairedCorr,'0.01'],['n',t.pairedN,'1']].map(([f,label,step])=>({label,step,value:s.paired[f],onInput:(e)=>this._setPaired(f,e.target.value)}));
-    const pairedReferenceOptions=specific?[]:s.pairedRefs.map((p)=>({value:p.key,label:p.legend+' (N='+p.n+')'+(p.referenceLabel?' — '+p.referenceLabel:'')}));
+    const pairedReferenceOptions=s.bivaMode!=='classic'?[]:s.pairedRefs.map((p)=>({value:p.key,label:p.legend+' (N='+p.n+')'+(p.referenceLabel?' — '+p.referenceLabel:'')}));
     const symbolOptions=[{value:'circle',label:'● Círculo'},{value:'square',label:'■ Quadrado'},{value:'diamond',label:'◆ Losango'},{value:'triangle',label:'▲ Triângulo'}];
     const measurements=currentMeasurements.map((m)=>{const editing=s.editingMeasurementId===m.id,d=editing?(s.measurementDraft||{}):{};return{label:m.participant+' · '+m.time,coords:axisX+' '+this._fmt(m.rh,1)+' · '+axisY+' '+this._fmt(m.xc,1),color:m.color,axisX,axisY,editStyle:editing?'padding:9px;border-top:1px solid var(--border-5);background:var(--bg-drawer)':'display:none',editParticipant:d.participant||'',editTime:d.time||'',editRh:d.rh??'',editXc:d.xc??'',editColor:d.color||m.color,editSymbol:d.symbol||m.symbol,symbolOptions,onEdit:()=>this._startEditMeasurement(m),onEditParticipant:(e)=>this._setMeasurementDraft('participant',e.target.value),onEditTime:(e)=>this._setMeasurementDraft('time',e.target.value),onEditRh:(e)=>this._setMeasurementDraft('rh',e.target.value),onEditXc:(e)=>this._setMeasurementDraft('xc',e.target.value),onEditColor:(e)=>this._setMeasurementDraft('color',e.target.value),onEditSymbol:(e)=>this._setMeasurementDraft('symbol',e.target.value),editErrorStyle:editing&&s.measurementError?'font-size:9.5px;color:#b45309;margin-bottom:7px':'display:none',onCancelEdit:()=>this.setState({editingMeasurementId:null,measurementDraft:null,measurementError:false}),onSaveEdit:()=>this._saveMeasurement(m.id),onRemove:()=>this._removeMeasurement(m.id)};});
     const annotations=s.annotations.map((a)=>({...a,onRemove:()=>this._removeAnnotation(a.id)}));
@@ -1772,15 +1808,15 @@ class Component extends DCLogic {
       emptyStyle:(s.ready&&!filtered.length)?'padding:24px 8px;text-align:center;font-size:12px;color:var(--text-muted)':'display:none',
 
       chartRef:(el)=>{ this._canvas=el; if(el) requestAnimationFrame(()=>this._draw()); },
-      chartSub:this._isZMode()?'Z(R/H) × Z(Xc/H)':((s.method==='confidence'&&s.comparisonMode==='paired'&&s.pairedView==='delta')?'Δ'+axisX+' × Δ'+axisY:(specific?'Rsp × Xcsp (Ω·cm)':t.chartSubBase)),
+      chartSub:this._isZMode()?'Z(R/H) × Z(Xc/H)':((s.method==='confidence'&&s.comparisonMode==='paired'&&s.pairedView==='delta')?'Δ'+axisX+' × Δ'+axisY:(axisX+' × '+axisY+' ('+metricAxes.ux+')')),
       chartEmptyStyle:(legendItems.length||this._indivPoint())?'display:none':'position:absolute;inset:0;display:flex;align-items:center;justify-content:center',
-      chartEmptyText: specific?t.batchHint:(s.method==='tolerance'?t.chartEmptyTol:t.chartEmpty),
+      chartEmptyText: s.method==='tolerance'?t.chartEmptyTol:t.chartEmpty,
       legendItems,
       legendEmptyStyle:legendItems.length?'display:none':'font-size:11px;color:var(--text-muted);font-style:italic',
       onExport:()=>this._exportPNG(),
       onExportExcel:()=>this._exportExcel(),
-      onTogglePhase:()=>this.setState({showPhase:!s.showPhase}),
-      phaseBtnStyle:'font:500 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:pointer;'+(s.showPhase?'background:var(--strong-bg);color:var(--strong-text);border:1px solid var(--strong-bg)':'background:var(--bg-panel);color:var(--text-2);border:1px solid var(--border-2)'),
+      onTogglePhase:()=>this._togglePhase(),
+      phaseBtnStyle:'font:500 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:'+(this._phaseAllowed()?'pointer':'not-allowed')+';opacity:'+(this._phaseAllowed()?'1':'.45')+';'+(s.showPhase?'background:var(--strong-bg);color:var(--strong-text);border:1px solid var(--strong-bg)':'background:var(--bg-panel);color:var(--text-2);border:1px solid var(--border-2)'),
       onToggleLegend:()=>this.setState({legendVisible:!s.legendVisible}),
       legendBtnStyle:'font:500 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:pointer;'+(s.legendVisible?'background:var(--strong-bg);color:var(--strong-text);border:1px solid var(--strong-bg)':'background:var(--bg-panel);color:var(--text-2);border:1px solid var(--border-2)'),
       onChartPointerDown:(e)=>this._startAnnotationDrag(e),onChartPointerMove:(e)=>this._moveAnnotationDrag(e),onChartPointerUp:(e)=>this._endAnnotationDrag(e),
@@ -1809,15 +1845,16 @@ class Component extends DCLogic {
       srcActiveStyle:srcBtn(!manual), srcManualStyle:srcBtn(manual),
       newName:s.newName, onNewName:(ev)=>this.setState({newName:ev.target.value}),
       newFields,bivaModes,
-      specificNoteStyle:specific?'font-size:9.5px;color:var(--text-11);background:var(--bg-warn);border:1px solid var(--border-warn);border-radius:7px;padding:7px 8px;margin-bottom:7px;line-height:1.4':'display:none',
+      metricNoteStyle:(specific||h2)?'font-size:9.5px;color:var(--text-11);background:var(--bg-warn);border:1px solid var(--border-warn);border-radius:7px;padding:7px 8px;margin-bottom:7px;line-height:1.4':'display:none',
+      metricNote:h2?t.h2Note:t.specificNote,
       confidenceImportStatus:s.importStatus.scope==='confidence'?s.importStatus.text:'',
       confidenceImportStatusStyle:s.importStatus.scope==='confidence'&&s.importStatus.text?'font-size:10px;color:'+(s.importStatus.type==='error'?'#a33a2c':'#0b6b5d')+';margin-top:7px;line-height:1.4':'display:none',
       toleranceImportStatus:s.importStatus.scope==='tolerance'?s.importStatus.text:'',
       toleranceImportStatusStyle:s.importStatus.scope==='tolerance'&&s.importStatus.text?'font-size:10px;color:'+(s.importStatus.type==='error'?'#a33a2c':'#0b6b5d')+';margin-top:7px;line-height:1.4':'display:none',
       onImportConfidence:(ev)=>this._importParticipants(ev,'confidence'),onImportTolerance:(ev)=>this._importParticipants(ev,'tolerance'),
       manualGridStyle:manual?'display:grid;grid-template-columns:1fr 1fr;gap:8px':'display:none',
-      activeSrcNoteStyle:!manual&&!specific?'font-size:11px;color:var(--text-7);background:var(--bg-warm2);border:1px solid var(--border-warn2);border-radius:8px;padding:8px 10px':'display:none',
-      activeSrcNote:activePop?((s.lang==='en'?'Source: ':(s.lang==='es'?'Origen: ':'Origem: '))+activePop.country+' '+activePop.sex+' — R/H '+this._fmt(activePop.rhMean,1)+', Xc/H '+this._fmt(activePop.xcHMean,1)+', N='+activePop.n):t.activeNoneNote,
+      activeSrcNoteStyle:!manual?'font-size:11px;color:var(--text-7);background:var(--bg-warm2);border:1px solid var(--border-warn2);border-radius:8px;padding:8px 10px':'display:none',
+      activeSrcNote:activePop?((s.lang==='en'?'Source: ':(s.lang==='es'?'Origen: ':'Origem: '))+activePop.country+' '+activePop.sex+' — '+axisX+' '+this._fmt(activePop.rhMean,1)+', '+axisY+' '+this._fmt(activePop.xcHMean,1)+', N='+activePop.n):t.activeNoneNote,
       onAddEllipse:()=>this._addEllipse(),
       ellipses,
       ellipseEmptyStyle:currentEllipses.length?'display:none':'padding:16px 8px;text-align:center;font-size:11.5px;color:var(--text-muted);line-height:1.5',

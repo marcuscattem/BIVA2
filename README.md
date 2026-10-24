@@ -9,10 +9,11 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 - **BIVA2.dc.html** - Fonte editável do design atual da Workspace
 - **estimador-pearson.html** - Ferramenta complementar para estimar a correlação de Pearson pela geometria de elipses publicadas
 - **support.js** - Runtime local utilizado pela Workspace avançada
-- **reference_populations_final.json** - Base revisada com 166 populações (133 de confiança e 33 de tolerância)
+- **reference_populations_final.json** - Base revisada com 523 populações clássicas, específicas e H²/Z
 - **paired_reference_populations.json** - Oito conjuntos de referência para análise pareada
 - **biva2-data.js** - Base JSON empacotada para uso direto no navegador
 - **BIVA2-modelo-importacao.xlsx** - Modelo padronizado para importação em lote
+- **BIVA2-FUNCOES.md** - Inventário completo das funções e limitações metodológicas
 - **xlsx.full.min.js** - Leitor local de planilhas Excel, sem envio de dados
 
 ## 🚀 Como Usar
@@ -45,6 +46,11 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 - Entrada manual, nome, cor, traço e espessura por elipse
 - Comparação independente e Hotelling T² pareado sobre os deltas
 
+### Índices H²/Z
+- Referências em H²/R e H²/Xc sem conversão indevida para R/H e Xc/H
+- Importação automática a partir de R, Xc e estatura
+- 98 populações de referência próprias
+
 ### Mista
 - Combinação de Tolerância + Confiança
 - Visão completa e comparativa
@@ -59,7 +65,7 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 
 ## 📊 Populações de Referência
 
-Total de **166 populações** importadas exclusivamente das abas “Confidence refs” (133) e “Tolerance refs” (33) do arquivo de referência fornecido, além de **8 conjuntos pareados** da aba “Confidence paired data”. A aba auxiliar de coordenadas de desenho não foi tratada como população.
+Total de **523 populações** após validação e deduplicação: 400 clássicas, 25 específicas e 98 em H²/R × H²/Xc. O banco preserva metadados bibliográficos e de extração, além de **8 conjuntos pareados**.
 
 Cada população contém:
 - Código e identificação
@@ -77,6 +83,7 @@ Cada população contém:
 ✅ Manual do modelo Excel em português, inglês, espanhol e italiano
 ✅ Cálculo automático de média, DP amostral, correlação de Pearson e N por grupo
 ✅ BIVA clássica (R/H, Xc/H) e específica (Rsp, Xcsp)
+✅ Índices de impedância H²/R e H²/Xc em modo próprio
 ✅ Bloqueio da análise quando faltam estatura ou perímetros exigidos
 ✅ Gráfico RXc com elipses e fallback Canvas local
 ✅ Autor, ano e DOI clicável visíveis em cada população de referência
@@ -84,7 +91,7 @@ Cada população contém:
 ✅ Tolerance tradicional deslocada ou centrada em z-score
 ✅ Eixos dos gráficos editáveis manualmente
 ✅ Atalho para abrir análise mista mantendo medições, elipses, estilos e eixos
-✅ Linha do centro da elipse à origem com cálculo do ângulo de fase
+✅ Ângulo de fase animado para referências, elipses e pontos, com fórmula correta em H²/Z
 ✅ Confidence com entrada de elipses por média, DP, correlação e N
 ✅ Estilo editável por elipse: cor, traço e espessura
 ✅ Edição de elipses customizadas já adicionadas
@@ -133,6 +140,6 @@ Cada população contém:
 
 ---
 
-**Versão:** 9.0
-**Data:** Julho 2026
+**Versão:** 10.0
+**Data:** Outubro 2026
 **Desenvolvido com:** HTML5, CSS3, JavaScript e Canvas
