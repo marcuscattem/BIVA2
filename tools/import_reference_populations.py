@@ -97,7 +97,7 @@ def infer_population(legend, section="") -> str:
     text = ascii_key(f"{section} {legend}")
     if re.search(r"athlet|sport|soccer|football|rugby|volley|cycl|marathon|handball|basket|swim|triathlon", text):
         return "Sport"
-    if re.search(r"doent|clinic|patient|disease|renal|dialy|obes|cancer|sarcopen|parkinson|dementia|hospital|esrd", text):
+    if re.search(r"doent|clinic|patient|disease|renal|dialy|obes|cancer|sarcopen|parkinson|dementia|hospital|esrd|edema", text):
         return "Clinical"
     if re.search(r"saudav|healthy|reference|adult|child|adolesc|newborn|infant|elderly|older", text):
         return "Healthy"
@@ -211,7 +211,7 @@ def parse_specific(workbook, excluded):
 
 def parse_piccoli(workbook, sheet_name, source, excluded):
     sheet = workbook[sheet_name]
-    records, reference = [], ""
+    records, reference, group_prefix = [], "", ""
     for row_number, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), 2):
         values = list(row) + [None] * 14
         for candidate in (values[0], values[8]):
@@ -221,15 +221,30 @@ def parse_piccoli(workbook, sheet_name, source, excluded):
             continue
         _, n, mx, sx, my, sy, correlation = values[:7]
         legend = clean(values[8])
+        if legend.startswith("Females + Females,"):
+            legend = "Males + Females," + legend[len("Females + Females,"):]
+        corrected_edema = sheet_name == "CONFIDENCE PICOLLI" and legend == "Females, White, with edema" and my == 155.2
+        if corrected_edema:
+            my = 15.2
+        age_fragment = re.search(r"(?:[<>≥≤]?\s*\d+)\s+age\s+(?:[<>≥≤]?\s*\d+)(?:\s*yr)?\s*$", legend, re.I)
+        if re.match(r"^(Males?|Females?)\b", legend, re.I) and age_fragment:
+            group_prefix = clean(legend[:age_fragment.start()].rstrip(" ,"))
+        elif group_prefix and age_fragment and not re.match(r"^(Males?|Females?)\b", legend, re.I):
+            legend = group_prefix + ", " + clean(age_fragment.group(0))
         if not valid(n, sx, sy, correlation):
             excluded.append({"sheet": sheet.title, "row": row_number, "legend": legend, "reason": "invalid N, SD, or correlation"})
             continue
-        records.append(base_record(
+        record = base_record(
             metric="classic", source=source, n=n, mx=mx, sx=sx, my=my, sy=sy, correlation=correlation,
             legend=legend, equipment=values[9], reference=reference,
             ellipse_use="Tolerance" if source == "tolerance" else "Confidence",
             source_sheet=sheet.title, source_row=row_number, sex_raw=values[7],
-        ))
+        )
+        if "Nutrition 18:153-167, 2002" in reference:
+            record["country"] = "USA"
+        if corrected_edema:
+            record["note"] = "Xc/H corrigido de 155.2 para 15.2; o valor anterior do banco e a faixa fisiológica indicam erro de digitação na planilha."
+        records.append(record)
     return records
 
 

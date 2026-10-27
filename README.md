@@ -14,6 +14,7 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 - **biva2-data.js** - Base JSON empacotada para uso direto no navegador
 - **BIVA2-modelo-importacao.xlsx** - Modelo padronizado para importação em lote
 - **BIVA2-FUNCOES.md** - Inventário completo das funções e limitações metodológicas
+- **BIVA2-RELATORIO-REFERENCIAS.md** - Auditoria das populações antigas e novas, deduplicação e tabelas descritivas
 - **xlsx.full.min.js** - Leitor local de planilhas Excel, sem envio de dados
 
 ## 🚀 Como Usar
@@ -54,7 +55,7 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 ### Mista
 - Combinação de Tolerância + Confiança
 - Visão completa e comparativa
-- 166 populações e 8 conjuntos pareados
+- 523 populações e 8 conjuntos pareados
 
 ## 🌐 Idiomas Suportados
 
