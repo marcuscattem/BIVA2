@@ -92,7 +92,7 @@ const TERMS={
   'Tolerância populacional (χ², n grande)':['Population tolerance (χ², large n)','Tolerancia poblacional (χ², n grande)','Tolleranza della popolazione (χ², n grande)'],
   'Tolerância de Piccoli (n finito)':['Piccoli tolerance (finite n)','Tolerancia de Piccoli (n finito)','Tolleranza di Piccoli (n finito)'],
   'Confiança da média (F, Hotelling)':['Mean confidence (F, Hotelling)','Confianza de la media (F, Hotelling)','Confidenza della media (F, Hotelling)'],
-  'Confiança da média (χ², como o BIVA2 desenha)':['Mean confidence (χ², as drawn by BIVA2)','Confianza de la media (χ², como la dibuja BIVA2)','Confidenza della media (χ², come disegnata da BIVA2)'],
+  'Confiança da média (χ², n grande)':['Mean confidence (χ², large n)','Confianza de la media (χ², n grande)','Confidenza della media (χ², n grande)'],
   'Cobertura':['Coverage','Cobertura','Copertura'],
   'n da amostra':['sample n','n de la muestra','n del campione'],
   'Enviar para o BIVA2':['Send to BIVA2','Enviar a BIVA2','Invia a BIVA2'],

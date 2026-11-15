@@ -28,7 +28,7 @@ html,body{height:100%}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}
-.lang-select{height:34px;padding:0 28px 0 10px;border:1px solid var(--line);border-radius:var(--r);
+.lang-select{width:auto!important;flex:none;height:34px;padding:0 28px 0 10px;border:1px solid var(--line);border-radius:var(--r);
   background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;outline:none}
 .lang-select:focus-visible{box-shadow:0 0 0 3px var(--focus)}
 .file-native{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;
@@ -376,7 +376,7 @@ setas movem · <b>[</b> <b>]</b> giram · roda ou pinça dá zoom · <b>Shift</b
             <option value="pop">Tolerância populacional (χ², n grande)</option>
             <option value="tol">Tolerância de Piccoli (n finito)</option>
             <option value="mean">Confiança da média (F, Hotelling)</option>
-            <option value="meanchi">Confiança da média (χ², como o BIVA2 desenha)</option>
+            <option value="meanchi">Confiança da média (χ², n grande)</option>
           </select>
         </label>
         <div class="grid2" style="margin-top:8px">
@@ -707,7 +707,7 @@ function draw(){
     drawEllipse(S.preview,COL.live,2,[7,5]);
     const an=analyze(S.preview,sc), cs=toS({x:S.preview.cx,y:S.preview.cy});
     badge(cs.x, cs.y-Math.max(S.preview.b*S.z,S.preview.a*S.z)-16,
-      'prévia  r = '+(an?fmt(an.r,3):'?'), COL.live);
+      (window.estimatorTranslate?window.estimatorTranslate('prévia'):'prévia')+'  r = '+(an?fmt(an.r,3):'?'), COL.live);
   }
   if(loupeWanted()) drawLoupe(R);
 }

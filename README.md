@@ -40,12 +40,12 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 
 ### Tolerância
 - Análise de variabilidade populacional
-- 3 elipses (50%, 75%, 95%)
+- 3 elipses (50%, 75%, 95%), calculadas com a distribuição F exata (2 e n−2 graus de liberdade), como no BIVA software 2002
 - Modos tradicional deslocado e z-score centrado no zero
 - Múltiplas medidas por participante, tempos e trajetórias longitudinais
 
 ### Confiança
-- Intervalo de confiança (95%)
+- Elipse de confiança de 95% da média, com fator F exato (equivale ao teste T² de Hotelling)
 - Erro padrão = DP/√N
 - Entrada manual, nome, cor, traço e espessura por elipse
 - Comparação independente e Hotelling T² pareado sobre os deltas
@@ -124,6 +124,7 @@ Cada população contém:
 ✅ Sessão salva automaticamente: recarregar a página ou ir ao estimador não apaga a análise
 ✅ Estimador envia médias, DPs, r e N para a Workspace (caixa "Recebido do Estimador")
 ✅ Estimador com lupa, toque/pinça, pontos arrastáveis, desfazer (Ctrl+Z), arrastar-e-soltar da imagem e tema compartilhado
+✅ Elipses de tolerância e de confiança com fórmulas F exatas (antes: aproximação qui-quadrado, que subestimava as elipses de grupos pequenos)
 
 ## 🧪 Análise de Confiança
 
@@ -156,6 +157,6 @@ Cada população contém:
 
 ---
 
-**Versão:** 11.0
+**Versão:** 11.1
 **Data:** Novembro 2026
 **Desenvolvido com:** HTML5, CSS3, JavaScript e Canvas

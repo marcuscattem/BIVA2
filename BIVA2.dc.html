@@ -1440,6 +1440,12 @@ class Component extends DCLogic {
     for(let i=0;i<=steps;i++){const t=i*2*Math.PI/steps,cs=Math.cos(t),sn=Math.sin(t);pts.push({x:mx+sx*c*cs,y:my+sy*c*(sr*cs+o*sn)});}
     return pts;
   }
+  // Exact elliptical regions of the RXc graph (Piccoli & Pastori, BIVA software 2002): Snedecor's F with 2 and n-2 df,
+  // which has the closed-form quantile F = (n-2)/2 * ((1-p)^(-2/(n-2)) - 1). Both functions return the squared
+  // Mahalanobis radius that _ellipsePts expects; they converge to the chi-square values in CHI as n grows.
+  _fq(n,p){ return (n>2)?((n-2)/2*(Math.pow(1-p,-2/(n-2))-1)):NaN; }
+  _chiTol(n,lvl){ const p={t50:0.50,t75:0.75,t95:0.95}[lvl]; if(!(n>2)) return this.CHI[lvl]; return 2*(n+1)*(n-1)/(n*(n-2))*this._fq(n,p); }
+  _chiConf(n){ if(!(n>2)) return this.CHI.c95; return 2*(n-1)/(n-2)*this._fq(n,0.95); }   // used with SD/sqrt(n)
   _covFromPop(p){return[[p.rhSd*p.rhSd,p.r*p.rhSd*p.xcHSd],[p.r*p.rhSd*p.xcHSd,p.xcHSd*p.xcHSd]];}
   _inv2(m){const d=m[0][0]*m[1][1]-m[0][1]*m[1][0];if(!Number.isFinite(d)||Math.abs(d)<1e-10)return null;return[[m[1][1]/d,-m[0][1]/d],[-m[1][0]/d,m[0][0]/d]];}
   _quad(v,m){return v[0]*(m[0][0]*v[0]+m[0][1]*v[1])+v[1]*(m[1][0]*v[0]+m[1][1]*v[1]);}
@@ -1613,8 +1619,8 @@ class Component extends DCLogic {
     let xmin=1e9,xmax=-1e9,ymin=1e9,ymax=-1e9;
     items.forEach((it)=>{
       let pts;
-      if(it.kind==='ref'){ const p=this._displayStats(it.pop); if(it.mode==='tolerance') pts=this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd,p.xcHSd,p.r,this.CHI.t95); else { const se=1/Math.sqrt(p.n); pts=this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd*se,p.xcHSd*se,p.r,this.CHI.c95); } }
-      else { const e=this._displayStats(it.e),se=(sd,n)=>sd/Math.sqrt(n); pts=this._ellipsePts(e.rhMean,e.xcHMean,se(e.rhSd,e.n),se(e.xcHSd,e.n),e.r,this.CHI.c95); }
+      if(it.kind==='ref'){ const p=this._displayStats(it.pop); if(it.mode==='tolerance') pts=this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd,p.xcHSd,p.r,this._chiTol(p.n,'t95')); else { const se=1/Math.sqrt(p.n); pts=this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd*se,p.xcHSd*se,p.r,this._chiConf(p.n)); } }
+      else { const e=this._displayStats(it.e),se=(sd,n)=>sd/Math.sqrt(n); pts=this._ellipsePts(e.rhMean,e.xcHMean,se(e.rhSd,e.n),se(e.xcHSd,e.n),e.r,this._chiConf(e.n)); }
       pts.forEach((pt)=>{ if(pt.x<xmin)xmin=pt.x;if(pt.x>xmax)xmax=pt.x;if(pt.y<ymin)ymin=pt.y;if(pt.y>ymax)ymax=pt.y; });
     });
     indivs.forEach((raw)=>{const indiv=this._displayPoint(raw);if(indiv.x<xmin)xmin=indiv.x;if(indiv.x>xmax)xmax=indiv.x;if(indiv.y<ymin)ymin=indiv.y;if(indiv.y>ymax)ymax=indiv.y;});
@@ -1735,11 +1741,11 @@ class Component extends DCLogic {
         const p=this._displayStats(it.pop);
         if(it.mode==='tolerance'){
           [['t95',0.6],['t75',1],['t50',1.5]].forEach(([lvl,k])=>{
-            drawEl(this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd,p.xcHSd,p.r,this.CHI[lvl]),col,fillOf(st.fill*k),lvl==='t50'?st.width:Math.max(0.5,st.width*0.7),dash);
+            drawEl(this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd,p.xcHSd,p.r,this._chiTol(p.n,lvl)),col,fillOf(st.fill*k),lvl==='t50'?st.width:Math.max(0.5,st.width*0.7),dash);
           });
         } else {
           const se=1/Math.sqrt(p.n);
-          drawEl(this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd*se,p.xcHSd*se,p.r,this.CHI.c95),col,fillOf(st.fill),st.width,dash);
+          drawEl(this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd*se,p.xcHSd*se,p.r,this._chiConf(p.n)),col,fillOf(st.fill),st.width,dash);
         }
         const cx=px(p.rhMean),cy=py(p.xcHMean);
         drawMarker(cx,cy,st.symbol,col,3.6,true);
@@ -1747,7 +1753,7 @@ class Component extends DCLogic {
         if(st.label) centerLabel(shortLabel(it.pop.title||it.pop.legend,44),cx,cy,col);
       } else {
         const e=this._displayStats(it.e), se=(sd,n)=>sd/Math.sqrt(n);
-        drawEl(this._ellipsePts(e.rhMean,e.xcHMean,se(e.rhSd,e.n),se(e.xcHSd,e.n),e.r,this.CHI.c95),col,fillOf(st.fill),st.width,dash);
+        drawEl(this._ellipsePts(e.rhMean,e.xcHMean,se(e.rhSd,e.n),se(e.xcHSd,e.n),e.r,this._chiConf(e.n)),col,fillOf(st.fill),st.width,dash);
         const cx=px(e.rhMean),cy=py(e.xcHMean);
         drawMarker(cx,cy,st.symbol,col,3.6,true);
         drawPhase(e.rhMean,e.xcHMean,col,e.name);
@@ -1802,7 +1808,7 @@ class Component extends DCLogic {
     const p=this._byKey(this.state.activeKey); if(!p) return {noPop:true};
     const inv=this._inv2(this._covFromPop(p)); if(!inv) return {noPop:true};
     const d2=this._quad([pt.rh-p.rhMean,pt.xc-p.xcHMean],inv);
-    let level; if(d2<=this.CHI.t50) level='in50'; else if(d2<=this.CHI.t75) level='in75'; else if(d2<=this.CHI.t95) level='in95'; else level='out';
+    let level; if(d2<=this._chiTol(p.n,'t50')) level='in50'; else if(d2<=this._chiTol(p.n,'t75')) level='in75'; else if(d2<=this._chiTol(p.n,'t95')) level='in95'; else level='out';
     return {level,d2,d:Math.sqrt(Math.max(0,d2)),pop:p};
   }
 

@@ -85,11 +85,11 @@ O BIVA2.0 é uma aplicação web para análise vetorial de bioimpedância. O apl
 
 ## Análise de tolerância
 
-- Desenha elipses de tolerância de 50%, 75% e 95%.
+- Desenha elipses de tolerância de 50%, 75% e 95% com o fator exato `2(n+1)(n−1)F/[n(n−2)]`, em que F é o quantil da distribuição F com 2 e n−2 graus de liberdade (BIVA software 2002).
 - Permite inserir vários pontos individuais.
 - Importa vários participantes de uma planilha Excel padronizada.
 - Calcula automaticamente as coordenadas conforme o sistema selecionado.
-- Classifica a medida individual em relação às elipses de 50%, 75% e 95%.
+- Classifica a medida individual em relação às elipses de 50%, 75% e 95%, com os mesmos limites exatos usados no desenho.
 - Calcula distância de Mahalanobis e `D²` para a classificação.
 - Permite editar nome, tempo, coordenadas, cor e símbolo de cada ponto.
 - Permite excluir pontos individualmente ou limpar a análise.
@@ -106,7 +106,7 @@ O BIVA2.0 é uma aplicação web para análise vetorial de bioimpedância. O apl
 
 ## Análise de confiança
 
-- Cria elipses de confiança de 95% da média.
+- Cria elipses de confiança de 95% da média com o fator exato `2(n−1)F/[n(n−2)]`; a elipse dos deltas exclui a origem exatamente quando o T² pareado é significativo.
 - Adiciona uma elipse a partir de uma população ativa.
 - Adiciona manualmente nome, médias, desvios-padrão, correlação e N.
 - Importa vários participantes e calcula elipses por grupo.
@@ -208,6 +208,7 @@ O BIVA2.0 é uma aplicação web para análise vetorial de bioimpedância. O apl
 - **Enviar para o BIVA2**: leva nome, médias, DPs, r e N para a Workspace.
 - Possui calculadora direta para semieixos e ângulo conhecidos.
 - Copia tabela (médias, DPs, r, n) e exporta os resultados em JSON.
+- Interface em português, inglês, espanhol e italiano (`estimator-i18n.js`); segue o idioma da Workspace e pode ser trocada no topo da página.
 
 ## Regras e limitações metodológicas
 
