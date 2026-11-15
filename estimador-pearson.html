@@ -14,13 +14,27 @@
   --live:#E0662A; --warn:#B45309; --warn-soft:#FDF3E8; --ok:#0F8A7C; --ok-soft:#EAF6F3;
   --sans:'IBM Plex Sans',system-ui,sans-serif;
   --mono:'IBM Plex Mono',ui-monospace,monospace;
-  --r:8px;
+  --r:8px; --side:#F7F5EF; --field:#FFFFFF; --grid:rgba(0,0,0,.035); --legend:rgba(255,255,255,.92);
+}
+[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#14161C; --panel:#1E222E; --ink:#F4F2EC; --ink-2:#A6ABB8; --ink-3:#8A8F9C;
+  --line:#333845; --line-2:#2B2F3B; --accent:#7F9BF7; --accent-soft:#1C2540;
+  --warn:#E0B866; --warn-soft:#2C2313; --ok:#4FC3B3; --ok-soft:#12302B;
+  --side:#191C26; --field:#20242F; --grid:rgba(255,255,255,.045); --legend:rgba(30,34,46,.94);
 }
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
   font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}
+.lang-select{height:34px;padding:0 28px 0 10px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;outline:none}
+.lang-select:focus-visible{box-shadow:0 0 0 3px var(--focus)}
+.file-native{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;
+  overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.file-picker{display:flex;align-items:center;gap:8px;min-width:0}
+.file-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--ink-3)}
 .app{display:flex;flex-direction:column;height:100vh}
 
 /* ---------- barra superior com o resultado sempre visível ---------- */
@@ -46,15 +60,19 @@ button,input,select{font:inherit;color:inherit}
 .iconbtn{background:#2B2F3B;border:1px solid #333845;color:#C8CCD6;border-radius:6px;
   padding:5px 8px;font-size:11px;cursor:pointer}
 .iconbtn:hover{background:rgba(255,255,255,.24);color:#fff}
+a.iconbtn{text-decoration:none;white-space:nowrap}
+.sendbox{background:var(--accent-soft);border:1px solid var(--line);border-radius:var(--r);padding:10px 11px;margin-top:10px}
+.sendbox .hint{font-size:12px}
 
 .main{flex:1;display:grid;grid-template-columns:336px 1fr 322px;min-height:0}
 .col{overflow-y:auto;overflow-x:hidden}
-.left{background:#F7F5EF;border-right:1px solid var(--line)}
-.right{background:#F7F5EF;border-left:1px solid var(--line)}
+.left{background:var(--side);border-right:1px solid var(--line)}
+.right{background:var(--side);border-left:1px solid var(--line)}
 .stage{position:relative;min-width:0;overflow:hidden;background:
-  linear-gradient(0deg,rgba(0,0,0,.035) 1px,transparent 1px) 0 0/22px 22px,
-  linear-gradient(90deg,rgba(0,0,0,.035) 1px,transparent 1px) 0 0/22px 22px,var(--paper)}
-canvas{display:block;cursor:crosshair}
+  linear-gradient(0deg,var(--grid) 1px,transparent 1px) 0 0/22px 22px,
+  linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/22px 22px,var(--paper)}
+.stage.drop{outline:3px dashed var(--accent);outline-offset:-10px}
+canvas{display:block;cursor:crosshair;touch-action:none}
 
 /* ---------- blocos ---------- */
 .block{border-bottom:1px solid var(--line-2);padding:14px 18px 16px}
@@ -85,12 +103,15 @@ canvas{display:block;cursor:crosshair}
 .check .go:hover{background:var(--accent-soft)}
 
 /* ---------- controles ---------- */
-.btn{appearance:none;border:1px solid var(--line);background:#fff;border-radius:var(--r);
+.btn{appearance:none;border:1px solid var(--line);background:var(--field);border-radius:var(--r);
   padding:7px 11px;font-size:13px;cursor:pointer;transition:.13s;font-weight:500}
-.btn:hover{border-color:var(--ink-3);background:#FAFCFD}
+.btn:hover{border-color:var(--ink-3)}
 .btn:active{transform:translateY(1px)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary{background:#2F4FD6;border-color:#2F4FD6;color:#fff}
 .btn.primary:hover{background:#2039A8}
+.btn.send{background:#173F8A;border-color:#173F8A;color:#fff;font-weight:600}
+.btn.send:hover{background:#12326E}
+.btn.danger{background:#B9382A!important;border-color:#B9382A!important;color:#fff!important}
 .btn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
 .btn.ghost{border-color:transparent;background:transparent;color:var(--ink-2);padding:5px 7px}
 .btn.ghost:hover{background:var(--line-2)}
@@ -105,8 +126,10 @@ canvas{display:block;cursor:crosshair}
 label.f{display:flex;flex-direction:column;gap:3px;font-size:10.5px;color:var(--ink-3);
   font-weight:600;letter-spacing:.03em;text-transform:uppercase;flex:1;min-width:0}
 input[type=number],input[type=text],select{border:1px solid var(--line);border-radius:5px;
-  padding:6px 8px;background:#fff;font-family:var(--mono);font-size:12.5px;width:100%;min-width:0}
-input.need{border-color:var(--warn);background:#FFFCF8}
+  padding:6px 8px;background:var(--field);font-family:var(--mono);font-size:12.5px;width:100%;min-width:0}
+input[type=text]{font-family:var(--sans)}
+input.need{border-color:var(--warn);background:var(--warn-soft)}
+label.f small{font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink-3)}
 input[type=file]{font-size:12px;width:100%}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
@@ -164,7 +187,7 @@ details[open] summary{margin-bottom:8px}
   white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
 .zoombar{position:absolute;right:12px;bottom:12px;display:flex;gap:6px;background:var(--panel);
   border:1px solid var(--line);border-radius:var(--r);padding:4px}
-.legend{position:absolute;left:12px;bottom:12px;background:rgba(255,255,255,.92);
+.legend{position:absolute;left:12px;bottom:12px;max-width:calc(100% - 250px);background:var(--legend);
   border:1px solid var(--line);border-radius:var(--r);padding:6px 10px;font-size:11px;color:var(--ink-2)}
 .legend b{font-family:var(--mono);font-weight:600;color:var(--ink)}
 
@@ -192,6 +215,14 @@ details[open] summary{margin-bottom:8px}
       </div>
     </div>
     <div class="spacer"></div>
+    <select class="lang-select" id="langSelect" title="Idioma da interface" aria-label="Idioma da interface">
+      <option value="pt-BR">Português</option>
+      <option value="en">English</option>
+      <option value="es">Español</option>
+      <option value="it">Italiano</option>
+    </select>
+    <button class="iconbtn" id="btnNew" title="Apagar imagem, calibração e elipses">Nova sessão</button>
+    <button class="iconbtn" id="btnTheme" title="Alternar tema claro/escuro (compartilhado com o BIVA2)">☀</button>
     <span class="chip" id="scaleChip">sem calibração</span>
     <div class="liveR">
       <div class="lab">r de Pearson<b id="liveSrc">aguardando</b></div>
@@ -218,17 +249,21 @@ details[open] summary{margin-bottom:8px}
 
       <div class="block">
         <h2>Imagem do gráfico</h2>
-        <input type="file" id="file" accept="image/*">
+        <input class="file-native" type="file" id="file" accept="image/*">
+        <div class="file-picker">
+          <label class="btn sm" for="file">Selecionar imagem</label>
+          <span class="file-name" id="fileName">Nenhum arquivo selecionado</span>
+        </div>
         <div class="row" style="margin-top:8px">
           <button class="btn primary sm" id="btnDemo">Abrir exemplo</button>
           <button class="btn ghost sm" id="btnPaste">Colar imagem</button>
         </div>
-        <p class="hint" style="margin:9px 0 0">Também dá para colar direto com <code>Ctrl+V</code>.</p>
+        <p class="hint" style="margin:9px 0 0">Também dá para <b>arrastar o arquivo</b> para a área central ou colar com <code>Ctrl+V</code>. A sessão fica salva neste navegador.</p>
       </div>
 
       <div class="block">
         <h2>Escalas dos eixos</h2>
-        <p class="hint">Clique em duas marcas conhecidas de cada eixo e digite os valores. A razão entre as duas escalas é o que determina <i>r</i>.</p>
+        <p class="hint">Clique em duas marcas conhecidas de cada eixo e digite os valores (<code>Enter</code> avança). As linhas tracejadas podem ser arrastadas para corrigir.</p>
 
         <div class="row">
           <button class="btn" id="btnCalX">Marcar eixo X</button>
@@ -271,6 +306,7 @@ details[open] summary{margin-bottom:8px}
       <div class="block">
         <h2>Elipses marcadas</h2>
         <div id="elist"><div class="empty">Nenhuma elipse ainda.</div></div>
+        <div id="consist" style="display:none;margin:2px 0 10px;padding:8px 10px;border:1px dashed var(--line);border-radius:var(--r)"></div>
         <div class="row">
           <button class="btn ghost sm" id="btnDup">Duplicar</button>
           <button class="btn ghost sm" id="btnDel">Excluir</button>
@@ -303,9 +339,10 @@ details[open] summary{margin-bottom:8px}
       <canvas id="cv"></canvas>
       <div class="overlay-hint" id="ohint">Carregue uma imagem ou abra o exemplo</div>
       <div class="legend" id="legend" style="display:none">
-        setas movem · <b>[</b> <b>]</b> giram · roda dá zoom · <b>Shift</b>+arrastar move a tela
+setas movem · <b>[</b> <b>]</b> giram · roda ou pinça dá zoom · <b>Shift</b>+arrastar move a tela · <b>Ctrl+Z</b> desfaz
       </div>
       <div class="zoombar">
+        <button class="btn ghost" id="btnUndo" title="Desfazer (Ctrl+Z)" disabled>↶ desfazer</button>
         <button class="btn ghost" id="zOut">−</button>
         <button class="btn ghost" id="zFit">ajustar</button>
         <button class="btn ghost" id="zIn">+</button>
@@ -331,27 +368,37 @@ details[open] summary{margin-bottom:8px}
       </div>
 
       <div class="block">
-        <h2>Geometria em unidades do gráfico</h2>
-        <div id="geo"><div class="empty">Complete os passos ao lado.</div></div>
-      </div>
-
-      <div class="block">
-        <h2>Desvios-padrão</h2>
-        <p class="hint"><i>r</i> não depende disto. Os desvios-padrão sim: precisam saber qual elipse foi desenhada.</p>
-        <label class="f">Tipo de elipse
+        <h2>Parâmetros para o BIVA2</h2>
+        <p class="hint">Tipo, cobertura e <i>n</i> da elipse selecionada convertem os semieixos em desvios-padrão.</p>
+        <label class="f">Nome da elipse ou população<input type="text" id="ename" placeholder="ex.: Atletas, homens (Fig. 2)"></label>
+        <label class="f" style="margin-top:8px">Tipo de elipse
           <select id="etype">
-            <option value="pop">Tolerância populacional (n grande)</option>
+            <option value="pop">Tolerância populacional (χ², n grande)</option>
             <option value="tol">Tolerância de Piccoli (n finito)</option>
-            <option value="mean">Confiança da média</option>
+            <option value="mean">Confiança da média (F, Hotelling)</option>
+            <option value="meanchi">Confiança da média (χ², como o BIVA2 desenha)</option>
           </select>
         </label>
         <div class="grid2" style="margin-top:8px">
           <label class="f">Cobertura
             <select id="epct"><option value="0.95">95%</option><option value="0.75">75%</option><option value="0.50">50%</option></select>
           </label>
-          <label class="f">n<input type="number" id="en" value="100" min="5" step="1"></label>
+          <label class="f">n da amostra <input type="number" id="en" min="3" step="1" placeholder="ex.: 120"><small id="nHelp"></small></label>
         </div>
         <div style="margin-top:10px" id="sdOut"><div class="empty">—</div></div>
+        <div class="sendbox">
+          <div class="row">
+            <button class="btn send" id="btnSend" disabled>Enviar para o BIVA2</button>
+            <button class="btn" id="btnSendAll" style="display:none" disabled>Enviar todas</button>
+          </div>
+          <p class="hint" id="sendNote" style="display:none;margin:9px 0 0"></p>
+          <p class="hint" style="margin:8px 0 0"><a id="openBiva" href="BIVA2.html" style="display:none;font-weight:600;color:var(--accent)">Abrir o BIVA2 →</a></p>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>Geometria em unidades do gráfico</h2>
+        <div id="geo"><div class="empty">Complete os passos ao lado.</div></div>
       </div>
 
       <div class="block">
@@ -388,18 +435,33 @@ details[open] summary{margin-bottom:8px}
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="estimator-i18n.js"></script>
 <script>
 (function(){
 'use strict';
 const $ = s => document.querySelector(s);
 const cv = $('#cv'), ctx = cv.getContext('2d'), stage = $('#stage');
+const OUTBOX_KEY='biva2-estimator-outbox-v1', SESSION_KEY='biva2-estimator-session-v1', THEME_KEY='biva2-theme';
 
-const S = { img:null, z:1, ox:0, oy:0, mode:'contour', calX:[], calY:[],
+const S = { img:null, imgSrc:null, demo:false, z:1, ox:0, oy:0, mode:'contour', calX:[], calY:[],
             pts:[], preview:null, els:[], sel:-1, drag:null, pan:null, counter:0,
-            pending:null, demoR:null };
+            pending:null, demoR:null, cursor:null, hist:[], touch:false,
+            def:{etype:'pop', epct:'0.95', n:''}, sent:{}, confirmNew:false };
 
 let tt; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show');
-  clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2100); }
+  clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2600); }
+
+/* =========== tema compartilhado com o BIVA2 =========== */
+function applyTheme(){
+  let th='light'; try{ th=localStorage.getItem(THEME_KEY)==='dark'?'dark':'light'; }catch(e){}
+  document.documentElement.setAttribute('data-theme',th);
+  const b=$('#btnTheme'); if(b) b.textContent=th==='dark'?'☾':'☀';
+}
+$('#btnTheme').onclick=()=>{
+  const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  try{ localStorage.setItem(THEME_KEY,next); }catch(e){}
+  applyTheme(); draw();
+};
 
 /* =========== visualização =========== */
 function resize(){
@@ -414,12 +476,31 @@ function fit(){
   S.z=Math.min((r.width-40)/S.img.width,(r.height-40)/S.img.height);
   S.ox=(r.width-S.img.width*S.z)/2; S.oy=(r.height-S.img.height*S.z)/2; draw();
 }
+function zoomAt(f,mx,my){
+  const nz=Math.max(.05,Math.min(20,S.z*f));
+  S.ox=mx-(mx-S.ox)*(nz/S.z); S.oy=my-(my-S.oy)*(nz/S.z); S.z=nz; draw();
+}
+function zoomCenter(f){ const r=stage.getBoundingClientRect(); zoomAt(f,r.width/2,r.height/2); }
 const toS = p => ({x:p.x*S.z+S.ox, y:p.y*S.z+S.oy});
 function toI(e){ const r=cv.getBoundingClientRect();
   return {x:(e.clientX-r.left-S.ox)/S.z, y:(e.clientY-r.top-S.oy)/S.z}; }
 
+/* =========== desfazer =========== */
+function snap(){
+  S.hist.push(JSON.stringify({calX:S.calX,calY:S.calY,pts:S.pts,els:S.els,sel:S.sel,counter:S.counter,
+    vals:['#xv0','#xv1','#yv0','#yv1'].map(s=>$(s).value)}));
+  if(S.hist.length>60) S.hist.shift();
+}
+function undo(){
+  const h=S.hist.pop(); if(!h) return toast('Nada para desfazer.');
+  const o=JSON.parse(h);
+  S.calX=o.calX; S.calY=o.calY; S.pts=o.pts; S.els=o.els; S.sel=Math.min(o.sel,o.els.length-1); S.counter=o.counter;
+  ['#xv0','#xv1','#yv0','#yv1'].forEach((s,i)=>$(s).value=o.vals[i]);
+  S.pending=null; updatePreview(); sync();
+}
+
 /* =========== matemática =========== */
-const num = sel => { const v=parseFloat($(sel).value); return isFinite(v)?v:null; };
+const num = sel => { const v=parseFloat(String($(sel).value).replace(',','.')); return isFinite(v)?v:null; };
 function scales(){
   if(S.calX.length<2||S.calY.length<2) return null;
   const x0=num('#xv0'),x1=num('#xv1'),y0=num('#yv0'),y1=num('#yv1');
@@ -445,10 +526,13 @@ function analyze(e,sc){
     A:Math.sqrt(E.l1), B:Math.sqrt(E.l2), theta:E.ang*180/Math.PI,
     sdxU:Math.sqrt(m11), sdyU:Math.sqrt(m22) };
 }
-function kFactor(){
-  const p=parseFloat($('#epct').value), t=$('#etype').value, n=parseFloat($('#en').value);
+/* fator k que liga os semieixos desenhados aos desvios-padrão; cada elipse guarda o seu tipo, cobertura e n */
+function kFactor(e){
+  const o=e||S.def, p=parseFloat(o.epct), t=o.etype, n=parseFloat(o.n);
+  if(!(p>0&&p<1)) return null;
   if(t==='pop') return Math.sqrt(-2*Math.log(1-p));
   if(!isFinite(n)||n<5) return null;
+  if(t==='meanchi') return Math.sqrt(-2*Math.log(1-p)/n);
   const base=Math.pow(1-p,-2/(n-2))-1;          // F(2,d) tem forma fechada
   return t==='tol' ? Math.sqrt((n*n-1)/n*base) : Math.sqrt((n-1)/n*base);
 }
@@ -457,6 +541,13 @@ function strengthWord(r){
   const m = a<.1?'desprezível': a<.3?'fraca': a<.5?'moderada': a<.7?'forte':
             a<.9?'muito forte':'quase perfeita';
   return m+' e '+dir+' · r² = '+fmt(r*r,3);
+}
+/* parâmetros prontos para o BIVA2: médias, DPs, r e n da elipse */
+function params(e,sc){
+  const an=analyze(e,sc); if(!an) return null;
+  const k=kFactor(e), n=parseFloat(e.n);
+  return { name:e.name, r:an.r, xMean:an.cx, yMean:an.cy,
+    xSd:k?an.sdxU/k:null, ySd:k?an.sdyU/k:null, n:isFinite(n)&&n>0?n:null, k, an };
 }
 
 /* --- ajuste de cônica --- */
@@ -506,6 +597,7 @@ function fitFour(p){
 }
 
 /* =========== desenho =========== */
+const COL={cal:'#0B6E8A', sel:'#0B6E8A', other:'#5B6B77', live:'#C2189B'};
 function drawEllipse(e,color,w,dash){
   const c=toS({x:e.cx,y:e.cy});
   ctx.save(); ctx.setLineDash(dash||[]); ctx.strokeStyle=color; ctx.lineWidth=w;
@@ -529,52 +621,100 @@ function handlesOf(e){ return {
   a:{x:e.cx+e.a*Math.cos(e.phi), y:e.cy+e.a*Math.sin(e.phi)},
   b:{x:e.cx-e.b*Math.sin(e.phi), y:e.cy+e.b*Math.cos(e.phi)} };
 }
+/* lupa: amplia a região sob o cursor enquanto se marca um ponto */
+function loupeWanted(){
+  if(!S.img||!S.cursor) return false;
+  if(S.pending||S.mode==='contour'||S.mode==='four') return true;
+  return !!(S.drag&&S.drag.k!=='c');
+}
+function drawLoupe(R){
+  const cur=S.cursor, rad=Math.min(78,Math.max(54,R.width*0.085)), mag=Math.max(3,Math.min(8,3/S.z*2));
+  const pad=14; let cx=R.width-rad-pad, cy=rad+pad+34;
+  if(cur.sx>R.width-2*rad-3*pad && cur.sy<2*rad+3*pad+34) cx=rad+pad;   // foge do cursor
+  const srcW=2*rad/(S.z*mag);
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.closePath();
+  ctx.fillStyle='#fff'; ctx.fill(); ctx.clip();
+  ctx.imageSmoothingEnabled=false;
+  const k=S.z*mag;
+  ctx.drawImage(S.img, cx-cur.ix*k, cy-cur.iy*k, S.img.width*k, S.img.height*k);
+  ctx.imageSmoothingEnabled=true;
+  // o que já foi marcado também aparece ampliado
+  const map=p=>({x:cx+(p.x-cur.ix)*k, y:cy+(p.y-cur.iy)*k});
+  ctx.lineWidth=1.5;
+  S.els.forEach((e,i)=>{ const c=map({x:e.cx,y:e.cy}); ctx.strokeStyle=i===S.sel?COL.sel:COL.other;
+    ctx.beginPath(); ctx.ellipse(c.x,c.y,Math.max(e.a*k,.5),Math.max(e.b*k,.5),e.phi,0,Math.PI*2); ctx.stroke(); });
+  if(S.preview){ const c=map({x:S.preview.cx,y:S.preview.cy}); ctx.strokeStyle=COL.live; ctx.setLineDash([6,4]);
+    ctx.beginPath(); ctx.ellipse(c.x,c.y,Math.max(S.preview.a*k,.5),Math.max(S.preview.b*k,.5),S.preview.phi,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]); }
+  S.pts.forEach(p=>{ const m=map(p); ctx.beginPath(); ctx.arc(m.x,m.y,4,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill(); ctx.strokeStyle=COL.live; ctx.stroke(); });
+  // mira
+  ctx.strokeStyle='rgba(194,24,155,.9)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(cx-rad,cy); ctx.lineTo(cx-6,cy); ctx.moveTo(cx+6,cy); ctx.lineTo(cx+rad,cy);
+  ctx.moveTo(cx,cy-rad); ctx.lineTo(cx,cy-6); ctx.moveTo(cx,cy+6); ctx.lineTo(cx,cy+rad); ctx.stroke();
+  ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.strokeStyle='#14161C'; ctx.lineWidth=2.5; ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(cx,cy,rad-2,0,Math.PI*2); ctx.stroke();
+  const sc=scales();
+  if(sc){ const txt=fmt(cur.ix*sc.sx+sc.bx,1)+' , '+fmt(cur.iy*sc.sy+sc.by,1);
+    ctx.font='600 10.5px ui-monospace,monospace'; const w=ctx.measureText(txt).width+12;
+    ctx.fillStyle='rgba(20,22,28,.9)'; ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(cx-w/2,cy+rad+5,w,17,8); else ctx.rect(cx-w/2,cy+rad+5,w,17); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(txt,cx,cy+rad+14); }
+  ctx.restore();
+}
+function calLabel(x,y,text,align){
+  ctx.save(); ctx.font='600 10.5px ui-monospace,monospace'; const w=ctx.measureText(text).width+10;
+  const bx=align==='center'?x-w/2:x;
+  ctx.fillStyle=COL.cal; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(bx,y-8,w,16,5); else ctx.rect(bx,y-8,w,16); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(text,bx+5,y+.5); ctx.restore();
+}
 function draw(){
   const R=stage.getBoundingClientRect();
   ctx.clearRect(0,0,R.width,R.height);
   if(S.img){ ctx.imageSmoothingQuality='high';
+    ctx.fillStyle='#fff'; ctx.fillRect(S.ox,S.oy,S.img.width*S.z,S.img.height*S.z);
     ctx.drawImage(S.img,S.ox,S.oy,S.img.width*S.z,S.img.height*S.z); }
 
-  ctx.save(); ctx.strokeStyle='#0B6E8A'; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
-  if(S.calX.length===2){ const a=toS(S.calX[0]),b=toS(S.calX[1]);
-    ctx.beginPath(); ctx.moveTo(a.x,0); ctx.lineTo(a.x,R.height);
-    ctx.moveTo(b.x,0); ctx.lineTo(b.x,R.height); ctx.stroke(); }
-  if(S.calY.length===2){ const a=toS(S.calY[0]),b=toS(S.calY[1]);
-    ctx.beginPath(); ctx.moveTo(0,a.y); ctx.lineTo(R.width,a.y);
-    ctx.moveTo(0,b.y); ctx.lineTo(R.width,b.y); ctx.stroke(); }
+  ctx.save(); ctx.strokeStyle=COL.cal; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+  S.calX.forEach(p=>{ const a=toS(p); ctx.beginPath(); ctx.moveTo(a.x,0); ctx.lineTo(a.x,R.height); ctx.stroke(); });
+  S.calY.forEach(p=>{ const a=toS(p); ctx.beginPath(); ctx.moveTo(0,a.y); ctx.lineTo(R.width,a.y); ctx.stroke(); });
   ctx.restore();
-  S.calX.concat(S.calY).forEach(p=>dot(p,'#0B6E8A',4));
+  S.calX.concat(S.calY).forEach(p=>dot(p,COL.cal,5));
+  S.calX.forEach((p,i)=>{ const v=$(i?'#xv1':'#xv0').value; calLabel(toS(p).x,R.height-58,'X'+(i+1)+(v!==''?' = '+v:' = ?'),'center'); });
+  S.calY.forEach((p,i)=>{ const v=$(i?'#yv1':'#yv0').value; calLabel(6,toS(p).y,'Y'+(i+1)+(v!==''?' = '+v:' = ?')); });
 
   const sc=scales();
   S.els.forEach((e,i)=>{
     const on=i===S.sel;
-    drawEllipse(e,on?'#0B6E8A':'#5B6B77',on?2.4:1.6);
+    drawEllipse(e,on?COL.sel:COL.other,on?2.4:1.6);
     if(on&&S.mode==='edit'){
       const h=handlesOf(e), c=toS(h.c), ha=toS(h.a), hb=toS(h.b);
       ctx.save(); ctx.strokeStyle='rgba(11,110,138,.5)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
       ctx.beginPath(); ctx.moveTo(c.x,c.y); ctx.lineTo(ha.x,ha.y);
       ctx.moveTo(c.x,c.y); ctx.lineTo(hb.x,hb.y); ctx.stroke(); ctx.restore();
-      dot(h.c,'#0B6E8A',5); dot(h.a,'#0B6E8A',6,'#0B6E8A'); dot(h.b,'#0B6E8A',6,'#fff');
+      const hr=S.touch?9:6;
+      dot(h.c,COL.sel,hr-1); dot(h.a,COL.sel,hr,COL.sel); dot(h.b,COL.sel,hr,'#fff');
     }
     const an=analyze(e,sc), cs=toS({x:e.cx,y:e.cy});
     badge(cs.x, cs.y - Math.max(e.b*S.z,e.a*S.z) - 16,
-      e.name+'  r = '+(an?fmt(an.r,3):'?'), on?'#0B6E8A':'rgba(74,86,97,.85)');
+      e.name+'  r = '+(an?fmt(an.r,3):'?'), on?COL.sel:'rgba(74,86,97,.85)');
   });
 
-  S.pts.forEach((p,i)=>{ dot(p,'#C2189B',4.5); const s=toS(p);
-    ctx.save(); ctx.fillStyle='#C2189B'; ctx.font='600 10px ui-monospace,monospace';
+  S.pts.forEach((p,i)=>{ dot(p,COL.live,S.touch?6:4.5); const s=toS(p);
+    ctx.save(); ctx.fillStyle=COL.live; ctx.font='600 10px ui-monospace,monospace';
     ctx.fillText(i+1,s.x+7,s.y-6); ctx.restore(); });
   if(S.preview){
-    drawEllipse(S.preview,'#C2189B',2,[7,5]);
+    drawEllipse(S.preview,COL.live,2,[7,5]);
     const an=analyze(S.preview,sc), cs=toS({x:S.preview.cx,y:S.preview.cy});
     badge(cs.x, cs.y-Math.max(S.preview.b*S.z,S.preview.a*S.z)-16,
-      'prévia  r = '+(an?fmt(an.r,3):'?'), '#C2189B');
+      'prévia  r = '+(an?fmt(an.r,3):'?'), COL.live);
   }
+  if(loupeWanted()) drawLoupe(R);
 }
 
-/* =========== interação =========== */
-function hit(e,ip){
-  const h=handlesOf(e), tol=10/S.z;
+/* =========== interação (mouse, toque e caneta) =========== */
+function hit(e,ip,tol){
+  const h=handlesOf(e);
   if(Math.hypot(ip.x-h.a.x,ip.y-h.a.y)<tol) return 'a';
   if(Math.hypot(ip.x-h.b.x,ip.y-h.b.y)<tol) return 'b';
   if(Math.hypot(ip.x-h.c.x,ip.y-h.c.y)<tol) return 'c';
@@ -585,43 +725,94 @@ function inside(e,ip){
   const u=dx*c-dy*s, v=dx*s+dy*c;
   return (u*u)/(e.a*e.a)+(v*v)/(e.b*e.b)<=1.15;
 }
-cv.addEventListener('mousedown', ev=>{
-  if(ev.button===1||ev.shiftKey){ S.pan={x:ev.clientX,y:ev.clientY,ox:S.ox,oy:S.oy}; ev.preventDefault(); return; }
+function nearIdx(list,ip,tol,axis){
+  for(let i=list.length-1;i>=0;i--){
+    const d=axis==='x'?Math.abs(list[i].x-ip.x):axis==='y'?Math.abs(list[i].y-ip.y):Math.hypot(list[i].x-ip.x,list[i].y-ip.y);
+    if(d<tol) return i;
+  }
+  return -1;
+}
+function setCursor(ev){
+  const r=cv.getBoundingClientRect(), ip=toI(ev);
+  S.cursor={sx:ev.clientX-r.left, sy:ev.clientY-r.top, ix:ip.x, iy:ip.y};
+}
+const pointers=new Map(); let pinch=null;
+cv.addEventListener('pointerdown', ev=>{
+  S.touch=ev.pointerType==='touch';
+  pointers.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+  try{ cv.setPointerCapture(ev.pointerId); }catch(e){}
+  if(pointers.size===2){            // dois dedos: zoom e deslocamento
+    const [a,b]=[...pointers.values()];
+    pinch={d:Math.hypot(a.x-b.x,a.y-b.y), mx:(a.x+b.x)/2, my:(a.y+b.y)/2};
+    if(S.drag&&S.drag.fresh){ S.pts.pop(); updatePreview(); }
+    S.drag=null; S.pan=null; S.cursor=null; sync(); return;
+  }
+  if(ev.button===1||ev.button===2||ev.shiftKey){ S.pan={x:ev.clientX,y:ev.clientY,ox:S.ox,oy:S.oy}; ev.preventDefault(); return; }
   if(!S.img) return;
-  const ip=toI(ev);
+  setCursor(ev);
+  const ip=toI(ev), tol=(S.touch?18:10)/S.z;
   if(S.pending==='X'||S.pending==='Y'){
+    snap();
     const arr = S.pending==='X'?S.calX:S.calY;
     arr.push(ip); if(arr.length>2) arr.splice(0,arr.length-2);
-    if(arr.length===2){ const was=S.pending; S.pending=null;
-      const el=$(was==='X'?'#xv0':'#yv0'); el.focus(); el.select();
-      toast('Agora digite os dois valores do eixo '+was); }
+    S.drag={k:S.pending==='X'?'calX':'calY', i:arr.length-1};
     sync(); return;
   }
+  // pontos já marcados podem ser arrastados para corrigir
+  const pi=nearIdx(S.pts,ip,tol);
+  if(pi>=0){ snap(); S.drag={k:'pt',i:pi}; return; }
   if(S.mode==='contour'||S.mode==='four'){
     if(S.mode==='four'&&S.pts.length>=4) return;
-    S.pts.push(ip); updatePreview(); sync(); return;
+    snap(); S.pts.push(ip); S.drag={k:'pt',i:S.pts.length-1,fresh:true}; updatePreview(); sync(); return;
   }
-  if(S.sel>=0){ const k=hit(S.els[S.sel],ip); if(k){ S.drag={i:S.sel,k}; return; } }
+  if(S.sel>=0){ const k=hit(S.els[S.sel],ip,tol); if(k){ snap(); S.drag={i:S.sel,k,ox:ip.x-S.els[S.sel].cx,oy:ip.y-S.els[S.sel].cy}; return; } }
+  const cx=nearIdx(S.calX,ip,tol,'x'); if(cx>=0){ snap(); S.drag={k:'calX',i:cx}; return; }
+  const cy=nearIdx(S.calY,ip,tol,'y'); if(cy>=0){ snap(); S.drag={k:'calY',i:cy}; return; }
   for(let i=S.els.length-1;i>=0;i--) if(inside(S.els[i],ip)){
-    S.sel=i; S.drag={i,k:'c',ox:ip.x-S.els[i].cx,oy:ip.y-S.els[i].cy}; sync(); return; }
+    snap(); S.sel=i; S.drag={i,k:'c',ox:ip.x-S.els[i].cx,oy:ip.y-S.els[i].cy}; sync(); return; }
   S.sel=-1; sync();
 });
-window.addEventListener('mousemove', ev=>{
+window.addEventListener('pointermove', ev=>{
+  if(pointers.has(ev.pointerId)) pointers.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+  if(pinch&&pointers.size===2){
+    const [a,b]=[...pointers.values()], d=Math.hypot(a.x-b.x,a.y-b.y), mx=(a.x+b.x)/2, my=(a.y+b.y)/2, r=cv.getBoundingClientRect();
+    S.ox+=mx-pinch.mx; S.oy+=my-pinch.my;
+    if(pinch.d>0) zoomAt(d/pinch.d,mx-r.left,my-r.top); else draw();
+    pinch={d,mx,my}; return;
+  }
   if(S.pan){ S.ox=S.pan.ox+(ev.clientX-S.pan.x); S.oy=S.pan.oy+(ev.clientY-S.pan.y); draw(); return; }
-  if(!S.drag) return;
-  const e=S.els[S.drag.i], ip=toI(ev);
-  if(S.drag.k==='c'){ e.cx=ip.x-(S.drag.ox||0); e.cy=ip.y-(S.drag.oy||0); }
-  else{ const dx=ip.x-e.cx, dy=ip.y-e.cy, d=Math.hypot(dx,dy);
-    if(S.drag.k==='a'){ e.a=Math.max(d,1); e.phi=Math.atan2(dy,dx); } else e.b=Math.max(d,1); }
+  const over=ev.target===cv||!!S.drag;
+  if(over&&S.img) setCursor(ev); else if(S.cursor){ S.cursor=null; draw(); return; }
+  if(!S.drag){ if(over&&loupeWanted()) draw(); return; }
+  const ip=toI(ev), d=S.drag;
+  if(d.k==='pt'){ S.pts[d.i]=ip; updatePreview(); sync(true); return; }
+  if(d.k==='calX'||d.k==='calY'){ S[d.k][d.i]=ip; sync(true); return; }
+  const e=S.els[d.i];
+  if(d.k==='c'){ e.cx=ip.x-(d.ox||0); e.cy=ip.y-(d.oy||0); }
+  else{ const dx=ip.x-e.cx, dy=ip.y-e.cy, dd=Math.hypot(dx,dy);
+    if(d.k==='a'){ e.a=Math.max(dd,1); e.phi=Math.atan2(dy,dx); } else e.b=Math.max(dd,1); }
   sync();
 });
-window.addEventListener('mouseup',()=>{S.drag=null;S.pan=null;});
+function endPointer(ev){
+  pointers.delete(ev.pointerId); if(pointers.size<2) pinch=null;
+  const d=S.drag; S.drag=null; S.pan=null;
+  if(d&&(d.k==='calX'||d.k==='calY')&&S.pending){
+    const arr=S[d.k];
+    if(arr.length===2){ const was=S.pending; S.pending=null;
+      const el=$(was==='X'?'#xv0':'#yv0'); el.focus(); el.select();
+      toast('Agora digite os dois valores do eixo '+was+' (Enter avança)'); }
+  }
+  if(S.touch) S.cursor=null;
+  if(d) sync(); else draw();
+}
+window.addEventListener('pointerup',endPointer);
+window.addEventListener('pointercancel',endPointer);
+cv.addEventListener('pointerleave',()=>{ if(!S.drag&&S.cursor){ S.cursor=null; draw(); } });
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 cv.addEventListener('wheel', ev=>{
   if(!S.img) return; ev.preventDefault();
-  const r=cv.getBoundingClientRect(), mx=ev.clientX-r.left, my=ev.clientY-r.top;
-  const nz=Math.max(.05,Math.min(20,S.z*Math.exp(-ev.deltaY*0.0016)));
-  S.ox=mx-(mx-S.ox)*(nz/S.z); S.oy=my-(my-S.oy)*(nz/S.z); S.z=nz; draw();
+  const r=cv.getBoundingClientRect();
+  zoomAt(Math.exp(-ev.deltaY*0.0016),ev.clientX-r.left,ev.clientY-r.top);
 },{passive:false});
 
 function updatePreview(){
@@ -636,7 +827,7 @@ function setMode(m){
   $({edit:'#mEdit',contour:'#mCont',four:'#mFour'}[m]).classList.add('on');
   $('#modeHelp').textContent={
     edit:'Clique numa elipse para selecioná-la. Arraste o ponto cheio para mudar tamanho e giro; o vazado muda o outro semieixo.',
-    contour:'Clique em 5 pontos ou mais espalhados pelo contorno. O r aparece na prévia magenta enquanto você clica.',
+    contour:'Clique em 5 pontos ou mais espalhados pelo contorno. A lupa mostra onde o clique cai; arraste um ponto para corrigi-lo. Enter confirma.',
     four:'Clique nas duas pontas do eixo maior e depois nas duas pontas do eixo menor, nessa ordem.'
   }[m];
   sync();
@@ -644,27 +835,31 @@ function setMode(m){
 $('#mEdit').onclick=()=>setMode('edit');
 $('#mCont').onclick=()=>setMode('contour');
 $('#mFour').onclick=()=>setMode('four');
-$('#btnCalX').onclick=()=>{S.pending='X';S.calX=[];sync();};
-$('#btnCalY').onclick=()=>{S.pending='Y';S.calY=[];sync();};
-$('#btnCalReset').onclick=()=>{S.calX=[];S.calY=[];S.pending=null;sync();};
-$('#btnUndoPt').onclick=()=>{S.pts.pop();updatePreview();sync();};
-$('#btnClearPts').onclick=()=>{S.pts=[];S.preview=null;sync();};
+function startCal(axis){ if(!S.img) return toast('Carregue a imagem primeiro.'); snap(); S.pending=axis; if(axis==='X')S.calX=[]; else S.calY=[]; S.pts=[]; S.preview=null; sync(); }
+$('#btnCalX').onclick=()=>startCal('X');
+$('#btnCalY').onclick=()=>startCal('Y');
+$('#btnCalReset').onclick=()=>{snap();S.calX=[];S.calY=[];S.pending=S.img?'X':null;sync();};
+$('#btnUndoPt').onclick=()=>{ if(!S.pts.length) return; snap(); S.pts.pop();updatePreview();sync();};
+$('#btnClearPts').onclick=()=>{ if(!S.pts.length) return; snap(); S.pts=[];S.preview=null;sync();};
+$('#btnUndo').onclick=undo;
 $('#btnMake').onclick=()=>{
   if(!S.preview) return;
-  const e=Object.assign({},S.preview); e.name='E'+(++S.counter);
-  S.els.push(e); S.sel=S.els.length-1; S.pts=[]; S.preview=null; setMode('edit');
+  snap();
+  const e=Object.assign({},S.preview,S.def); e.name='E'+(++S.counter); e.uid='u'+Date.now()+'-'+S.counter;
+  S.els.push(e); S.sel=S.els.length-1; S.pts=[]; S.preview=null;
   const an=analyze(e,scales());
-  toast(an? e.name+' criada — r = '+fmt(an.r,3) : e.name+' criada — falta calibrar os eixos');
-  sync();
+  toast(an? e.name+' criada — r = '+fmt(an.r,3)+'. Informe tipo, cobertura e n à direita.' : e.name+' criada — falta calibrar os eixos');
+  setMode('edit');
 };
-$('#btnDel').onclick=()=>{ if(S.sel<0) return; S.els.splice(S.sel,1); S.sel=S.els.length?0:-1; sync(); };
-$('#btnDup').onclick=()=>{ if(S.sel<0) return;
-  const e=Object.assign({},S.els[S.sel]); e.name='E'+(++S.counter); e.cx+=12; e.cy+=12;
+$('#btnDel').onclick=()=>{ if(S.sel<0) return; snap(); S.els.splice(S.sel,1); S.sel=S.els.length?Math.min(S.sel,S.els.length-1):-1; sync(); };
+$('#btnDup').onclick=()=>{ if(S.sel<0) return; snap();
+  const e=Object.assign({},S.els[S.sel]); e.name='E'+(++S.counter); e.uid='u'+Date.now()+'-'+S.counter; e.cx+=12; e.cy+=12;
   S.els.push(e); S.sel=S.els.length-1; sync(); };
 document.querySelectorAll('[data-nudge]').forEach(b=>b.onclick=()=>{
   if(S.sel<0) return toast('Selecione uma elipse primeiro.');
+  snap();
   const e=S.els[S.sel], k=b.dataset.nudge;
-  if(k==='rot-') e.phi-=Math.PI/180; if(k==='rot+') e.phi+=Math.PI/180;
+  if(k==='rot-') e.phi-=Math.PI/360; if(k==='rot+') e.phi+=Math.PI/360;
   if(k==='a-') e.a=Math.max(e.a-1,1); if(k==='a+') e.a+=1;
   if(k==='b-') e.b=Math.max(e.b-1,1); if(k==='b+') e.b+=1;
   sync();
@@ -677,31 +872,54 @@ document.querySelectorAll('[data-nudge]').forEach(b=>b.onclick=()=>{
   else e.phi=v*Math.PI/180;
   sync(true);
 }));
-['xv0','xv1','yv0','yv1','etype','epct','en'].forEach(id=>$('#'+id).addEventListener('input',()=>sync()));
+['xv0','xv1','yv0','yv1'].forEach(id=>$('#'+id).addEventListener('input',()=>sync(true)));
+/* Enter percorre a calibração: X1 → X2 → marcar Y → Y1 → Y2 → contornar */
+const chain={xv0:()=>{$('#xv1').focus();$('#xv1').select();},
+  xv1:()=>{ $('#xv1').blur(); if(S.calY.length<2) startCal('Y'); else { $('#yv0').focus(); $('#yv0').select(); } },
+  yv0:()=>{$('#yv1').focus();$('#yv1').select();},
+  yv1:()=>{ $('#yv1').blur(); if(!S.els.length) setMode('contour'); }};
+Object.keys(chain).forEach(id=>$('#'+id).addEventListener('keydown',ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); chain[id](); } }));
+/* tipo, cobertura, n e nome pertencem à elipse selecionada (e viram padrão das próximas) */
+['etype','epct','en'].forEach(id=>$('#'+id).addEventListener('input',()=>{
+  const o={etype:$('#etype').value, epct:$('#epct').value, n:$('#en').value};
+  S.def=o; if(S.sel>=0) Object.assign(S.els[S.sel],o);
+  sync(true);
+}));
+$('#ename').addEventListener('input',()=>{ if(S.sel>=0){ S.els[S.sel].name=$('#ename').value.trim()||('E'+(S.sel+1)); sync(true); } });
 ['da','db','dth'].forEach(id=>$('#'+id).addEventListener('input',direct));
-$('#zIn').onclick=()=>{S.z*=1.25;draw()}; $('#zOut').onclick=()=>{S.z/=1.25;draw()}; $('#zFit').onclick=fit;
+$('#zIn').onclick=()=>zoomCenter(1.25); $('#zOut').onclick=()=>zoomCenter(1/1.25); $('#zFit').onclick=fit;
 
 /* =========== imagem =========== */
-function adopt(img,name){ S.img=img; fit(); sync(); if(name) toast(name); }
+function adopt(img,name,keep){
+  S.img=img;
+  if(!keep&&!S.demo&&!S.calX.length&&!S.calY.length) S.pending='X';   // já entra pedindo a calibração
+  fit(); sync(); if(name) toast(name);
+}
+function resetWork(){ S.calX=[];S.calY=[];S.pts=[];S.preview=null;S.els=[];S.sel=-1;S.counter=0;S.pending=null;S.demoR=null;S.hist=[];
+  ['#xv0','#xv1','#yv0','#yv1'].forEach(s=>$(s).value=''); }
 function loadImage(src){
   const im=new Image();
-  im.onload=()=>adopt(im,'Imagem carregada: '+im.width+'×'+im.height+' px');
+  im.onload=()=>{ S.demo=false; resetWork(); S.imgSrc=src.length<4000000?src:null;   // imagens muito grandes não entram na sessão salva
+    adopt(im,'Imagem carregada ('+im.width+'×'+im.height+' px). Clique em duas marcas do eixo X.'); };
   im.onerror=()=>toast('Não deu para ler essa imagem. Tente PNG ou JPG.');
   im.src=src;
 }
-$('#file').onchange=e=>{ const f=e.target.files[0]; if(!f) return;
-  const rd=new FileReader(); rd.onload=()=>loadImage(rd.result); rd.readAsDataURL(f); };
+function readFile(f){ if(!f||!/^image\//.test(f.type)) return toast('Escolha um arquivo de imagem (PNG, JPG…).');
+  const rd=new FileReader(); rd.onload=()=>loadImage(rd.result); rd.readAsDataURL(f); }
+$('#file').onchange=e=>{ const f=e.target.files[0]; if(f){ $('#fileName').textContent=f.name; readFile(f); } e.target.value=''; };
 $('#btnPaste').onclick=async()=>{
   try{ const items=await navigator.clipboard.read();
-    for(const it of items) for(const t of it.types) if(t.startsWith('image/')){
-      loadImage(URL.createObjectURL(await it.getType(t))); return; }
+    for(const it of items) for(const t of it.types) if(t.startsWith('image/')){ readFile(await it.getType(t)); return; }
     toast('Nenhuma imagem na área de transferência.');
-  }catch(e){ toast('O navegador bloqueou a leitura. Use o seletor de arquivo.'); }
+  }catch(e){ toast('O navegador bloqueou a leitura. Use Ctrl+V ou o seletor de arquivo.'); }
 };
 window.addEventListener('paste', e=>{
   const it=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith('image/'));
-  if(it) loadImage(URL.createObjectURL(it.getAsFile()));
+  if(it) readFile(it.getAsFile());
 });
+['dragenter','dragover'].forEach(n=>stage.addEventListener(n,e=>{ e.preventDefault(); stage.classList.add('drop'); }));
+['dragleave','drop'].forEach(n=>stage.addEventListener(n,e=>{ e.preventDefault(); stage.classList.remove('drop'); }));
+stage.addEventListener('drop',e=>{ const f=[...(e.dataTransfer?.files||[])].find(x=>/^image\//.test(x.type)); if(f) readFile(f); });
 
 /* =========== exemplo embutido =========== */
 function buildDemo(){
@@ -711,7 +929,6 @@ function buildDemo(){
   const px=v=>X0+(v-xmin)/(xmax-xmin)*(X1-X0);
   const py=v=>Y1-(v-ymin)/(ymax-ymin)*(Y1-Y0);
   g.fillStyle='#fff'; g.fillRect(0,0,W,H);
-  // grade e eixos
   g.strokeStyle='#E4E9ED'; g.lineWidth=1;
   for(let v=200;v<=460;v+=40){ g.beginPath(); g.moveTo(px(v),Y0); g.lineTo(px(v),Y1); g.stroke(); }
   for(let v=20;v<=60;v+=10){ g.beginPath(); g.moveTo(X0,py(v)); g.lineTo(X1,py(v)); g.stroke(); }
@@ -735,7 +952,6 @@ function buildDemo(){
   for(let i=0;i<150;i++){ const z1=nrm(), z2=nrm();
     const X=mx+sdx*z1, Y=my+sdy*(rr*z1+Math.sqrt(1-rr*rr)*z2);
     g.beginPath(); g.arc(px(X),py(Y),2.6,0,Math.PI*2); g.fill(); }
-  // elipses 50 / 75 / 95 %
   const C11=sdx*sdx,C22=sdy*sdy,C12=rr*sdx*sdy;
   const tr=(C11+C22)/2,dd=Math.hypot((C11-C22)/2,C12);
   const l1=tr+dd,l2=tr-dd, ang=0.5*Math.atan2(2*C12,C11-C22);
@@ -749,18 +965,30 @@ function buildDemo(){
     g.closePath(); g.stroke();
   });
   g.setLineDash([]); g.textAlign='left'; g.font='12px sans-serif'; g.fillStyle='#5B6B77';
-  g.fillText('elipses de tolerância 50% · 75% · 95%',X0+8,Y0+18);
+  const demoLabel=window.estimatorTranslate?window.estimatorTranslate('elipses de tolerância 50% · 75% · 95%'):'elipses de tolerância 50% · 75% · 95%';
+  g.fillText(demoLabel,X0+8,Y0+18);
   return {canvas:c, cal:{x:[px(200),px(440)], xv:[200,440], y:[py(20),py(60)], yv:[20,60]}, r:rr};
 }
-$('#btnDemo').onclick=()=>{
+function openDemo(quiet){
   const d=buildDemo();
+  resetWork(); S.demo=true; S.imgSrc=null;
   S.calX=[{x:d.cal.x[0],y:0},{x:d.cal.x[1],y:0}];
   S.calY=[{x:0,y:d.cal.y[0]},{x:0,y:d.cal.y[1]}];
   $('#xv0').value=d.cal.xv[0]; $('#xv1').value=d.cal.xv[1];
   $('#yv0').value=d.cal.yv[0]; $('#yv1').value=d.cal.yv[1];
-  S.els=[]; S.sel=-1; S.pts=[]; S.preview=null; S.counter=0; S.demoR=d.r;
-  adopt(d.canvas); setMode('contour');
-  toast('Exemplo aberto e já calibrado. Contorne qualquer uma das três elipses — todas dão r = 0,680.');
+  S.demoR=d.r; S.def={etype:'pop',epct:'0.95',n:'150'};
+  $('#fileName').textContent='Exemplo integrado';
+  adopt(d.canvas,null,true); setMode('contour');
+  if(!quiet) toast('Exemplo aberto e já calibrado. Contorne qualquer uma das três elipses — todas dão r = 0,680.');
+}
+$('#btnDemo').onclick=()=>openDemo();
+$('#btnNew').onclick=()=>{
+  if(!S.confirmNew){ S.confirmNew=true; $('#btnNew').textContent='Apagar tudo?'; $('#btnNew').classList.add('danger');
+    setTimeout(()=>{ S.confirmNew=false; $('#btnNew').textContent='Nova sessão'; $('#btnNew').classList.remove('danger'); },3500); return; }
+  S.confirmNew=false; $('#btnNew').textContent='Nova sessão'; $('#btnNew').classList.remove('danger');
+  resetWork(); S.img=null; S.imgSrc=null; S.demo=false; S.sent={}; setMode('contour');
+  $('#fileName').textContent='Nenhum arquivo selecionado';
+  try{ localStorage.removeItem(SESSION_KEY); }catch(e){}
 };
 
 /* =========== calculadora direta =========== */
@@ -776,19 +1004,20 @@ function direct(){
 const fmt=(v,d)=>(v===null||v===undefined||!isFinite(v))?'—'
   :(Math.abs(v)>=1e5||(Math.abs(v)<1e-3&&v!==0)?v.toExponential(2):v.toFixed(d===undefined?2:d));
 const kv=(a,b)=>'<div class="kv"><span>'+a+'</span><b>'+b+'</b></div>';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 function sync(skipInputs){
   const sc=scales();
   const valsOK = ['#xv0','#xv1','#yv0','#yv1'].every(s=>num(s)!==null);
-  ['#xv0','#xv1','#yv0','#yv1'].forEach(s=>
-    $(s).classList.toggle('need', (S.calX.length===2||S.calY.length===2)&&num(s)===null));
+  ['#xv0','#xv1'].forEach(s=>$(s).classList.toggle('need', S.calX.length===2&&num(s)===null));
+  ['#yv0','#yv1'].forEach(s=>$(s).classList.toggle('need', S.calY.length===2&&num(s)===null));
 
   // checklist
   const steps=[
     {ok:!!S.img, t:'Carregar a imagem do gráfico', go:()=>$('#file').click()},
-    {ok:S.calX.length===2, t:'Marcar 2 pontos no eixo X', go:()=>$('#btnCalX').click()},
-    {ok:S.calY.length===2, t:'Marcar 2 pontos no eixo Y', go:()=>$('#btnCalY').click()},
-    {ok:valsOK, t:'Digitar os 4 valores dos eixos', go:()=>{$('#xv0').focus();$('#xv0').select();}},
+    {ok:S.calX.length===2, t:'Marcar 2 pontos no eixo X', go:()=>startCal('X')},
+    {ok:S.calY.length===2, t:'Marcar 2 pontos no eixo Y', go:()=>startCal('Y')},
+    {ok:valsOK, t:'Digitar os 4 valores dos eixos', go:()=>{ const first=['#xv0','#xv1','#yv0','#yv1'].find(s=>num(s)===null)||'#xv0'; $(first).focus();$(first).select();}},
     {ok:S.els.length>0, t:'Marcar ao menos uma elipse', go:()=>setMode('contour')}
   ];
   const C=$('#check');
@@ -800,19 +1029,19 @@ function sync(skipInputs){
   const NB=$('#nextBox');
   if(firstMissing<0){
     NB.classList.add('done'); $('#nextN').textContent='✓';
-    $('#nextT').textContent='Pronto — o r está no alto da tela e sobre cada elipse';
+    $('#nextT').textContent='Pronto — confira os parâmetros à direita e envie para o BIVA2';
     $('#nextD').textContent = S.demoR!==null
       ? 'Neste exemplo o r verdadeiro é 0,680. Compare com o seu.'
-      : 'Refine a elipse arrastando as alças; o r acompanha em tempo real.';
+      : 'Refine a elipse arrastando as alças; r, médias e DPs acompanham em tempo real.';
   }else{
     NB.classList.remove('done'); $('#nextN').textContent=firstMissing+1;
     $('#nextT').textContent=steps[firstMissing].t;
     $('#nextD').textContent=[
-      'Escolha um arquivo ou abra o exemplo pronto.',
-      'Duas marcas do eixo horizontal, bem afastadas uma da outra.',
+      'Arraste o arquivo para a área central, cole com Ctrl+V ou abra o exemplo.',
+      'Duas marcas do eixo horizontal, bem afastadas uma da outra. A lupa ajuda a acertar o traço.',
       'Duas marcas do eixo vertical, bem afastadas uma da outra.',
-      'Os números que aparecem impressos naquelas marcas.',
-      'Contorne a elipse com 5 cliques ou mais e confirme.'
+      'Os números impressos naquelas marcas. Enter passa para o campo seguinte.',
+      'Contorne a elipse com 5 cliques ou mais e confirme com Enter.'
     ][firstMissing];
   }
 
@@ -820,43 +1049,55 @@ function sync(skipInputs){
   $('#chipY').textContent=S.calY.length+' / 2';
   $('#chipX').className='chip'+(S.calX.length===2?' ok':'');
   $('#chipY').className='chip'+(S.calY.length===2?' ok':'');
+  $('#btnCalX').classList.toggle('on',S.pending==='X'); $('#btnCalY').classList.toggle('on',S.pending==='Y');
   $('#scaleChip').textContent=sc?'escala '+fmt(Math.abs(sc.sx),4)+' × '+fmt(Math.abs(sc.sy),4)+' un/px':'sem calibração';
   $('#scaleChip').className='chip'+(sc?' ok':' warn');
 
   $('#legend').style.display=S.img?'':'none';
   const showHint=!S.img||S.pending||S.mode!=='edit';
   $('#ohint').style.display=showHint?'':'none';
-  $('#ohint').textContent = !S.img?'Carregue uma imagem ou abra o exemplo'
+  $('#ohint').textContent = !S.img?'Arraste uma imagem para cá, cole com Ctrl+V ou abra o exemplo'
     : S.pending==='X'?'Clique em duas marcas do eixo X ('+S.calX.length+'/2)'
     : S.pending==='Y'?'Clique em duas marcas do eixo Y ('+S.calY.length+'/2)'
-    : S.mode==='contour'?'Contorno: '+S.pts.length+' ponto(s) — mínimo 5'
-    : S.mode==='four'?'Eixo maior e depois eixo menor: '+S.pts.length+'/4' : '';
+    : S.mode==='contour'?'Contorno: '+S.pts.length+' ponto(s) — mínimo 5'+(S.preview?' · Enter confirma':'')
+    : S.mode==='four'?'Eixo maior e depois eixo menor: '+S.pts.length+'/4'+(S.preview?' · Enter confirma':'') : '';
   $('#btnMake').disabled=!S.preview;
+  $('#btnUndo').disabled=!S.hist.length;
+  cv.style.cursor = S.mode==='edit'&&!S.pending ? 'default' : 'crosshair';
 
-  // lista
-  const L=$('#elist');
+  // lista + consistência entre elipses do mesmo conjunto
+  const L=$('#elist'), all=S.els.map(e=>params(e,sc));
   if(!S.els.length) L.innerHTML='<div class="empty">Nenhuma elipse ainda.</div>';
-  else L.innerHTML=S.els.map((e,i)=>{ const an=analyze(e,sc);
+  else L.innerHTML=S.els.map((e,i)=>{ const p=all[i];
     return '<div class="eitem'+(i===S.sel?' sel':'')+'" data-i="'+i+'"><div class="top">'+
-      '<span class="nm">'+e.name+'</span><span class="rr">r = '+(an?fmt(an.r,3):'—')+'</span></div>'+
-      '<div class="sub">'+(an?'a '+fmt(an.A,2)+' · b '+fmt(an.B,2)+' · θ '+fmt(an.theta,1)+'°':'calibre os eixos')+
+      '<span class="nm">'+esc(e.name)+(S.sent[e.uid]?' <span class="chip ok">enviada</span>':'')+'</span><span class="rr">r = '+(p?fmt(p.r,3):'—')+'</span></div>'+
+      '<div class="sub">'+(p?'centro '+fmt(p.xMean,1)+' , '+fmt(p.yMean,1)+' · '+({pop:'tol. pop.',tol:'tol. Piccoli',mean:'conf. média',meanchi:'conf. χ²'}[e.etype]||'')+' '+Math.round(e.epct*100)+'%':'calibre os eixos')+
       '</div></div>'; }).join('');
-  L.querySelectorAll('.eitem').forEach(el=>el.onclick=()=>{S.sel=+el.dataset.i;sync();});
+  L.querySelectorAll('.eitem').forEach(el=>el.onclick=()=>{S.sel=+el.dataset.i; if(S.mode!=='edit') setMode('edit'); else sync();});
+  const rs=all.filter(Boolean).map(p=>p.r);
+  $('#consist').style.display=rs.length>1?'':'none';
+  if(rs.length>1){ const mean=rs.reduce((a,b)=>a+b,0)/rs.length, lo=Math.min(...rs), hi=Math.max(...rs);
+    $('#consist').innerHTML=kv('r médio das '+rs.length+' elipses',fmt(mean,3))+kv('Amplitude',fmt(lo,3)+' a '+fmt(hi,3))+
+      '<p class="hint" style="margin:6px 0 0">Elipses do mesmo grupo (50, 75 e 95%) devem dar o mesmo r: quanto menor a amplitude, mais confiável a marcação.</p>'; }
 
+  const e=S.sel>=0?S.els[S.sel]:null;
   if(!skipInputs){
-    const e=S.sel>=0?S.els[S.sel]:null;
     $('#pcx').value=e?e.cx.toFixed(1):''; $('#pcy').value=e?e.cy.toFixed(1):'';
     $('#pa').value=e?e.a.toFixed(1):'';   $('#pb').value=e?e.b.toFixed(1):'';
     $('#pphi').value=e?(e.phi*180/Math.PI).toFixed(2):'';
+    const o=e||S.def;
+    $('#etype').value=o.etype; $('#epct').value=o.epct; $('#en').value=o.n==null?'':o.n;
+    $('#ename').value=e?e.name:'';
   }
+  $('#ename').disabled=!e;
 
   // resultado: prévia tem prioridade, senão a elipse selecionada
-  const useEl = S.preview || (S.sel>=0?S.els[S.sel]:null);
+  const useEl = S.preview || e;
   const isPrev = !!S.preview;
   const an = analyze(useEl, sc);
   const H=$('#rhoVal'), N=$('#liveNum');
   if(an){
-    H.className='val'; H.innerHTML=fmt(an.r,3)+'<small> &nbsp;'+(isPrev?'prévia':useEl.name)+'</small>';
+    H.className='val'; H.innerHTML=fmt(an.r,3)+'<small> &nbsp;'+(isPrev?'prévia':esc(useEl.name))+'</small>';
     N.className='num'; N.textContent=fmt(an.r,3);
     $('#liveSrc').textContent=isPrev?'prévia em traçado':(useEl.name||'');
     $('#liveTag').style.display=isPrev?'':'none';
@@ -879,22 +1120,58 @@ function sync(skipInputs){
     $('#geo').innerHTML='<div class="empty">'+why.charAt(0).toUpperCase()+why.slice(1)+'.</div>';
   }
 
-  const k=kFactor();
-  $('#en').disabled = $('#etype').value==='pop';
-  $('#sdOut').innerHTML = (an&&k)
-    ? kv('k',fmt(k,4))+kv('DP em X',fmt(an.sdxU/k,3))+kv('DP em Y',fmt(an.sdyU/k,3))+
-      kv('Covariância',fmt(an.m12/(k*k),3))+kv('DP eixo maior',fmt(an.A/k,3))+kv('DP eixo menor',fmt(an.B/k,3))
-    : '<div class="empty">'+(an?'Informe um n ≥ 5.':'—')+'</div>';
+  // parâmetros para o BIVA2
+  const src=isPrev?Object.assign({},S.preview,S.def,{name:'prévia'}):e, p=src?params(src,sc):null;
+  const needN=src&&src.etype!=='pop';
+  $('#en').classList.toggle('need', !!src && !(parseFloat(src.n)>=(needN?5:3)));
+  $('#nHelp').textContent = needN ? 'obrigatório para este tipo' : 'não altera o DP, mas o BIVA2 precisa';
+  $('#sdOut').innerHTML = p
+    ? kv('Média X (centro)',fmt(p.xMean,2))+kv('Média Y (centro)',fmt(p.yMean,2))+
+      kv('DP em X',p.k?fmt(p.xSd,3):'informe n ≥ 5')+kv('DP em Y',p.k?fmt(p.ySd,3):'informe n ≥ 5')+
+      kv('r de Pearson',fmt(p.r,3))+kv('N',p.n?String(p.n):'—')+
+      (p.k?'<div class="kv"><span>fator k da elipse</span><b>'+fmt(p.k,4)+'</b></div>':'')
+    : '<div class="empty">'+(src?'Calibre os eixos para ver os parâmetros.':'Selecione ou marque uma elipse.')+'</div>';
+  const ready=S.els.map((x,i)=>all[i]).filter(Boolean);
+  $('#btnSend').disabled=!(e&&all[S.sel]);
+  $('#btnSendAll').disabled=ready.length<2; $('#btnSendAll').textContent='Enviar todas ('+ready.length+')';
+  $('#btnSendAll').style.display=S.els.length>1?'':'none';
 
-  draw();
+  draw(); saveSession();
 }
+
+/* =========== ponte com o BIVA2 =========== */
+function outboxItem(e,p){
+  return { id:'est-'+e.uid, src:e.uid, name:e.name, r:+p.r.toFixed(4),
+    xMean:+p.xMean.toFixed(3), yMean:+p.yMean.toFixed(3),
+    xSd:p.xSd!=null?+p.xSd.toFixed(4):null, ySd:p.ySd!=null?+p.ySd.toFixed(4):null, n:p.n,
+    kind:e.etype, coverage:+e.epct, at:Date.now() };
+}
+function send(list){
+  const sc=scales(); let box=[];
+  try{ const raw=JSON.parse(localStorage.getItem(OUTBOX_KEY)||'[]'); if(Array.isArray(raw)) box=raw; }catch(e){}
+  let n=0, partial=0;
+  list.forEach(e=>{ const p=params(e,sc); if(!p) return;
+    const it=outboxItem(e,p); box=box.filter(x=>x.src!==e.uid); box.push(it); S.sent[e.uid]=true; n++;
+    if(it.xSd==null||!(it.n>2)) partial++; });
+  if(!n) return toast('Calibre os eixos e marque uma elipse antes de enviar.');
+  try{ localStorage.setItem(OUTBOX_KEY,JSON.stringify(box)); }
+  catch(e){ return toast('O navegador bloqueou o armazenamento local; copie a tabela.'); }
+  $('#sendNote').innerHTML = n+' elipse(s) na caixa de entrada do BIVA2'+(partial?' — '+partial+' sem DP ou n: no BIVA2 só o r poderá ser usado':'')+
+    '. No workspace elas aparecem em <b>Recebido do Estimador</b>, prontas para virar referência ou elipse de confiança.';
+  $('#sendNote').style.display=''; $('#openBiva').style.display='';
+  toast(n+' elipse(s) enviada(s) para o BIVA2'); sync(true);
+}
+$('#btnSend').onclick=()=>{ if(S.sel>=0) send([S.els[S.sel]]); };
+$('#btnSendAll').onclick=()=>send(S.els);
 
 /* =========== exportar =========== */
 function rows(){
   const sc=scales();
-  return S.els.map(e=>{ const a=analyze(e,sc); return {
+  return S.els.map(e=>{ const p=params(e,sc), a=p&&p.an; return {
     nome:e.name, r_pearson:a?+a.r.toFixed(4):null, r2:a?+(a.r*a.r).toFixed(4):null,
-    centro_x:a?+a.cx.toFixed(4):null, centro_y:a?+a.cy.toFixed(4):null,
+    media_x:a?+a.cx.toFixed(4):null, media_y:a?+a.cy.toFixed(4):null,
+    dp_x:p&&p.k?+p.xSd.toFixed(4):null, dp_y:p&&p.k?+p.ySd.toFixed(4):null, n:p?p.n:null,
+    tipo_elipse:e.etype, cobertura:+e.epct,
     semieixo_maior:a?+a.A.toFixed(4):null, semieixo_menor:a?+a.B.toFixed(4):null,
     angulo_graus:a?+a.theta.toFixed(3):null,
     px:{cx:+e.cx.toFixed(2),cy:+e.cy.toFixed(2),a:+e.a.toFixed(2),b:+e.b.toFixed(2),
@@ -908,9 +1185,9 @@ $('#btnCopyR').onclick=async()=>{
 };
 $('#btnCopy').onclick=async()=>{
   const R=rows(); if(!R.length) return toast('Nada para copiar ainda.');
-  const head='nome\tr_pearson\tr2\tcentro_x\tcentro_y\tsemieixo_maior\tsemieixo_menor\tangulo_graus';
-  const body=R.map(r=>[r.nome,r.r_pearson,r.r2,r.centro_x,r.centro_y,r.semieixo_maior,r.semieixo_menor,r.angulo_graus].join('\t')).join('\n');
-  try{ await navigator.clipboard.writeText(head+'\n'+body); toast('Tabela copiada'); }
+  const cols=['nome','media_x','dp_x','media_y','dp_y','r_pearson','n','tipo_elipse','cobertura','semieixo_maior','semieixo_menor','angulo_graus'];
+  const body=R.map(r=>cols.map(c=>r[c]==null?'':r[c]).join('\t')).join('\n');
+  try{ await navigator.clipboard.writeText(cols.join('\t')+'\n'+body); toast('Tabela copiada — cole no Excel'); }
   catch(e){ toast('O navegador bloqueou a cópia.'); }
 };
 $('#btnJson').onclick=()=>{
@@ -919,22 +1196,66 @@ $('#btnJson').onclick=()=>{
   a.download='elipses-pearson.json'; a.click(); URL.revokeObjectURL(a.href);
 };
 
+/* =========== sessão salva no navegador =========== */
+let saveT, saveReady=false;
+function saveSession(){ if(!saveReady) return; clearTimeout(saveT); saveT=setTimeout(saveNow,250); }
+function saveNow(){
+  if(!saveReady) return; clearTimeout(saveT);
+  {
+    const base={v:1, demo:S.demo, calX:S.calX, calY:S.calY, els:S.els, sel:S.sel, counter:S.counter, def:S.def, sent:S.sent,
+      vals:['#xv0','#xv1','#yv0','#yv1'].map(s=>$(s).value)};
+    try{ localStorage.setItem(SESSION_KEY,JSON.stringify(Object.assign({img:S.imgSrc},base))); }
+    catch(e){ try{ localStorage.setItem(SESSION_KEY,JSON.stringify(base)); }catch(e2){} }   // imagem grande demais: guarda só as marcações
+  }
+}
+window.addEventListener('pagehide',saveNow);
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) saveNow(); });
+function restoreSession(){
+  let o=null; try{ o=JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); }catch(e){}
+  if(!o||o.v!==1) return false;
+  const apply=()=>{
+    if(Array.isArray(o.calX)) S.calX=o.calX; if(Array.isArray(o.calY)) S.calY=o.calY;
+    if(Array.isArray(o.els)) S.els=o.els.filter(e=>e&&[e.cx,e.cy,e.a,e.b,e.phi].every(isFinite));
+    S.sel=Math.min(+o.sel||0,S.els.length-1); S.counter=+o.counter||S.els.length;
+    if(o.def&&o.def.etype) S.def=o.def; S.sent=o.sent||{};
+    (o.vals||[]).forEach((v,i)=>{ $(['#xv0','#xv1','#yv0','#yv1'][i]).value=v; });
+    S.pending=null;
+  };
+  if(o.demo){ openDemo(true); apply(); saveReady=true; setMode(S.els.length?'edit':'contour'); return true; }
+  if(o.img){ const im=new Image();
+    im.onload=()=>{ S.imgSrc=o.img; S.img=im; $('#fileName').textContent='Imagem da sessão'; apply(); fit(); saveReady=true; setMode(S.els.length?'edit':'contour'); toast('Sessão anterior restaurada.'); };
+    im.onerror=()=>{ saveReady=true; sync(); };
+    im.src=o.img; return true; }
+  return false;
+}
+
 /* =========== teclado =========== */
 window.addEventListener('keydown', ev=>{
+  if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='z'&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){ ev.preventDefault(); undo(); return; }
   if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
   if(ev.key==='Escape'){ S.pending=null; S.pts=[]; S.preview=null; sync(); return; }
   if(ev.key==='Enter'&&S.preview){ $('#btnMake').click(); return; }
+  if(ev.key==='+'||ev.key==='='){ zoomCenter(1.25); return; }
+  if(ev.key==='-'){ zoomCenter(1/1.25); return; }
+  if(ev.key==='0'){ fit(); return; }
   if(S.sel<0) return;
   const e=S.els[S.sel], st=ev.shiftKey?5:1;
   const mv={ArrowLeft:[-st,0],ArrowRight:[st,0],ArrowUp:[0,-st],ArrowDown:[0,st]}[ev.key];
-  if(mv){ e.cx+=mv[0]; e.cy+=mv[1]; ev.preventDefault(); sync(); }
-  if(ev.key==='[') { e.phi-=Math.PI/180; sync(); }
-  if(ev.key===']') { e.phi+=Math.PI/180; sync(); }
-  if(ev.key==='Delete'||ev.key==='Backspace'){ S.els.splice(S.sel,1); S.sel=-1; sync(); }
+  if(mv){ e.cx+=mv[0]/S.z; e.cy+=mv[1]/S.z; ev.preventDefault(); sync(); }
+  if(ev.key==='[') { e.phi-=Math.PI/360; sync(); }
+  if(ev.key===']') { e.phi+=Math.PI/360; sync(); }
+  if(ev.key==='Delete'||ev.key==='Backspace'){ snap(); S.els.splice(S.sel,1); S.sel=S.els.length?Math.min(S.sel,S.els.length-1):-1; sync(); }
+});
+window.addEventListener('storage',ev=>{ if(ev.key===THEME_KEY){ applyTheme(); draw(); } });
+window.addEventListener('estimator-language-change',()=>{
+  if(S.demo) S.img=buildDemo().canvas;
+  sync(true); direct(); draw();
 });
 
+applyTheme();
 new ResizeObserver(resize).observe(stage);
-setMode('contour'); resize(); sync();
+setMode('contour'); resize();
+if(!restoreSession()){ saveReady=true; sync(); }
 })();
 </script>
 </body>

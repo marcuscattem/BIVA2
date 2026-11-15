@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BIVA2</title>
+<script>window.__resources={"https://unpkg.com/react@18.3.1/umd/react.production.min.js":"vendor/react.production.min.js","https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js":"vendor/react-dom.production.min.js"};</script>
 <script src="./support.js"></script>
 <style>
   [style*="background:radial-gradient"] { background:var(--bg-page) !important; color:var(--text-1) !important; }
@@ -22,7 +23,10 @@
     .workspace-topbar>div:last-child{flex-wrap:wrap;justify-content:flex-end}
     .workspace-layout{flex-direction:column;overflow:visible!important}
     .reference-panel,.analysis-panel{width:100%!important;min-height:0!important;overflow:visible!important}
-    .reference-panel{height:540px}
+    .reference-panel{height:680px}
+    .chart-column>div:first-child{flex-wrap:wrap;gap:8px}
+    .chart-column>div:first-child>div:last-child{flex-wrap:wrap}
+    .chart-column>div:first-child button{white-space:nowrap}
     .chart-column{min-height:650px}
     .chart-stage{height:520px!important;flex:none!important;padding:10px!important}
     .analysis-panel{border-left:none!important;border-top:1px solid #ddd8cc}
@@ -55,6 +59,10 @@
   .scr::-webkit-scrollbar-thumb:hover{background:var(--bg-scroll-hover);background-clip:content-box}
   .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
   input[type=range]{accent-color:#2f4fd6}
+  mark.hl{background:#ffe7a3;color:inherit;border-radius:2px;padding:0 1px}
+  [data-theme="dark"] mark.hl{background:#6b5a1e}
+  .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  select.facet{width:100%;min-width:0;font:500 11px 'IBM Plex Sans';padding:6px 6px;border-radius:7px;outline:none;cursor:pointer;text-overflow:ellipsis}
   @keyframes popin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   @keyframes winin{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
 
@@ -125,7 +133,7 @@
                   <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text-2)"><span style="width:5px;height:5px;border-radius:2px;background:{{ m.accent }};flex:none"></span>{{ f }}</div>
                 </sc-for>
               </div>
-              <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:{{ m.accent }}">{{ t.open }} <span style="font-size:16px">→</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:{{ m.accent }}">{{ m.cta }} <span style="font-size:16px">→</span></div>
             </div>
           </sc-for>
         </div>
@@ -158,6 +166,8 @@
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
+        <a href="estimador-pearson.html" target="_blank" rel="noopener" title="{{ t.estimatorHint }}" style="display:flex;align-items:center;gap:6px;font:600 12px 'IBM Plex Sans';color:#c8d6ff;background:rgba(47,79,214,.22);border:1px solid rgba(110,135,240,.45);padding:6px 11px;border-radius:8px;text-decoration:none;white-space:nowrap" style-hover="filter:brightness(1.15)"><span class="mono" style="font-style:italic">r</span> {{ t.estimatorBtn }} ↗</a>
+        <button onClick="{{ onNewAnalysis }}" title="{{ t.newAnalysis }}" style="{{ newAnalysisStyle }}">{{ newAnalysisLabel }}</button>
         <button onClick="{{ onMigrate }}" style="{{ migrateStyle }}" style-hover="filter:brightness(1.05)">⇄ {{ t.migrateBtn }}</button>
         <span class="mono" style="font-size:11px;color:#8a8f9c;padding:5px 9px;border:1px solid #2b2e37;border-radius:7px">{{ popTotalLabel }}</span>
         <div onClick="{{ onToggleTheme }}" title="{{ t.themeToggle }}" style="{{ themeSwitchTrackStyle }}"><span style="{{ themeSwitchDotStyle }}">{{ themeSwitchIcon }}</span></div>
@@ -188,12 +198,18 @@
         <!-- add reference form -->
         <div style="{{ addRefFormStyle }}">
           <div style="font-size:12.5px;font-weight:600;color:var(--text-1);margin-bottom:6px">{{ t.addRefTitle }}</div>
-          <div style="font-size:10.5px;color:var(--text-7);margin-bottom:10px;line-height:1.4">{{ t.addRefHint }}</div>
+          <div style="font-size:10.5px;color:var(--text-7);margin-bottom:6px;line-height:1.4">{{ t.addRefHint }}</div>
+          <a href="estimador-pearson.html" target="_blank" rel="noopener" style="display:block;font-size:10.5px;font-weight:600;margin-bottom:10px;text-decoration:underline;text-underline-offset:2px">{{ t.estimatorLink }}</a>
           <div style="display:flex;flex-direction:column;gap:8px">
             <div style="display:flex;gap:7px">
               <input type="text" placeholder="{{ t.refName }}" value="{{ refName }}" onInput="{{ onRefName }}" style="flex:2;min-width:0;font-size:12px;padding:7px 9px;border:1px solid var(--border-2);border-radius:7px;background:var(--bg-panel);outline:none" style-focus="border-color:#e0662a">
               <input type="text" placeholder="{{ t.refCountry }}" value="{{ refCountry }}" onInput="{{ onRefCountry }}" style="flex:1;min-width:0;font-size:12px;padding:7px 9px;border:1px solid var(--border-2);border-radius:7px;background:var(--bg-panel);outline:none" style-focus="border-color:#e0662a">
             </div>
+            <div style="display:flex;gap:7px">
+              <input type="text" placeholder="{{ t.refEquip }}" value="{{ refEquip }}" onInput="{{ onRefEquip }}" style="flex:1;min-width:0;font-size:12px;padding:7px 9px;border:1px solid var(--border-2);border-radius:7px;background:var(--bg-panel);outline:none" style-focus="border-color:#e0662a">
+              <input type="text" placeholder="{{ t.refAge }}" value="{{ refAge }}" onInput="{{ onRefAge }}" style="flex:1;min-width:0;font-size:12px;padding:7px 9px;border:1px solid var(--border-2);border-radius:7px;background:var(--bg-panel);outline:none" style-focus="border-color:#e0662a">
+            </div>
+            <input type="text" placeholder="{{ t.refCitation }}" value="{{ refCitation }}" onInput="{{ onRefCitation }}" style="width:100%;font-size:12px;padding:7px 9px;border:1px solid var(--border-2);border-radius:7px;background:var(--bg-panel);outline:none" style-focus="border-color:#e0662a">
             <div style="display:flex;gap:6px">
               <sc-for list="{{ refSexOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for>
             </div>
@@ -207,6 +223,7 @@
                 </label>
               </sc-for>
             </div>
+            <div style="{{ refErrorStyle }}">{{ t.editInvalid }}</div>
             <div style="display:flex;gap:7px;margin-top:2px">
               <button onClick="{{ onRefCancel }}" style="font:500 12px 'IBM Plex Sans';color:var(--text-6);background:var(--bg-panel);border:1px solid var(--border-2);padding:8px 14px;border-radius:8px;cursor:pointer">{{ t.refCancel }}</button>
               <button onClick="{{ onRefSave }}" style="flex:1;font:600 12.5px 'IBM Plex Sans';color:#fff;background:#e0662a;border:none;padding:8px;border-radius:8px;cursor:pointer" style-hover="filter:brightness(1.05)">{{ t.refSave }}</button>
@@ -214,47 +231,68 @@
           </div>
         </div>
 
-        <input type="text" placeholder="{{ t.searchPh }}" onInput="{{ onSearch }}" class="scr" style="width:100%;font:400 13px 'IBM Plex Sans';padding:9px 11px;border:1px solid var(--border-2);border-radius:9px;background:var(--bg-panel);outline:none;margin:10px 0" style-focus="border-color:#2f4fd6;box-shadow:0 0 0 3px rgba(47,79,214,.12)">
+        <div style="position:relative;margin:10px 0 8px">
+          <input type="text" placeholder="{{ t.searchPh }}" value="{{ search }}" onInput="{{ onSearch }}" class="scr" style="width:100%;font:400 13px 'IBM Plex Sans';padding:9px 30px 9px 11px;border:1px solid var(--border-2);border-radius:9px;background:var(--bg-panel);outline:none" style-focus="border-color:#2f4fd6;box-shadow:0 0 0 3px rgba(47,79,214,.12)">
+          <button onClick="{{ onClearSearch }}" title="{{ t.clearFilters }}" style="{{ clearSearchStyle }}">×</button>
+        </div>
         <!-- sex segmented -->
         <div style="display:flex;gap:6px;margin-bottom:8px">
-          <sc-for list="{{ sexFilters }}" as="f" hint-placeholder-count="3">
+          <sc-for list="{{ sexFilters }}" as="f" hint-placeholder-count="4">
             <button onClick="{{ f.onClick }}" style="{{ f.style }}" style-hover="border-color:var(--border-hover)">{{ f.label }}</button>
           </sc-for>
         </div>
         <!-- type chips -->
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <sc-for list="{{ typeFilters }}" as="f" hint-placeholder-count="4">
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <sc-for list="{{ typeFilters }}" as="f" hint-placeholder-count="5">
             <button onClick="{{ f.onClick }}" style="{{ f.style }}" style-hover="border-color:var(--border-hover)">{{ f.label }}</button>
           </sc-for>
+        </div>
+        <!-- facets: device, country, age, study + sort/group -->
+        <div style="{{ facetGridStyle }}">
+          <sc-for list="{{ facetSelects }}" as="fs" hint-placeholder-count="6">
+            <select class="facet" value="{{ fs.value }}" onChange="{{ fs.onChange }}" title="{{ fs.title }}" style="{{ fs.style }}">
+              <sc-for list="{{ fs.options }}" as="o" hint-placeholder-count="2"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+            </select>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:9px">
+          <span class="mono" style="font-size:10.5px;color:var(--text-6);white-space:nowrap">{{ popCountLabel }}</span>
+          <button onClick="{{ onToggleOnlySelected }}" style="{{ onlySelectedStyle }}">{{ onlySelectedLabel }}</button>
+          <span style="flex:1"></span>
+          <button onClick="{{ onClearFilters }}" style="{{ clearFiltersStyle }}">{{ t.clearFilters }}</button>
+          <button onClick="{{ onToggleFilters }}" style="{{ filtersBtnStyle }}">{{ filtersBtnLabel }}</button>
         </div>
       </div>
 
       <div class="scr" style="flex:1;overflow-y:auto;padding:12px 12px 20px;display:flex;flex-direction:column;gap:9px">
         <sc-for list="{{ pops }}" as="p" hint-placeholder-count="7">
+          <div style="{{ p.groupHeaderStyle }}"><span>{{ p.groupHeader }}</span><span class="mono" style="font-weight:500;opacity:.7">{{ p.groupCount }}</span></div>
           <div onClick="{{ p.onToggle }}" title="{{ p.cardTitle }}" style="{{ p.cardStyle }}" style-hover="border-color:var(--border-hover);box-shadow:0 2px 8px rgba(0,0,0,.05)">
             <div style="width:4px;flex:none;border-radius:4px;align-self:stretch;background:{{ p.accent }}"></div>
-            <svg viewBox="0 0 60 44" style="width:56px;height:42px;flex:none;background:var(--bg-thumb);border:1px solid var(--border-4);border-radius:7px">
-              <line x1="4" y1="40" x2="56" y2="40" stroke="var(--stroke-grid)" stroke-width="1"></line>
-              <line x1="6" y1="4" x2="6" y2="40" stroke="var(--stroke-grid)" stroke-width="1"></line>
-              <ellipse cx="31" cy="22" rx="23" ry="11" transform="rotate(-25 31 22)" fill="{{ p.thumbFill }}" stroke="{{ p.thumbStroke }}" stroke-width="1.4"></ellipse>
-            </svg>
             <div style="flex:1;min-width:0">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
-                <span class="mono" style="font-size:9.5px;font-weight:500;color:#fff;background:{{ p.sexColor }};padding:1px 5px;border-radius:4px">{{ p.sexLabel }}</span>
-                <span style="font-size:12px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">{{ p.country }}</span>
-                <span style="{{ p.customTagStyle }}">★</span>
-                <span class="mono" style="font-size:10px;color:var(--text-muted)">N={{ p.n }}</span>
+              <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:6px">
+{{ p.thumb }}
+                <div style="flex:1;min-width:0">
+                  <div class="clamp2" style="font-size:12px;font-weight:600;color:var(--text-1);line-height:1.3;overflow-wrap:anywhere">{{ p.titleNode }}</div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+                    <span class="mono" style="font-size:9.5px;font-weight:600;color:#fff;background:{{ p.sexColor }};padding:1px 5px;border-radius:4px">{{ p.sexLabel }}</span>
+                    <span class="mono" style="font-size:10px;color:var(--text-muted)">N={{ p.n }}</span>
+                    <span style="{{ p.customTagStyle }}">★ {{ t.refCustomTag }}</span>
+                  </div>
+                </div>
+                <button onClick="{{ p.onRemoveCustom }}" title="{{ t.removeRef }}" aria-label="{{ t.removeRef }}" style="{{ p.removeCustomStyle }}">×</button>
                 <button onClick="{{ p.onToggle }}" title="{{ p.selectTitle }}" aria-label="{{ p.selectTitle }}" style="{{ p.selectStyle }}">{{ p.selectIcon }}</button>
               </div>
-              <div style="font-size:10.5px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px">{{ p.subLine }}</div>
-              <div style="{{ p.referenceStyle }}"><span style="font-weight:600">{{ t.refArticle }}:</span> {{ p.referenceAuthor }} ({{ p.referenceYear }}) <a href="{{ p.referenceHref }}" target="_blank" rel="noopener noreferrer" onClick="{{ p.onDoiClick }}" style="{{ p.doiStyle }}">· DOI: {{ p.referenceDoi }}</a></div>
-              <div style="{{ p.noteStyle }}">{{ p.noteText }}</div>
-              <div style="display:flex;gap:5px;flex-wrap:wrap">
-                <span style="{{ p.typeChip }}">{{ p.type }}</span>
-                <span style="font-size:9.5px;color:var(--text-muted);background:var(--bg-chip);padding:1px 6px;border-radius:5px">{{ p.age }}</span>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+                <sc-for list="{{ p.chips }}" as="c" hint-placeholder-count="4">
+                  <button onClick="{{ c.onClick }}" title="{{ c.title }}" style="{{ c.style }}" style-hover="filter:brightness(.96)">{{ c.label }}</button>
+                </sc-for>
               </div>
+              <div style="{{ p.equipStyle }}">{{ p.equipNode }}</div>
+              <div style="{{ p.referenceStyle }}"><span style="font-weight:600">{{ t.refArticle }}:</span> {{ p.referenceNode }} <a href="{{ p.referenceHref }}" target="_blank" rel="noopener noreferrer" onClick="{{ p.onDoiClick }}" style="{{ p.doiStyle }}">· DOI: {{ p.referenceDoi }}</a></div>
+              <div style="{{ p.noteStyle }}">{{ p.noteText }}</div>
               <div style="{{ p.statRow }}">
-                <span class="mono">{{ p.axisX }} {{ p.rhText }}</span><span style="color:var(--text-12)">·</span><span class="mono">{{ p.axisY }} {{ p.xcText }}</span>
+                <span class="mono">{{ p.axisX }} {{ p.rhText }}</span><span style="color:var(--text-12)">·</span><span class="mono">{{ p.axisY }} {{ p.xcText }}</span><span style="color:var(--text-12)">·</span><span class="mono">r {{ p.rText }}</span>
               </div>
               <div style="{{ p.modeRow }}">
                 <button onClick="{{ p.onConf }}" style="{{ p.confStyle }}">{{ t.modeConf }}</button>
@@ -263,6 +301,7 @@
             </div>
           </div>
         </sc-for>
+        <button onClick="{{ onShowMore }}" style="{{ showMoreStyle }}" style-hover="border-color:var(--border-hover)">{{ showMoreLabel }}</button>
         <div style="{{ emptyStyle }}">{{ t.noneFound }}</div>
       </div>
     </aside>
@@ -276,6 +315,7 @@
         </div>
         <div style="display:flex;gap:7px;position:relative">
           <button onClick="{{ onTogglePhase }}" style="{{ phaseBtnStyle }}" style-hover="border-color:var(--border-hover)">{{ t.phase }}</button>
+          <button onClick="{{ onToggleStyle }}" title="{{ t.styleHint }}" style="{{ styleBtnStyle }}" style-hover="border-color:var(--border-hover)">◐ {{ t.styleBtn }}</button>
           <button onClick="{{ onToggleLegend }}" title="{{ t.legendToggleHint }}" style="{{ legendBtnStyle }}" style-hover="border-color:var(--border-hover)">{{ t.legendControl }}</button>
           <button onClick="{{ onToggleText }}" style="{{ textBtnStyle }}" style-hover="border-color:var(--border-hover)">{{ t.textBox }}</button>
           <button onClick="{{ onToggleAxis }}" style="{{ axisBtnStyle }}" style-hover="border-color:var(--border-hover)">{{ t.axes }}</button>
@@ -383,10 +423,10 @@
       <div class="scr" style="flex:none;padding:10px 18px 14px;display:flex;gap:9px;flex-wrap:wrap;align-items:center;overflow-x:auto">
         <span style="font-size:10.5px;color:var(--text-muted);letter-spacing:.4px;font-weight:500">{{ t.onChart }}</span>
         <sc-for list="{{ legendItems }}" as="l" hint-placeholder-count="0">
-          <span style="display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--text-2);background:var(--bg-panel);border:1px solid var(--border-7);padding:4px 10px 4px 8px;border-radius:20px">
-            <span style="width:14px;height:10px;border-radius:3px;border:1.5px solid {{ l.color }};background:{{ l.fill }}"></span>
-            {{ l.label }}
-            <span style="font-size:9.5px;color:var(--text-muted);font-weight:500">{{ l.kind }}</span>
+          <span onClick="{{ l.onClick }}" title="{{ t.styleHint }}" style="display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--text-2);background:var(--bg-panel);border:1px solid var(--border-7);padding:4px 10px 4px 8px;border-radius:20px;cursor:pointer;max-width:340px" style-hover="border-color:var(--border-hover)">
+            <span style="width:16px;height:11px;flex:none;border-radius:3px;border:{{ l.border }};background:{{ l.fill }}"></span>
+            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ l.label }}</span>
+            <span style="font-size:9.5px;color:var(--text-muted);font-weight:500;white-space:nowrap">{{ l.kind }}</span>
           </span>
         </sc-for>
         <span style="{{ legendEmptyStyle }}">{{ t.legendEmpty }}</span>
@@ -395,6 +435,88 @@
 
     <!-- ============ RIGHT: ELLIPSES + STATS ============ -->
     <aside class="scr analysis-panel" style="width:360px;flex:none;background:var(--bg-sidebar);border-left:1px solid var(--border-1);display:flex;flex-direction:column;min-height:0;overflow-y:auto">
+
+      <!-- STYLE PANEL (docked, so it never covers the chart) -->
+      <div style="{{ styleWinStyle }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border-5)">
+          <span style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:2px;background:#7b3ff2;display:inline-block"></span>{{ t.styleTitle }}</span>
+          <button onClick="{{ onToggleStyle }}" style="background:none;border:none;font-size:16px;color:var(--text-muted);cursor:pointer;line-height:1">×</button>
+        </div>
+        <div style="padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px">
+          <div style="{{ stylePresetBoxStyle }}">
+            <div style="font-size:9.5px;color:var(--text-muted);letter-spacing:.3px;margin-bottom:6px">{{ t.stylePresets }}</div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap">
+              <sc-for list="{{ stylePresets }}" as="sp" hint-placeholder-count="5">
+                <button onClick="{{ sp.onClick }}" title="{{ sp.title }}" style="font:600 10.5px 'IBM Plex Sans';padding:5px 9px;border-radius:7px;cursor:pointer;background:var(--bg-panel);color:var(--text-2);border:1px solid var(--border-2);display:flex;align-items:center;gap:5px" style-hover="border-color:var(--border-hover)">{{ sp.icon }} {{ sp.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <sc-for list="{{ styleRows }}" as="r" hint-placeholder-count="0">
+            <div style="{{ r.boxStyle }}">
+              <div style="display:flex;align-items:center;gap:7px">
+                <input type="color" value="{{ r.color }}" onInput="{{ r.onColor }}" title="{{ t.colorLbl }}" style="width:30px;height:28px;flex:none;padding:2px;border:1px solid var(--border-2);border-radius:7px;background:var(--bg-panel);cursor:pointer">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="{{ r.name }}">{{ r.name }}</div>
+                  <div style="font-size:9.5px;color:var(--text-muted)">{{ r.kind }}</div>
+                </div>
+                <select value="{{ r.dash }}" onChange="{{ r.onDash }}" title="{{ t.lineLbl }}" class="mono" style="width:78px;flex:none;font-size:11px;padding:5px 4px;border:1px solid var(--border-2);border-radius:7px;background:var(--bg-panel);cursor:pointer">
+                  <sc-for list="{{ dashOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                </select>
+                <select value="{{ r.symbol }}" onChange="{{ r.onSymbol }}" title="{{ t.symbolLbl }}" style="width:50px;flex:none;font-size:12px;padding:5px 4px;border:1px solid var(--border-2);border-radius:7px;background:var(--bg-panel);cursor:pointer">
+                  <sc-for list="{{ centerSymbolOptions }}" as="o" hint-placeholder-count="7"><option value="{{ o.value }}" title="{{ o.title }}">{{ o.label }}</option></sc-for>
+                </select>
+                <button onClick="{{ r.onMore }}" title="{{ t.styleHint }}" style="width:24px;height:26px;flex:none;border:1px solid var(--border-2);border-radius:7px;background:var(--bg-panel);color:var(--text-6);font-size:11px;cursor:pointer;padding:0">{{ r.moreIcon }}</button>
+              </div>
+              <div style="{{ r.detailStyle }}">
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px">
+                <sc-for list="{{ r.swatches }}" as="sw" hint-placeholder-count="10"><button onClick="{{ sw.onClick }}" title="{{ sw.color }}" style="{{ sw.style }}"></button></sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:auto 1fr 30px auto 1fr 34px;gap:6px;align-items:center;margin-top:8px">
+                <span style="font-size:9px;color:var(--text-muted);letter-spacing:.2px">{{ t.widthLbl }}</span>
+                <input type="range" min="0.5" max="6" step="0.5" value="{{ r.width }}" onInput="{{ r.onWidth }}" style="width:100%;min-width:0">
+                <span class="mono" style="font-size:10px;color:var(--text-2);text-align:right">{{ r.widthLabel }}</span>
+                <span style="font-size:9px;color:var(--text-muted);letter-spacing:.2px">{{ t.fillLbl }}</span>
+                <input type="range" min="0" max="0.5" step="0.05" value="{{ r.fill }}" onInput="{{ r.onFill }}" style="width:100%;min-width:0">
+                <span class="mono" style="font-size:10px;color:var(--text-2);text-align:right">{{ r.fillLabel }}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:7px">
+                <label style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--text-2);cursor:pointer"><input type="checkbox" checked="{{ r.label }}" onChange="{{ r.onLabel }}"> {{ t.showLabel }}</label>
+                <label style="{{ r.visibleStyle }}"><input type="checkbox" checked="{{ r.visible }}" onChange="{{ r.onVisible }}"> {{ t.showEllipse }}</label>
+                <span style="flex:1"></span>
+                <button onClick="{{ r.onReset }}" style="font:500 10px 'IBM Plex Sans';color:var(--text-6);background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:2px">{{ t.resetStyle }}</button>
+              </div>
+              </div>
+            </div>
+          </sc-for>
+          <div style="{{ styleEmptyStyle }}">{{ t.styleEmpty }}</div>
+        </div>
+      </div>
+
+      <!-- ESTIMATOR INBOX -->
+      <div style="{{ inboxStyle }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+          <div style="font-size:12px;font-weight:600;color:var(--text-10);display:flex;align-items:center;gap:7px"><span class="mono" style="width:20px;height:20px;border-radius:6px;background:#173f8a;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-style:italic">r</span>{{ t.inboxTitle }} <span class="mono" style="font-weight:500;opacity:.7">{{ inboxCount }}</span></div>
+          <button onClick="{{ onInboxClear }}" style="font:500 10.5px 'IBM Plex Sans';color:var(--text-9);background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:2px">{{ t.inboxDismiss }}</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <sc-for list="{{ inboxItems }}" as="i" hint-placeholder-count="0">
+            <div style="background:var(--bg-panel);border:1px solid var(--border-info2);border-radius:9px;padding:8px 9px">
+              <div style="display:flex;align-items:baseline;gap:8px">
+                <span style="flex:1;min-width:0;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.name }}</span>
+                <span class="mono" style="font-size:12px;font-weight:600;color:var(--text-10)">r = {{ i.rText }}</span>
+                <button onClick="{{ i.onRemove }}" title="{{ t.remove }}" style="border:none;background:none;color:#b9564a;font-size:14px;cursor:pointer;line-height:1">×</button>
+              </div>
+              <div class="mono" style="font-size:9.5px;color:var(--text-muted);margin:2px 0 7px;line-height:1.4">{{ i.sub }}</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap">
+                <button onClick="{{ i.onAsRef }}" style="{{ i.fullBtnStyle }}">{{ t.inboxAsRef }}</button>
+                <button onClick="{{ i.onAsEllipse }}" style="{{ i.ellBtnStyle }}">{{ t.inboxAsEll }}</button>
+                <button onClick="{{ i.onUseR }}" style="font:600 10.5px 'IBM Plex Sans';padding:5px 9px;border-radius:7px;cursor:pointer;background:var(--bg-panel);color:var(--text-10);border:1px solid var(--border-info2)">{{ t.inboxUseR }}</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="{{ inboxNoteStyle }}">{{ inboxNote }}</div>
+      </div>
 
       <!-- ELLIPSE MANAGER -->
       <div style="{{ ellipsePanelStyle }}">
@@ -441,6 +563,7 @@
                 </label>
               </sc-for>
             </div>
+            <a href="estimador-pearson.html" target="_blank" rel="noopener" style="{{ manualEstimatorLinkStyle }}">{{ t.estimatorLink }}</a>
             <div style="{{ activeSrcNoteStyle }}">{{ activeSrcNote }}</div>
             <button onClick="{{ onAddEllipse }}" style="width:100%;font:600 13px 'IBM Plex Sans';color:#fff;background:#e0662a;border:none;padding:10px;border-radius:9px;cursor:pointer" style-hover="filter:brightness(1.05)">{{ t.addEllipse }}</button>
           </div>
@@ -452,7 +575,7 @@
             <div style="border:1px solid var(--border-6);border-radius:11px;background:var(--bg-panel);overflow:hidden;animation:popin .18s ease">
               <div style="display:flex;align-items:center;gap:9px;padding:9px 10px">
                 <button onClick="{{ e.onToggleVisible }}" title="Mostrar/ocultar" style="{{ e.eyeStyle }}">{{ e.eyeIcon }}</button>
-                <span style="width:16px;height:16px;border-radius:5px;flex:none;border:2px solid {{ e.color }};background:{{ e.swatchFill }}"></span>
+                <button onClick="{{ e.onStyle }}" title="{{ t.styleHint }}" style="width:20px;height:20px;border-radius:6px;flex:none;border:{{ e.swatchBorder }};background:{{ e.swatchFill }};cursor:pointer;padding:0"></button>
                 <div style="flex:1;min-width:0">
                   <div style="font-size:12.5px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ e.name }}</div>
                   <div class="mono" style="font-size:9.5px;color:var(--text-muted)">{{ e.meta }}</div>
@@ -477,24 +600,7 @@
                   <button onClick="{{ e.onCancelEdit }}" style="font:500 11px 'IBM Plex Sans';color:var(--text-6);background:var(--bg-panel);border:1px solid var(--border-2);padding:7px 10px;border-radius:7px;cursor:pointer">{{ t.refCancel }}</button>
                   <button onClick="{{ e.onSaveEdit }}" style="flex:1;font:600 11.5px 'IBM Plex Sans';color:#fff;background:#e0662a;border:none;padding:7px 10px;border-radius:7px;cursor:pointer">{{ t.saveChanges }}</button>
                 </div>
-                <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">{{ t.colorLbl }}</div>
-                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px">
-                  <sc-for list="{{ e.swatches }}" as="sw" hint-placeholder-count="8">
-                    <button onClick="{{ sw.onClick }}" style="{{ sw.style }}"></button>
-                  </sc-for>
-                </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
-                  <span style="font-size:10px;color:var(--text-muted)">{{ t.strokeLbl }}</span>
-                  <div style="display:flex;gap:5px">
-                    <button onClick="{{ e.onSolid }}" style="{{ e.solidStyle }}">──</button>
-                    <button onClick="{{ e.onDashed }}" style="{{ e.dashedStyle }}">- -</button>
-                  </div>
-                </div>
-                <div style="display:flex;align-items:center;gap:9px">
-                  <span style="font-size:10px;color:var(--text-muted);white-space:nowrap">{{ t.widthLbl }}</span>
-                  <input type="range" min="1" max="5" step="0.5" value="{{ e.width }}" onInput="{{ e.onWidth }}" style="flex:1">
-                  <span class="mono" style="font-size:11px;color:var(--text-2);width:26px;text-align:right">{{ e.widthLabel }}</span>
-                </div>
+                <button onClick="{{ e.onStyle }}" style="width:100%;font:600 11px 'IBM Plex Sans';color:var(--text-2);background:var(--bg-panel);border:1px solid var(--border-2);padding:7px 10px;border-radius:7px;cursor:pointer" style-hover="border-color:var(--border-hover)">◐ {{ t.styleOpen }}</button>
               </div>
             </div>
           </sc-for>
@@ -699,6 +805,10 @@ class Component extends DCLogic {
     fSex: '',
     fType: '',
     search: '',
+    fEquip:'', fCountry:'', fAge:'', fStudy:'', sortBy:'default', groupBy:'none', onlySelected:false, showFilters:true, listLimit:60,
+    refStyles: {},        // key -> { color, dash, width, fill, symbol, label }
+    showStyleWin: false, styleFocus: '',
+    inbox: [], inboxNote: '', confirmReset: false, refError: false,
     refKeys: [],          // populations plotted (order = color index)
     refModes: {},         // key -> 'conf95' | 'tolerance'
     activeKey: null,      // for "da população ativa"
@@ -741,13 +851,23 @@ class Component extends DCLogic {
     // add-reference form
     showAddRef: false,
     customRefs: [],       // user-added reference populations
-    newRef: { name:'', sex:'M', type:'Healthy', country:'', n:'', rhMean:'', rhSd:'', xcHMean:'', xcHSd:'', r:'' },
+    newRef: { name:'', sex:'M', type:'Healthy', country:'', equip:'', age:'', reference:'', n:'', rhMean:'', rhSd:'', xcHMean:'', xcHSd:'', r:'' },
   };
 
   REF_COLORS = ['#2f4fd6','#0f9d8f','#7b3ff2','#c0248f','#b45309'];
   CONF_COLORS = ['#e0662a','#0891b2','#d1417a','#2a9d5c','#8a5cf6','#b45309'];
   SWATCHES = ['#e0662a','#0891b2','#d1417a','#2a9d5c','#8a5cf6','#2f4fd6','#b45309','#1b1e26'];
   CHI = { t50:1.386, t75:2.773, t95:5.991, c95:5.991 };
+  CB_COLORS = ['#0072B2','#D55E00','#009E73','#CC79A7','#E69F00','#56B4E9','#000000'];
+  STYLE_SWATCHES = ['#2f4fd6','#e0662a','#0f9d8f','#c0248f','#7b3ff2','#b45309','#0891b2','#2a9d5c','#d1417a','#111111','#6b7280'];
+  DASHES = { solid:[], dashed:[7,4], dotted:[0.1,4.2], dashdot:[9,4,0.1,4], longdash:[14,5] };
+  DASH_ORDER = ['solid','dashed','dotted','dashdot','longdash'];
+  DASH_LABEL = { solid:'────', dashed:'– – –', dotted:'· · · ·', dashdot:'– · –', longdash:'── ──' };
+  SYMBOLS = ['circle','square','diamond','triangle','cross','plus'];
+  SYMBOL_ICON = { circle:'●', square:'■', diamond:'◆', triangle:'▲', cross:'✕', plus:'✚', none:'∅' };
+  AGE_ORDER = ['infant','child','adolescent','adult','older','unknown'];
+  SESSION_KEY = 'biva2-session-v1'; CUSTOM_KEY = 'biva2-custom-refs-v1'; INBOX_KEY = 'biva2-estimator-outbox-v1';
+  PERSIST = ['screen','method','fSex','fType','fEquip','fCountry','fAge','fStudy','sortBy','groupBy','search','showFilters','refKeys','refModes','refStyles','activeKey','ellipses','showPhase','legendVisible','legendPos','annotations','cmpA','cmpB','comparisonMode','pairedView','paired','tolMode','indiv','indivShown','measurements','bivaMode','axisMode','axisManual','axisNames','axisUnits'];
   THUMB_WIN = { xmin:200, xmax:520, ymin:18, ymax:66 };
 
   I18N = {
@@ -1012,7 +1132,106 @@ class Component extends DCLogic {
       tolTitle:'confidenza 95%', tolTitleTol:'tolleranza', kindConf:'confidenza',
     },
   };
-  _T(){ return this.I18N[this.state.lang] || this.I18N['pt-BR']; }
+
+  I18N_EXTRA = {
+    'pt-BR': {
+      searchPh:'Buscar: país, aparelho, idade, autor, ano…',
+      sexB:'M+F', tOther:'Outras', clearFilters:'Limpar filtros', onlySel:'Selecionadas', showMore:'Mostrar mais', remaining:'restantes',
+      filtersShow:'Filtros ▾', filtersHide:'Filtros ▴',
+      fEquipAll:'Aparelho: todos', fCountryAll:'País: todos', fAgeAll:'Idade: todas', fStudyAll:'Estudo: todos',
+      fEquipTitle:'Filtrar por aparelho', fCountryTitle:'Filtrar por país', fAgeTitle:'Filtrar por faixa etária', fStudyTitle:'Filtrar por estudo', sortTitle:'Ordenar a lista', groupTitle:'Agrupar a lista',
+      sortDefault:'Ordem: banco', sortCountry:'Ordem: país A–Z', sortN:'Ordem: maior N', sortYear:'Ordem: mais recente', sortEquip:'Ordem: aparelho',
+      groupNone:'Agrupar: não', groupEquip:'Agrupar: aparelho', groupCountry:'Agrupar: país', groupAge:'Agrupar: idade', groupStudy:'Agrupar: estudo',
+      ageInfant:'Recém-nascidos e lactentes', ageChild:'Crianças', ageAdolescent:'Adolescentes', ageAdult:'Adultos', ageOlder:'Idosos', ageUnknown:'Idade não informada',
+      notInformed:'não informado', ofWord:'de', chipFilter:'Filtrar por', chipUnfilter:'Remover filtro', removeRef:'Excluir esta referência',
+      chipCountry:'país', chipEquip:'aparelho', chipAge:'idade', chipType:'tipo',
+      refEquip:'Aparelho', refAge:'Idade (ex.: 18–30 y)', refCitation:'Artigo / DOI (opcional)',
+      addRefHint:'Insira os parâmetros de uma nova população. Ela fica salva neste navegador e aparece no topo da lista, com os mesmos filtros das publicadas.',
+      estimatorBtn:'Estimador', estimatorHint:'Abrir o estimador de correlação de Pearson em nova aba', estimatorLink:'Sem a correlação? Estime r pela figura do artigo ↗',
+      newAnalysis:'Nova análise', confirmNew:'Limpar tudo?', resume:'Continuar',
+      styleBtn:'Estilo', styleTitle:'Aparência das elipses', styleHint:'Editar cor, tipo de linha, símbolo e preenchimento', stylePresets:'APLICAR A TODAS',
+      presetDefault:'Cores', presetCb:'Daltônico', presetMono:'P&B', presetLines:'Variar linhas', presetSymbols:'Variar símbolos',
+      presetDefaultT:'Paleta padrão do BIVA2', presetCbT:'Paleta segura para daltonismo (Okabe-Ito)', presetMonoT:'Preto e branco para publicação: distingue por linha e símbolo', presetLinesT:'Um tipo de linha diferente para cada elipse', presetSymbolsT:'Um símbolo diferente para cada elipse',
+      styleEmpty:'Adicione populações ou elipses ao gráfico para editar a aparência.',
+      lineLbl:'Tipo de linha', symbolLbl:'Símbolo do centro', fillLbl:'PREENCH.', showLabel:'Rótulo', showEllipse:'Visível', resetStyle:'Restaurar', kindRef:'referência', styleOpen:'Cor, linha e símbolo…',
+      inboxTitle:'Recebido do Estimador', inboxAsRef:'+ Referência', inboxAsEll:'+ Elipse de confiança', inboxUseR:'Usar só o r', inboxDismiss:'Dispensar tudo',
+      inboxRUsed:'r copiado para os formulários de nova referência e de elipse manual.', inboxRefAdded:'adicionada às referências (★).', inboxEllAdded:'adicionada às elipses de confiança.', inboxNeed:'Faltam média, DP ou N > 2: complete no estimador ou use só o r.',
+      symCircle:'Círculo', symSquare:'Quadrado', symDiamond:'Losango', symTriangle:'Triângulo', symCross:'Xis', symPlus:'Cruz', symNone:'Sem símbolo',
+    },
+    'en': {
+      searchPh:'Search: country, device, age, author, year…',
+      sexB:'M+F', tOther:'Other', clearFilters:'Clear filters', onlySel:'Selected', showMore:'Show more', remaining:'remaining',
+      filtersShow:'Filters ▾', filtersHide:'Filters ▴',
+      fEquipAll:'Device: all', fCountryAll:'Country: all', fAgeAll:'Age: all', fStudyAll:'Study: all',
+      fEquipTitle:'Filter by device', fCountryTitle:'Filter by country', fAgeTitle:'Filter by age group', fStudyTitle:'Filter by study', sortTitle:'Sort the list', groupTitle:'Group the list',
+      sortDefault:'Order: database', sortCountry:'Order: country A–Z', sortN:'Order: largest N', sortYear:'Order: most recent', sortEquip:'Order: device',
+      groupNone:'Group: none', groupEquip:'Group: device', groupCountry:'Group: country', groupAge:'Group: age', groupStudy:'Group: study',
+      ageInfant:'Newborns and infants', ageChild:'Children', ageAdolescent:'Adolescents', ageAdult:'Adults', ageOlder:'Older adults', ageUnknown:'Age not reported',
+      notInformed:'not reported', ofWord:'of', chipFilter:'Filter by', chipUnfilter:'Remove filter', removeRef:'Delete this reference',
+      chipCountry:'country', chipEquip:'device', chipAge:'age', chipType:'type',
+      refEquip:'Device', refAge:'Age (e.g. 18–30 y)', refCitation:'Article / DOI (optional)',
+      addRefHint:'Enter the parameters of a new population. It is saved in this browser and listed first, with the same filters as the published ones.',
+      estimatorBtn:'Estimator', estimatorHint:'Open the Pearson correlation estimator in a new tab', estimatorLink:'No correlation reported? Estimate r from the article figure ↗',
+      newAnalysis:'New analysis', confirmNew:'Clear everything?', resume:'Continue',
+      styleBtn:'Style', styleTitle:'Ellipse appearance', styleHint:'Edit colour, line type, symbol and fill', stylePresets:'APPLY TO ALL',
+      presetDefault:'Colours', presetCb:'Colour-blind', presetMono:'B&W', presetLines:'Vary lines', presetSymbols:'Vary symbols',
+      presetDefaultT:'BIVA2 default palette', presetCbT:'Colour-blind-safe palette (Okabe-Ito)', presetMonoT:'Black and white for publication: told apart by line and symbol', presetLinesT:'A different line type for each ellipse', presetSymbolsT:'A different symbol for each ellipse',
+      styleEmpty:'Add populations or ellipses to the chart to edit their appearance.',
+      lineLbl:'Line type', symbolLbl:'Centre symbol', fillLbl:'FILL', showLabel:'Label', showEllipse:'Visible', resetStyle:'Reset', kindRef:'reference', styleOpen:'Colour, line and symbol…',
+      inboxTitle:'Received from the Estimator', inboxAsRef:'+ Reference', inboxAsEll:'+ Confidence ellipse', inboxUseR:'Use r only', inboxDismiss:'Dismiss all',
+      inboxRUsed:'r copied to the new-reference and manual-ellipse forms.', inboxRefAdded:'added to the references (★).', inboxEllAdded:'added to the confidence ellipses.', inboxNeed:'Mean, SD or N > 2 missing: complete it in the estimator or use r only.',
+      symCircle:'Circle', symSquare:'Square', symDiamond:'Diamond', symTriangle:'Triangle', symCross:'Cross', symPlus:'Plus', symNone:'No symbol',
+    },
+    'es': {
+      searchPh:'Buscar: país, equipo, edad, autor, año…',
+      sexB:'M+F', tOther:'Otras', clearFilters:'Limpiar filtros', onlySel:'Seleccionadas', showMore:'Mostrar más', remaining:'restantes',
+      filtersShow:'Filtros ▾', filtersHide:'Filtros ▴',
+      fEquipAll:'Equipo: todos', fCountryAll:'País: todos', fAgeAll:'Edad: todas', fStudyAll:'Estudio: todos',
+      fEquipTitle:'Filtrar por equipo', fCountryTitle:'Filtrar por país', fAgeTitle:'Filtrar por grupo de edad', fStudyTitle:'Filtrar por estudio', sortTitle:'Ordenar la lista', groupTitle:'Agrupar la lista',
+      sortDefault:'Orden: base', sortCountry:'Orden: país A–Z', sortN:'Orden: mayor N', sortYear:'Orden: más reciente', sortEquip:'Orden: equipo',
+      groupNone:'Agrupar: no', groupEquip:'Agrupar: equipo', groupCountry:'Agrupar: país', groupAge:'Agrupar: edad', groupStudy:'Agrupar: estudio',
+      ageInfant:'Recién nacidos y lactantes', ageChild:'Niños', ageAdolescent:'Adolescentes', ageAdult:'Adultos', ageOlder:'Adultos mayores', ageUnknown:'Edad no informada',
+      notInformed:'no informado', ofWord:'de', chipFilter:'Filtrar por', chipUnfilter:'Quitar filtro', removeRef:'Eliminar esta referencia',
+      chipCountry:'país', chipEquip:'equipo', chipAge:'edad', chipType:'tipo',
+      refEquip:'Equipo', refAge:'Edad (ej.: 18–30 y)', refCitation:'Artículo / DOI (opcional)',
+      addRefHint:'Introduce los parámetros de una nueva población. Se guarda en este navegador y aparece primero, con los mismos filtros que las publicadas.',
+      estimatorBtn:'Estimador', estimatorHint:'Abrir el estimador de correlación de Pearson en una pestaña nueva', estimatorLink:'¿Sin correlación? Estima r a partir de la figura del artículo ↗',
+      newAnalysis:'Nuevo análisis', confirmNew:'¿Borrar todo?', resume:'Continuar',
+      styleBtn:'Estilo', styleTitle:'Apariencia de las elipses', styleHint:'Editar color, tipo de línea, símbolo y relleno', stylePresets:'APLICAR A TODAS',
+      presetDefault:'Colores', presetCb:'Daltónico', presetMono:'B/N', presetLines:'Variar líneas', presetSymbols:'Variar símbolos',
+      presetDefaultT:'Paleta predeterminada de BIVA2', presetCbT:'Paleta segura para daltonismo (Okabe-Ito)', presetMonoT:'Blanco y negro para publicación: se distinguen por línea y símbolo', presetLinesT:'Un tipo de línea distinto para cada elipse', presetSymbolsT:'Un símbolo distinto para cada elipse',
+      styleEmpty:'Añade poblaciones o elipses al gráfico para editar su apariencia.',
+      lineLbl:'Tipo de línea', symbolLbl:'Símbolo del centro', fillLbl:'RELLENO', showLabel:'Etiqueta', showEllipse:'Visible', resetStyle:'Restaurar', kindRef:'referencia', styleOpen:'Color, línea y símbolo…',
+      inboxTitle:'Recibido del Estimador', inboxAsRef:'+ Referencia', inboxAsEll:'+ Elipse de confianza', inboxUseR:'Usar solo r', inboxDismiss:'Descartar todo',
+      inboxRUsed:'r copiado a los formularios de nueva referencia y de elipse manual.', inboxRefAdded:'añadida a las referencias (★).', inboxEllAdded:'añadida a las elipses de confianza.', inboxNeed:'Faltan media, DE o N > 2: complétalo en el estimador o usa solo r.',
+      symCircle:'Círculo', symSquare:'Cuadrado', symDiamond:'Rombo', symTriangle:'Triángulo', symCross:'Aspa', symPlus:'Cruz', symNone:'Sin símbolo',
+    },
+    'it': {
+      searchPh:'Cerca: paese, strumento, età, autore, anno…',
+      sexB:'M+F', tOther:'Altre', clearFilters:'Azzera filtri', onlySel:'Selezionate', showMore:'Mostra altre', remaining:'rimanenti',
+      filtersShow:'Filtri ▾', filtersHide:'Filtri ▴',
+      fEquipAll:'Strumento: tutti', fCountryAll:'Paese: tutti', fAgeAll:'Età: tutte', fStudyAll:'Studio: tutti',
+      fEquipTitle:'Filtra per strumento', fCountryTitle:'Filtra per paese', fAgeTitle:'Filtra per fascia di età', fStudyTitle:'Filtra per studio', sortTitle:'Ordina l’elenco', groupTitle:'Raggruppa l’elenco',
+      sortDefault:'Ordine: database', sortCountry:'Ordine: paese A–Z', sortN:'Ordine: N maggiore', sortYear:'Ordine: più recente', sortEquip:'Ordine: strumento',
+      groupNone:'Raggruppa: no', groupEquip:'Raggruppa: strumento', groupCountry:'Raggruppa: paese', groupAge:'Raggruppa: età', groupStudy:'Raggruppa: studio',
+      ageInfant:'Neonati e lattanti', ageChild:'Bambini', ageAdolescent:'Adolescenti', ageAdult:'Adulti', ageOlder:'Anziani', ageUnknown:'Età non riportata',
+      notInformed:'non riportato', ofWord:'di', chipFilter:'Filtra per', chipUnfilter:'Rimuovi filtro', removeRef:'Elimina questo riferimento',
+      chipCountry:'paese', chipEquip:'strumento', chipAge:'età', chipType:'tipo',
+      refEquip:'Strumento', refAge:'Età (es.: 18–30 y)', refCitation:'Articolo / DOI (opzionale)',
+      addRefHint:'Inserisci i parametri di una nuova popolazione. Viene salvata in questo browser e compare per prima, con gli stessi filtri di quelle pubblicate.',
+      estimatorBtn:'Stimatore', estimatorHint:'Apri lo stimatore della correlazione di Pearson in una nuova scheda', estimatorLink:'Manca la correlazione? Stima r dalla figura dell’articolo ↗',
+      newAnalysis:'Nuova analisi', confirmNew:'Cancellare tutto?', resume:'Continua',
+      styleBtn:'Stile', styleTitle:'Aspetto delle ellissi', styleHint:'Modifica colore, tipo di linea, simbolo e riempimento', stylePresets:'APPLICA A TUTTE',
+      presetDefault:'Colori', presetCb:'Daltonici', presetMono:'B/N', presetLines:'Varia linee', presetSymbols:'Varia simboli',
+      presetDefaultT:'Tavolozza predefinita di BIVA2', presetCbT:'Tavolozza sicura per il daltonismo (Okabe-Ito)', presetMonoT:'Bianco e nero per la pubblicazione: distinte per linea e simbolo', presetLinesT:'Un tipo di linea diverso per ogni ellisse', presetSymbolsT:'Un simbolo diverso per ogni ellisse',
+      styleEmpty:'Aggiungi popolazioni o ellissi al grafico per modificarne l’aspetto.',
+      lineLbl:'Tipo di linea', symbolLbl:'Simbolo del centro', fillLbl:'RIEMP.', showLabel:'Etichetta', showEllipse:'Visibile', resetStyle:'Ripristina', kindRef:'riferimento', styleOpen:'Colore, linea e simbolo…',
+      inboxTitle:'Ricevuto dallo Stimatore', inboxAsRef:'+ Riferimento', inboxAsEll:'+ Ellisse di confidenza', inboxUseR:'Usa solo r', inboxDismiss:'Ignora tutto',
+      inboxRUsed:'r copiato nei moduli di nuovo riferimento e di ellisse manuale.', inboxRefAdded:'aggiunta ai riferimenti (★).', inboxEllAdded:'aggiunta alle ellissi di confidenza.', inboxNeed:'Mancano media, DS o N > 2: completa nello stimatore o usa solo r.',
+      symCircle:'Cerchio', symSquare:'Quadrato', symDiamond:'Rombo', symTriangle:'Triangolo', symCross:'Croce a X', symPlus:'Croce', symNone:'Nessun simbolo',
+    },
+  };
+  _T(){ const l=this.I18N[this.state.lang]?this.state.lang:'pt-BR'; const c=this._tCache||(this._tCache={}); return c[l]||(c[l]={...this.I18N['pt-BR'],...this.I18N_EXTRA['pt-BR'],...this.I18N[l],...this.I18N_EXTRA[l]}); }
 
   componentDidMount() {
     this._load();
@@ -1026,9 +1245,89 @@ class Component extends DCLogic {
     } catch (e) {}
     this._onResize = () => this._draw();
     window.addEventListener('resize', this._onResize);
+    // cross-page bridge: the estimator writes to localStorage, this page listens
+    this._onStorage = (ev) => { if(!ev || !ev.key || ev.key===this.INBOX_KEY) this._readInbox(); };
+    this._onFocus = () => this._readInbox();
+    this._onHide = () => this._persistNow();
+    window.addEventListener('storage', this._onStorage);
+    window.addEventListener('focus', this._onFocus);
+    document.addEventListener('visibilitychange', this._onFocus);
+    window.addEventListener('pagehide', this._onHide);
   }
-  componentWillUnmount() { window.removeEventListener('resize', this._onResize); if(this._phaseFrame)cancelAnimationFrame(this._phaseFrame); }
-  componentDidUpdate() { this._draw(); }
+  componentWillUnmount() { window.removeEventListener('resize', this._onResize); window.removeEventListener('storage', this._onStorage); window.removeEventListener('focus', this._onFocus); document.removeEventListener('visibilitychange', this._onFocus); window.removeEventListener('pagehide', this._onHide); if(this._phaseFrame)cancelAnimationFrame(this._phaseFrame); }
+  componentDidUpdate() { this._draw(); if(this.state.ready) this._persist(); }
+
+  // ---------- session persistence (survives reloads and trips to the estimator) ----------
+  _persist(){ clearTimeout(this._persistTimer); this._persistTimer=setTimeout(()=>this._persistNow(),300); }
+  _persistNow(){
+    if(!this.state.ready) return;
+    try{
+      const keep={}; this.PERSIST.forEach((k)=>{ keep[k]=this.state[k]; });
+      localStorage.setItem(this.SESSION_KEY, JSON.stringify(keep));
+      localStorage.setItem(this.CUSTOM_KEY, JSON.stringify(this.state.customRefs.map((p)=>{ const c={...p}; delete c._hay; return c; })));
+    }catch(e){}
+  }
+  _restore(pops){
+    const out={customRefs:[]};
+    try{
+      const raw=JSON.parse(localStorage.getItem(this.CUSTOM_KEY)||'[]');
+      if(Array.isArray(raw)) out.customRefs=raw.filter((p)=>p&&typeof p.key==='string'&&this._keep(p)).map((p)=>this._decorate({...p,custom:true}));
+    }catch(e){}
+    try{
+      const saved=JSON.parse(localStorage.getItem(this.SESSION_KEY)||'null');
+      if(saved&&typeof saved==='object'){
+        const def=this.state, known=new Set([...pops,...out.customRefs].map((p)=>p.key));
+        this.PERSIST.forEach((k)=>{
+          const v=saved[k], d=def[k]; if(v===undefined||v===null&&d!==null) return;
+          if(Array.isArray(d)!==Array.isArray(v)) return;
+          if(d!==null&&typeof d!==typeof v) return;
+          out[k]=(d&&typeof d==='object'&&!Array.isArray(d))?{...d,...v}:v;
+        });
+        if(out.refKeys) out.refKeys=out.refKeys.filter((k)=>known.has(k));
+        if(out.activeKey!==undefined&&!known.has(out.activeKey)) out.activeKey=(out.refKeys&&out.refKeys[out.refKeys.length-1])||null;
+        const okNum=(e)=>e&&[e.rhMean,e.rhSd,e.xcHMean,e.xcHSd,e.r,e.n].every((x)=>Number.isFinite(x));
+        if(out.ellipses) out.ellipses=out.ellipses.filter((e)=>okNum(e)&&e.id);
+        if(out.measurements) out.measurements=out.measurements.filter((m)=>m&&m.id&&Number.isFinite(m.rh)&&Number.isFinite(m.xc));
+        if(out.annotations) out.annotations=out.annotations.filter((a)=>a&&a.id);
+        if(!['home','app'].includes(out.screen)) delete out.screen;
+        if(!['tolerance','confidence','combined'].includes(out.method)) delete out.method;
+        if(!['classic','specific','h2'].includes(out.bivaMode)) delete out.bivaMode;
+      }
+    }catch(e){}
+    return out;
+  }
+  _hasWork(){ const s=this.state; return !!(s.refKeys.length||s.ellipses.length||s.measurements.length||s.annotations.length); }
+
+  // ---------- estimator inbox ----------
+  _readInbox(){
+    try{
+      const raw=JSON.parse(localStorage.getItem(this.INBOX_KEY)||'[]');
+      const list=Array.isArray(raw)?raw.filter((x)=>x&&x.id&&Number.isFinite(+x.r)&&Math.abs(+x.r)<=1):[];
+      if(JSON.stringify(list)!==JSON.stringify(this.state.inbox)) this.setState({inbox:list});
+    }catch(e){}
+  }
+  _writeInbox(list,note){ try{ localStorage.setItem(this.INBOX_KEY, JSON.stringify(list)); }catch(e){} this.setState({inbox:list,inboxNote:note||''}); }
+  _inboxComplete(x){ return [x.xMean,x.yMean,x.xSd,x.ySd,x.r,x.n].every((v)=>Number.isFinite(+v)) && +x.xSd>0 && +x.ySd>0 && +x.n>2 && Math.abs(+x.r)<1; }
+  _inboxAsRef(x){
+    const t=this._T(); if(!this._inboxComplete(x)){ this.setState({inboxNote:t.inboxNeed}); return; }
+    const rec={ n:+x.n, r_h_mean:+x.xMean, r_h_sd:+x.xSd, xc_h_mean:+x.yMean, xc_h_sd:+x.ySd, correlation:+x.r, legend:String(x.name||'Estimador').trim(), sex:x.sex||'—', source:'custom', country:x.country||'', equipment:x.equipment||'', age:x.age||'', reference:x.reference||'', population:'Other', note:x.note||'' };
+    const norm=this._normalize(rec, this.state.pops.length+this.state.customRefs.length);
+    norm.key='custom:'+Date.now()+':'+Math.round(Math.random()*1e4); norm.custom=true; norm.metric=this.state.bivaMode;
+    if(!this._keep(norm)){ this.setState({inboxNote:t.inboxNeed}); return; }
+    this.setState({customRefs:[norm,...this.state.customRefs]});
+    this._writeInbox(this.state.inbox.filter((i)=>i.id!==x.id), '“'+rec.legend+'” '+t.inboxRefAdded);
+  }
+  _inboxAsEllipse(x){
+    const t=this._T(); if(!this._inboxComplete(x)){ this.setState({inboxNote:t.inboxNeed}); return; }
+    const s=this.state, name=String(x.name||'Estimador').trim();
+    const e={id:'est-'+Date.now(),name,color:this._nextColor(),stroke:'solid',width:2,visible:true,metric:s.bivaMode,rhMean:+x.xMean,rhSd:+x.xSd,xcHMean:+x.yMean,xcHSd:+x.ySd,r:Math.max(-0.999,Math.min(0.999,+x.r)),n:+x.n};
+    this.setState({ellipses:[...s.ellipses,e],method:s.method==='tolerance'?'combined':s.method,bounds:null});
+    this._writeInbox(s.inbox.filter((i)=>i.id!==x.id), '“'+name+'” '+t.inboxEllAdded);
+  }
+  _inboxUseR(x){
+    const r=(+x.r).toFixed(3);
+    this.setState({newRef:{...this.state.newRef,r},newVals:{...this.state.newVals,r},inboxNote:'r = '+r+' — '+this._T().inboxRUsed});
+  }
 
   _load(tries) {
     tries = tries || 0;
@@ -1039,16 +1338,50 @@ class Component extends DCLogic {
     }
     const pops = raw.map((p, i) => this._normalize(p, i)).filter((p) => this._keep(p));
     const pairedRefs = (window.BIVA2_PAIRED_REFERENCES||[]).map((p,i)=>this._normalizePaired(p,i)).filter((p)=>this._keepPaired(p));
-    this.setState({ pops, pairedRefs, ready: true });
+    this.setState({ pops, pairedRefs, ...this._restore(pops), ready: true }, () => this._readInbox());
   }
 
   // ---------- normalization ----------
   _inferCountry(l){const c=['Italy','USA','Brazil','Mexico','Spain','France','Germany','Portugal','South Korea','Poland','Slovakia','Cuba','India','Taiwan','Lebanon','Netherlands','Japan','Turkey'];return c.find((x)=>new RegExp('\\b'+x+'\\b','i').test(l))||'—';}
   _ptCountry(c){const m={Italy:'Itália',USA:'EUA',Brazil:'Brasil',Mexico:'México',Spain:'Espanha',France:'França',Germany:'Alemanha',Portugal:'Portugal','South Korea':'Coreia do Sul',Poland:'Polônia',Slovakia:'Eslováquia',Cuba:'Cuba',India:'Índia',Taiwan:'Taiwan',Lebanon:'Líbano',Netherlands:'Países Baixos',Japan:'Japão',Turkey:'Turquia'};return m[c]||c;}
-  _inferAge(l){const r=l.match(/(\d+)\s*age\s*(\d+)\s*(yr|years?|days?)/i);if(r)return r[1]+'–'+r[2]+' anos';const s=l.match(/age\s*(\d+)/i);if(s)return s[1]+' anos';if(/adult/i.test(l))return 'Adultos';return '—';}
+  _inferAge(l){
+    let m;
+    if((m=l.match(/(\d+)\s*age\s*(\d+)/i)))return m[1]+'–'+m[2]+' y';
+    if((m=l.match(/(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)\s*(?:y|yr|yrs|years?|anos)\b/i)))return m[1]+'–'+m[2]+' y';
+    if((m=l.match(/(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)\s*(?:mo|months?|meses)\b/i)))return m[1]+'–'+m[2]+' mo';
+    if((m=l.match(/\bage\s*(\d+)/i))||(m=l.match(/\b(\d+)\s*(?:y|yr|yrs|years?|anos)\b/i)))return m[1]+' y';
+    if(/newborn|neonat/i.test(l))return 'Newborns';if(/infant/i.test(l))return 'Infants';if(/child/i.test(l))return 'Children';if(/adolesc/i.test(l))return 'Adolescents';if(/elder|older/i.test(l))return 'Older adults';if(/adult/i.test(l))return 'Adults';return '—';
+  }
+  _norm(v){return String(v==null?'':v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
+  _equipBrand(e){
+    const v=String(e||'');
+    const list=[[/akern/i,'Akern'],[/rjl/i,'RJL Systems'],[/valhalla/i,'Valhalla'],[/data\s*input/i,'Data Input'],[/maltron/i,'Maltron'],[/xitron/i,'Xitron'],[/inbody/i,'InBody'],[/seca/i,'seca'],[/impedimed/i,'ImpediMed'],[/bodystat/i,'Bodystat'],[/biody|aminogram/i,'Biody Xpert'],[/z-?metrix|bioparhom/i,'Z-Metrix'],[/tanita/i,'Tanita'],[/bodygram/i,'Akern']];
+    const hit=list.find((x)=>x[0].test(v)); if(hit)return hit[1];
+    const t=v.trim(); return(!t||t==='—')?'—':t.split(/[\s(,]/)[0];
+  }
+  _ageGroup(age,legend){
+    const a=String(age||''),txt=a+' '+String(legend||'');
+    if(/newborn|neonat|infant|preterm|lactente|\bmo\b|months?\b|\bdays?\b/i.test(a)||/newborn|neonat|infant|preterm/i.test(txt))return 'infant';
+    const nums=(a.match(/\d+(?:[.,]\d+)?/g)||[]).map((x)=>parseFloat(x.replace(',','.')));
+    if(nums.length){let v;if(/^\s*[<≤]/.test(a))v=nums[0]-1;else if(/^\s*[>≥]/.test(a))v=nums[0]+1;else v=nums.length>1?(nums[0]+nums[1])/2:nums[0];return v<2?'infant':v<10?'child':v<18?'adolescent':v<60?'adult':'older';}
+    if(/child|crian|niñ|bambin|school|girls|boys/i.test(txt))return 'child';
+    if(/adolesc|teen|youth/i.test(txt))return 'adolescent';
+    if(/elder|older|idos|senior/i.test(txt))return 'older';
+    if(/adult/i.test(txt))return 'adult';
+    return 'unknown';
+  }
+  // derived, display-only fields used by the reference browser (the audited database values are never changed)
+  _decorate(p){
+    p.brand=this._equipBrand(p.equip);
+    p.ageGroup=this._ageGroup(p.age,p.legend);
+    p.title=String(p.legend||'').replace(/^\s*(?:males?\s*\+\s*females?|females?|males?)\s*,\s*/i,'')||p.legend;
+    p.studyKey=p.referenceAuthor?(p.referenceAuthor+(p.referenceYear?' ('+p.referenceYear+')':'')):'';
+    p._hay=this._norm([p.legend,p.country,p.countryRaw,p.equip,p.brand,p.age,p.type,p.reference,p.referenceLabel,p.note,p.code,p.sex==='M'?'male masculino hombre maschio homem':'',p.sex==='F'?'female feminino mujer femmina mulher':'',p.sex==='B'?'both ambos m+f':'',{infant:'newborn infant lactente recem-nascido neonato',child:'children crianca nino bambino',adolescent:'adolescent adolescente',adult:'adult adulto',older:'older elderly idoso anziano mayor'}[p.ageGroup]||'',{Sport:'sport athlete atleta esporte deporte',Clinical:'clinical clinica patient paciente',Healthy:'healthy saudavel sano sana'}[p.type]||''].join(' | '));
+    return p;
+  }
   _inferEquip(l){const m=l.match(/\(([^)]*(?:Akern|RJL|BIA|Bodystat|InBody|Tanita|SEAC)[^)]*)\)/i);if(m)return m[1].replace(/\s+/g,' ').trim();if(/akern/i.test(l))return 'Akern-RJL';if(/rjl/i.test(l))return 'RJL Systems';return '—';}
   _inferType(l){if(/athlet|sport|endurance|velocity|power|team-sports/i.test(l))return 'Sport';if(/clinical|patient|disease|renal|cardiac|obese|cancer|sarcopen/i.test(l))return 'Clinical';if(/healthy|reference|adult|children|adolescent/i.test(l))return 'Healthy';return 'Other';}
-  _inferSex(p,l){const s=String(p.sex||'').toLowerCase();if(s==='m'||s==='f')return s.toUpperCase();if(/females?/i.test(l))return 'F';if(/males?/i.test(l))return 'M';return '—';}
+  _inferSex(p,l){const s=String(p.sex||'').toLowerCase();if(s==='m'||s==='f'||s==='b')return s.toUpperCase();if(/males?\s*\+\s*females?|both sexes|mixed/i.test(l))return 'B';if(/\bfemales?\b|\bwomen\b|\bgirls\b/i.test(l))return 'F';if(/\bmales?\b|\bmen\b|\bboys\b/i.test(l))return 'M';return '—';}
   _referenceInfo(reference,legend,knownDoi){
     const r=String(reference||''),l=String(legend||'');
     if(/NHANES III/i.test(l))return{author:'Piccoli et al.',year:'2002',doi:'10.1016/S0899-9007(01)00665-7',label:'Piccoli et al. (2002) · DOI: 10.1016/S0899-9007(01)00665-7'};
@@ -1074,20 +1407,21 @@ class Component extends DCLogic {
     const legend=String(p.legend||('População '+(i+1))).replace(/\s+/g,' ').trim();
     const source=['confidence','tolerance','both','custom'].includes(p.source)?p.source:'tolerance';
     const metric=['classic','specific','h2'].includes(p.metric)?p.metric:'classic';
-    const country=p.country||this._inferCountry(legend);
+    const given=(v)=>(v&&String(v).trim()&&String(v).trim()!=='—')?String(v).trim():'';
+    const country=given(p.country)||this._inferCountry(legend);
     const ref=this._referenceInfo(p.reference,legend,p.doi);
-    return {
+    return this._decorate({
       key:source+':'+(p.code||i+1)+':'+i,
       code:p.code||i+1, legend, source, metric,
       sex:this._inferSex(p,legend),
       countryRaw:country, country:this._ptCountry(country),
-      age:p.age||this._inferAge(legend), equip:p.equipment||this._inferEquip(legend), type:p.population||this._inferType(legend), reference:p.reference||'',referenceAuthor:ref.author,referenceYear:ref.year,referenceDoi:ref.doi,referenceLabel:ref.label,
+      age:given(p.age)||this._inferAge(legend), equip:given(p.equipment)||this._inferEquip(legend), type:given(p.population)||this._inferType(legend), reference:p.reference||'',referenceAuthor:ref.author,referenceYear:ref.year,referenceDoi:ref.doi,referenceLabel:ref.label,
       note:p.note||'',foundIn:p.found_in||'',ellipseUse:p.ellipse_use||'',provenance:Array.isArray(p.provenance)?p.provenance:[],
       n:Number(p.n)||1,
       rhMean:Number(p.r_h_mean), rhSd:Number(p.r_h_sd),
       xcHMean:Number(p.xc_h_mean), xcHSd:Number(p.xc_h_sd),
       r:Math.max(-0.999,Math.min(0.999,Number(p.correlation)||0)),
-    };
+    });
   }
   _normalizePaired(p,i){
     const legend=String(p.legend||('Pareada '+(i+1))).replace(/\s+/g,' ').trim();
@@ -1140,7 +1474,39 @@ class Component extends DCLogic {
   _metricAxes(mode){if(mode==='specific')return{x:'Rsp',y:'Xcsp',ux:'Ω·cm',uy:'Ω·cm'};if(mode==='h2')return{x:'H²/R',y:'H²/Xc',ux:'cm²/Ω',uy:'cm²/Ω'};return{x:'R/H',y:'Xc/H',ux:'Ω/m',uy:'Ω/m'};}
   _phaseAngle(x,y){return(this.state.bivaMode==='h2'?Math.atan2(x,y):Math.atan2(y,x))*180/Math.PI;}
   _phaseAllowed(){return !this._isZMode()&&!(this.state.method==='confidence'&&this.state.comparisonMode==='paired'&&this.state.pairedView==='delta');}
-  _refColor(key){ const i=this.state.refKeys.indexOf(key); return i<0?null:this.REF_COLORS[i%this.REF_COLORS.length]; }
+  _refColor(key){ const i=this.state.refKeys.indexOf(key); return i<0?null:this._refStyle(key).color; }
+  _refStyle(key){
+    const i=Math.max(0,this.state.refKeys.indexOf(key));
+    return {color:this.REF_COLORS[i%this.REF_COLORS.length],dash:'solid',width:2,fill:0.10,symbol:'circle',label:true,...(this.state.refStyles[key]||{})};
+  }
+  _ellStyle(e){ return {color:e.color||'#0f9d8f',dash:this.DASHES[e.stroke]?e.stroke:'solid',width:+e.width||2,fill:e.fill==null?0.10:+e.fill,symbol:e.symbol||'circle',label:e.label!==false}; }
+  _itemStyle(it){ return it.kind==='ref'?this._refStyle(it.pop.key):this._ellStyle(it.e); }
+  _dashArr(st){ const k=Math.max(1,st.width/2); return (this.DASHES[st.dash]||[]).map((v)=>v*k); }
+  _usedColors(){ const s=this.state; return [...s.refKeys.map((k)=>this._refStyle(k).color),...s.ellipses.map((e)=>e.color)].map((c)=>String(c).toLowerCase()); }
+  _nextColor(palette){ const pal=palette||[...this.CONF_COLORS,...this.REF_COLORS], used=this._usedColors(); return pal.find((c)=>!used.includes(c.toLowerCase()))||pal[used.length%pal.length]; }
+  _setRefStyle(key,patch){ this.setState({refStyles:{...this.state.refStyles,[key]:{...(this.state.refStyles[key]||{}),...patch}}}); }
+  _setEllStyle(id,patch){ const p={...patch}; if(p.dash!==undefined){ p.stroke=p.dash; delete p.dash; } this._updEllipse(id,p); }
+  _styleTargets(){
+    const s=this.state, out=[];
+    s.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p&&(p.metric||'classic')===s.bivaMode) out.push({type:'ref',key:k,id:'ref:'+k}); });
+    s.ellipses.forEach((e)=>{ if((e.metric||'classic')===s.bivaMode) out.push({type:'ell',key:e.id,id:'ell:'+e.id}); });
+    return out;
+  }
+  _applyPreset(name){
+    const targets=this._styleTargets(), refStyles={...this.state.refStyles}; let ellipses=this.state.ellipses.slice(), ri=0, ei=0;
+    targets.forEach((tg,i)=>{
+      let patch={};
+      if(name==='default') patch={color:tg.type==='ref'?this.REF_COLORS[ri%this.REF_COLORS.length]:this.CONF_COLORS[ei%this.CONF_COLORS.length],dash:'solid',symbol:'circle',fill:0.10,width:2};
+      if(name==='cb') patch={color:this.CB_COLORS[i%this.CB_COLORS.length]};
+      if(name==='mono') patch={color:'#111111',dash:this.DASH_ORDER[i%this.DASH_ORDER.length],symbol:this.SYMBOLS[i%this.SYMBOLS.length],fill:0};
+      if(name==='lines') patch={dash:this.DASH_ORDER[i%this.DASH_ORDER.length]};
+      if(name==='symbols') patch={symbol:this.SYMBOLS[i%this.SYMBOLS.length]};
+      if(tg.type==='ref'){ refStyles[tg.key]={...(refStyles[tg.key]||{}),...patch}; ri++; }
+      else { const p={...patch}; if(p.dash!==undefined){ p.stroke=p.dash; delete p.dash; } ellipses=ellipses.map((e)=>e.id===tg.key?{...e,...p}:e); ei++; }
+    });
+    this.setState({refStyles,ellipses});
+  }
+  _openStyle(focus){ this.setState({showStyleWin:true,styleFocus:focus||''},()=>{ const el=document.querySelector('.analysis-panel'); if(el){ el.scrollTop=0; if(el.getBoundingClientRect().top>window.innerHeight*0.6&&el.scrollIntoView) el.scrollIntoView({behavior:'smooth',block:'start'}); } }); }
   _byKey(key){ return this.state.pops.find((p)=>p.key===key) || this.state.customRefs.find((p)=>p.key===key); }
   _hexA(hex,a){ const h=hex.replace('#','');const r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);return 'rgba('+r+','+g+','+b+','+a+')'; }
   _isZMode(){ return this.state.bivaMode==='classic' && this.state.tolMode==='zscore' && (this.state.method==='tolerance'||this.state.method==='combined') && !!this._byKey(this.state.activeKey); }
@@ -1154,27 +1520,73 @@ class Component extends DCLogic {
     return base?{...pt,x:(pt.x-base.rhMean)/base.rhSd,y:(pt.y-base.xcHMean)/base.xcHSd}:{...pt};
   }
 
-  _filtered(){
-    const { pops, customRefs, fSex, fType, search } = this.state;
-    const q = search.trim().toLowerCase();
-    return [...customRefs, ...pops].filter((p)=>{
-      if((p.metric||'classic')!==this.state.bivaMode) return false;
-      if(!p.custom && this.state.method==='confidence' && !['confidence','both'].includes(p.source)) return false;
-      if(!p.custom && this.state.method==='tolerance' && !['tolerance','both'].includes(p.source)) return false;
-      if(fSex && p.sex!==fSex) return false;
-      if(fType && p.type!==fType) return false;
-      if(q && !(p.legend.toLowerCase().includes(q) || p.country.toLowerCase().includes(q) || p.equip.toLowerCase().includes(q) || String(p.referenceLabel||'').toLowerCase().includes(q))) return false;
+  _searchTokens(){ const q=this._norm(this.state.search).trim(); return q?q.split(/\s+/).filter(Boolean):[]; }
+  _baseRefs(){
+    const s=this.state;
+    return [...s.customRefs, ...s.pops].filter((p)=>{
+      if((p.metric||'classic')!==s.bivaMode) return false;
+      if(!p.custom && s.method==='confidence' && !['confidence','both'].includes(p.source)) return false;
+      if(!p.custom && s.method==='tolerance' && !['tolerance','both'].includes(p.source)) return false;
       return true;
     });
   }
+  _passes(p,skip,toks){
+    const s=this.state;
+    if(skip!=='sex' && s.fSex && p.sex!==s.fSex) return false;
+    if(skip!=='type' && s.fType && p.type!==s.fType) return false;
+    if(skip!=='equip' && s.fEquip && p.brand!==s.fEquip) return false;
+    if(skip!=='country' && s.fCountry && p.countryRaw!==s.fCountry) return false;
+    if(skip!=='age' && s.fAge && p.ageGroup!==s.fAge) return false;
+    if(skip!=='study' && s.fStudy && p.studyKey!==s.fStudy) return false;
+    if(s.onlySelected && !s.refKeys.includes(p.key)) return false;
+    return toks.every((tk)=>(p._hay||'').includes(tk));
+  }
+  _groupKey(p){
+    const g=this.state.groupBy;
+    if(g==='equip') return p.brand; if(g==='country') return p.countryRaw; if(g==='age') return p.ageGroup; if(g==='study') return p.studyKey||'—';
+    return '';
+  }
+  _filtered(base){
+    const s=this.state, toks=this._searchTokens();
+    const list=(base||this._baseRefs()).filter((p)=>this._passes(p,'',toks)).map((p,i)=>({p,i}));
+    const dash=(v)=>(!v||v==='—')?'\uffff':String(v).toLowerCase();
+    const cmp={
+      country:(a,b)=>dash(a.p.country).localeCompare(dash(b.p.country)),
+      n:(a,b)=>b.p.n-a.p.n,
+      year:(a,b)=>(+b.p.referenceYear||0)-(+a.p.referenceYear||0),
+      equip:(a,b)=>dash(a.p.equip).localeCompare(dash(b.p.equip)),
+    }[s.sortBy];
+    const gcmp=s.groupBy==='none'?null:(s.groupBy==='age'
+      ?(a,b)=>this.AGE_ORDER.indexOf(a.p.ageGroup)-this.AGE_ORDER.indexOf(b.p.ageGroup)
+      :(a,b)=>dash(this._groupKey(a.p)).localeCompare(dash(this._groupKey(b.p))));
+    list.sort((a,b)=>(gcmp?gcmp(a,b):0)||(cmp?cmp(a,b):0)||(a.i-b.i));
+    return list.map((x)=>x.p);
+  }
+  _facetCounts(base,skip,keyFn){
+    const toks=this._searchTokens(), m=new Map();
+    base.forEach((p)=>{ if(this._passes(p,skip,toks)){ const k=keyFn(p); m.set(k,(m.get(k)||0)+1); } });
+    return m;
+  }
+  _clearFilters(){ this.setState({fSex:'',fType:'',fEquip:'',fCountry:'',fAge:'',fStudy:'',search:'',onlySelected:false,listLimit:60}); }
+  _hl(text,toks){
+    const str=String(text==null?'':text); if(!toks.length||!str) return str;
+    const same=str.split('').map((ch)=>{ const b=this._norm(ch); return b.length===1?b:(b[0]||' '); }).join('');
+    const marks=new Array(str.length).fill(false); let any=false;
+    toks.forEach((tk)=>{ if(tk.length<2) return; let from=0,at; while((at=same.indexOf(tk,from))>=0){ for(let k=at;k<at+tk.length;k++) marks[k]=true; any=true; from=at+tk.length; } });
+    if(!any) return str;
+    const out=[]; let start=0;
+    for(let k=1;k<=str.length;k++){ if(k===str.length||marks[k]!==marks[start]){ const seg=str.slice(start,k); out.push(marks[start]?React.createElement('mark',{className:'hl',key:start},seg):seg); start=k; } }
+    return out;
+  }
 
   _thumbPath(p){
+    const cache=this._thumbCache||(this._thumbCache=new Map()); if(cache.has(p.key)) return cache.get(p.key);
     const pts=this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd,p.xcHSd,p.r,this.CHI.t95),xs=pts.map((pt)=>pt.x),ys=pts.map((pt)=>pt.y),xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys),dx=xmax-xmin||1,dy=ymax-ymin||1;
     const mapx=(x)=>6+(x-xmin)/dx*50;
     const mapy=(y)=>40-(y-ymin)/dy*36;
     let d='';
-    pts.forEach((pt,i)=>{ d+=(i?'L':'M')+mapx(pt.x).toFixed(1)+' '+mapy(pt.y).toFixed(1)+' '; });
-    return d+'Z';
+    pts.forEach((pt,i)=>{ if(i%3===0) d+=(i?'L':'M')+mapx(pt.x).toFixed(1)+' '+mapy(pt.y).toFixed(1)+' '; });
+    cache.set(p.key,d+'Z'); return d+'Z';
   }
 
   // effective ellipse mode for a reference, honoring the technique tab
@@ -1231,7 +1643,7 @@ class Component extends DCLogic {
   }
 
   _cp(){
-    return this.state.theme==='dark' ? {
+    return (this.state.theme==='dark' && !this._forceLight) ? {
       grid:'#2a2e3a', tick:'#7d8394', frame:'#3a3f4d', zero:'#5a6070', axisTitle:'#c8ccd6',
       cross:'#f4f2ec', symbolFill:'#1e222e', legendBg:'rgba(30,34,46,.92)', legendBorder:'#3a3f4d', legendText:'#c8ccd6', annoBg:'rgba(30,34,46,.9)'
     } : {
@@ -1283,11 +1695,29 @@ class Component extends DCLogic {
     ctx.save(); ctx.translate(13,(pad.t+(H-pad.b))/2); ctx.rotate(-Math.PI/2); ctx.textBaseline='top'; ctx.fillText(yTitle,0,0); ctx.restore();
 
     // draw ellipses
+    const darkCanvas=this.state.theme==='dark'&&!this._forceLight;
+    // near-black strokes (B&W preset) stay readable on the dark canvas; exports always use the light palette
+    const ink=(c)=>{ if(!darkCanvas) return c; const h=String(c||'').replace('#',''); if(h.length!==6) return c; const l=(parseInt(h.substr(0,2),16)*299+parseInt(h.substr(2,2),16)*587+parseInt(h.substr(4,2),16)*114)/1000; return l<70?'#f4f2ec':c; };
     const drawEl=(pts,stroke,fill,lw,dash)=>{
       ctx.beginPath(); pts.forEach((pt,i)=>{ const X=px(pt.x),Y=py(pt.y); if(i)ctx.lineTo(X,Y);else ctx.moveTo(X,Y); }); ctx.closePath();
       if(fill){ctx.fillStyle=fill;ctx.fill();}
-      ctx.setLineDash(dash||[]); ctx.strokeStyle=stroke; ctx.lineWidth=lw; ctx.stroke(); ctx.setLineDash([]);
+      ctx.save(); ctx.setLineDash(dash||[]); if(dash&&dash.some((v)=>v<1)) ctx.lineCap='round'; ctx.strokeStyle=stroke; ctx.lineWidth=lw; ctx.stroke(); ctx.restore();
     };
+    const drawMarker=(X,Y,sym,color,r,solid)=>{
+      if(sym==='none') return;
+      ctx.save(); ctx.strokeStyle=color; ctx.fillStyle=solid?color:cp.symbolFill; ctx.lineWidth=solid?1.4:2.2; ctx.lineJoin='round'; ctx.beginPath();
+      if(sym==='cross'||sym==='plus'){ const a=sym==='cross'?r*0.9:r*1.15; ctx.lineWidth=solid?2:2.4; ctx.lineCap='round';
+        if(sym==='cross'){ctx.moveTo(X-a,Y-a);ctx.lineTo(X+a,Y+a);ctx.moveTo(X+a,Y-a);ctx.lineTo(X-a,Y+a);}else{ctx.moveTo(X-a,Y);ctx.lineTo(X+a,Y);ctx.moveTo(X,Y-a);ctx.lineTo(X,Y+a);}
+        ctx.stroke(); ctx.restore(); return; }
+      if(sym==='square') ctx.rect(X-r*0.85,Y-r*0.85,r*1.7,r*1.7);
+      else if(sym==='diamond'){ const a=r*1.18; ctx.moveTo(X,Y-a);ctx.lineTo(X+a,Y);ctx.lineTo(X,Y+a);ctx.lineTo(X-a,Y);ctx.closePath(); }
+      else if(sym==='triangle'){ const a=r*1.18; ctx.moveTo(X,Y-a);ctx.lineTo(X+a,Y+a*0.86);ctx.lineTo(X-a,Y+a*0.86);ctx.closePath(); }
+      else ctx.arc(X,Y,r,0,7);
+      ctx.fill(); ctx.stroke(); ctx.restore();
+    };
+    const shortLabel=(v,n)=>{ const str=String(v||''); return str.length>n?str.slice(0,n-1).trimEnd()+'…':str; };
+    // centre label: flips to the left of the centre when it would run past the right edge
+    const centerLabel=(text,cx,cy,col)=>{ ctx.fillStyle=col; ctx.font="600 10px 'IBM Plex Sans'"; ctx.textBaseline='bottom'; const w=ctx.measureText(text).width, right=cx+7+w<=W-pad.r-2||cx-7-w<pad.l; ctx.textAlign=right?'left':'right'; ctx.fillText(text,right?cx+7:cx-7,cy-5); };
     const phaseOn=this.state.showPhase&&this._phaseAllowed()&&b.xmin<=0&&b.xmax>=0&&b.ymin<=0&&b.ymax>=0;
     const phaseProgress=phaseOn&&this._phaseStart?Math.min(1,(performance.now()-this._phaseStart)/260):1;
     let phaseIndex=0;
@@ -1299,27 +1729,29 @@ class Component extends DCLogic {
       ctx.restore();phaseIndex++;
     };
     items.forEach((it)=>{
+      const st=this._itemStyle(it), col=ink(st.color), dash=this._dashArr(st);
+      const fillOf=(a)=>a>0?this._hexA(st.color,Math.min(0.9,a)):null;
       if(it.kind==='ref'){
-        const p=this._displayStats(it.pop),col=it.color;
+        const p=this._displayStats(it.pop);
         if(it.mode==='tolerance'){
-          [['t95',0.06],['t75',0.10],['t50',0.15]].forEach(([lvl,a])=>{
-            drawEl(this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd,p.xcHSd,p.r,this.CHI[lvl]),col,this._hexA(col,a),lvl==='t50'?2:1.4);
+          [['t95',0.6],['t75',1],['t50',1.5]].forEach(([lvl,k])=>{
+            drawEl(this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd,p.xcHSd,p.r,this.CHI[lvl]),col,fillOf(st.fill*k),lvl==='t50'?st.width:Math.max(0.5,st.width*0.7),dash);
           });
         } else {
           const se=1/Math.sqrt(p.n);
-          drawEl(this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd*se,p.xcHSd*se,p.r,this.CHI.c95),col,this._hexA(col,0.10),2);
+          drawEl(this._ellipsePts(p.rhMean,p.xcHMean,p.rhSd*se,p.xcHSd*se,p.r,this.CHI.c95),col,fillOf(st.fill),st.width,dash);
         }
-        // center
         const cx=px(p.rhMean),cy=py(p.xcHMean);
-        ctx.fillStyle=col; ctx.beginPath(); ctx.arc(cx,cy,3.2,0,7); ctx.fill();
+        drawMarker(cx,cy,st.symbol,col,3.6,true);
         drawPhase(p.rhMean,p.xcHMean,col,it.pop.legend);
-        ctx.fillStyle=col;ctx.font="600 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText((it.pop.country+' '+it.pop.sex).trim(),cx+6,cy-5,Math.max(40,W-cx-pad.r-10));
+        if(st.label) centerLabel(shortLabel(it.pop.title||it.pop.legend,44),cx,cy,col);
       } else {
         const e=this._displayStats(it.e), se=(sd,n)=>sd/Math.sqrt(n);
-        drawEl(this._ellipsePts(e.rhMean,e.xcHMean,se(e.rhSd,e.n),se(e.xcHSd,e.n),e.r,this.CHI.c95),e.color,this._hexA(e.color,0.10),e.width,e.stroke==='dashed'?[6,4]:[]);
-        const cx=px(e.rhMean),cy=py(e.xcHMean); ctx.fillStyle=e.color; ctx.beginPath(); ctx.arc(cx,cy,3,0,7); ctx.fill();
-        drawPhase(e.rhMean,e.xcHMean,e.color,e.name);
-        ctx.fillStyle=e.color;ctx.font="600 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(e.name,cx+6,cy-5);
+        drawEl(this._ellipsePts(e.rhMean,e.xcHMean,se(e.rhSd,e.n),se(e.xcHSd,e.n),e.r,this.CHI.c95),col,fillOf(st.fill),st.width,dash);
+        const cx=px(e.rhMean),cy=py(e.xcHMean);
+        drawMarker(cx,cy,st.symbol,col,3.6,true);
+        drawPhase(e.rhMean,e.xcHMean,col,e.name);
+        if(st.label) centerLabel(shortLabel(e.name,44),cx,cy,col);
       }
     });
 
@@ -1332,14 +1764,28 @@ class Component extends DCLogic {
     // longitudinal tolerance trajectories
     const groups={};indivs.forEach((m)=>{(groups[m.participant]||(groups[m.participant]=[])).push(m);});
     Object.values(groups).forEach((list)=>{if(list.length<2)return;ctx.strokeStyle=this._hexA(list[0].color,0.65);ctx.lineWidth=1.6;ctx.beginPath();list.forEach((raw,i)=>{const p=this._displayPoint(raw),X=px(p.x),Y=py(p.y);if(i)ctx.lineTo(X,Y);else ctx.moveTo(X,Y);});ctx.stroke();});
-    const drawSymbol=(X,Y,m)=>{ctx.save();ctx.fillStyle=cp.symbolFill;ctx.strokeStyle=m.color;ctx.lineWidth=2.2;ctx.beginPath();if(m.symbol==='square')ctx.rect(X-5,Y-5,10,10);else if(m.symbol==='diamond'){ctx.moveTo(X,Y-7);ctx.lineTo(X+7,Y);ctx.lineTo(X,Y+7);ctx.lineTo(X-7,Y);ctx.closePath();}else if(m.symbol==='triangle'){ctx.moveTo(X,Y-7);ctx.lineTo(X+7,Y+6);ctx.lineTo(X-7,Y+6);ctx.closePath();}else ctx.arc(X,Y,6,0,7);ctx.fill();ctx.stroke();ctx.restore();};
-    indivs.forEach((raw)=>{const indiv=this._displayPoint(raw),X=px(indiv.x),Y=py(indiv.y);drawSymbol(X,Y,raw);drawPhase(indiv.x,indiv.y,raw.color,raw.participant+' · '+raw.time);ctx.fillStyle=raw.color;ctx.font="600 9.5px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(raw.participant+' · '+raw.time,X+8,Y-5);});
+    const drawSymbol=(X,Y,m)=>drawMarker(X,Y,m.symbol,ink(m.color),6,false);
+    indivs.forEach((raw)=>{const indiv=this._displayPoint(raw),X=px(indiv.x),Y=py(indiv.y);drawSymbol(X,Y,raw);drawPhase(indiv.x,indiv.y,ink(raw.color),raw.participant+' · '+raw.time);ctx.fillStyle=ink(raw.color);ctx.font="600 9.5px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText(raw.participant+' · '+raw.time,X+8,Y-5);});
 
     // movable legend inside the figure and PNG export
     const phaseSuffix=(x,y)=>phaseOn?(' · φ '+this._phaseAngle(x,y).toFixed(1)+'°'):'';
-    const legend=[];items.forEach((it)=>{if(it.kind==='ref')legend.push({color:it.color,label:it.pop.legend+phaseSuffix(it.pop.rhMean,it.pop.xcHMean)});else legend.push({color:it.e.color,label:it.e.name+phaseSuffix(it.e.rhMean,it.e.xcHMean)});});
-    Object.values(groups).forEach((list)=>{if(list[0])legend.push({color:list[0].color,label:list[0].participant+phaseSuffix(list[0].x,list[0].y)});});
-    if(legend.length&&this.state.legendVisible){ctx.font="500 10px 'IBM Plex Sans'";const boxW=Math.min(220,Math.max(...legend.map((l)=>ctx.measureText(l.label).width))+42),boxH=legend.length*17+25,pos=this.state.legendPos||{x:72,y:4},bx=Math.max(0,Math.min(W-boxW,W*(+pos.x||0)/100)),by=Math.max(0,Math.min(H-boxH,H*(+pos.y||0)/100));ctx.fillStyle=cp.legendBg;ctx.strokeStyle=cp.legendBorder;ctx.lineWidth=1;ctx.fillRect(bx,by,boxW,boxH);ctx.strokeRect(bx,by,boxW,boxH);ctx.fillStyle=cp.legendText;ctx.font="600 9px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(this._T().legendControl.toUpperCase(),bx+9,by+10);ctx.font="600 14px 'IBM Plex Sans'";ctx.textAlign='center';ctx.fillText('×',bx+boxW-10,by+10);legend.forEach((l,i)=>{const yy=by+24+i*17;ctx.strokeStyle=l.color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx+9,yy);ctx.lineTo(bx+24,yy);ctx.stroke();ctx.fillStyle=cp.legendText;ctx.font="500 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(l.label,bx+29,yy,boxW-36);});this._legendBox={x:bx,y:by,w:boxW,h:boxH,close:{x:bx+boxW-22,y:by,w:22,h:22}};}
+    const legend=[];
+    items.forEach((it)=>{const st=this._itemStyle(it);if(it.kind==='ref')legend.push({st,label:it.pop.legend+phaseSuffix(it.pop.rhMean,it.pop.xcHMean)});else legend.push({st,label:it.e.name+phaseSuffix(it.e.rhMean,it.e.xcHMean)});});
+    Object.values(groups).forEach((list)=>{if(list[0])legend.push({point:list[0],trail:list.length>1,label:list[0].participant+phaseSuffix(list[0].x,list[0].y)});});
+    if(legend.length&&this.state.legendVisible){
+      ctx.font="500 10px 'IBM Plex Sans'";
+      const boxW=Math.max(104,Math.min(250,Math.max(...legend.map((l)=>ctx.measureText(l.label).width))+56)),boxH=legend.length*18+25,pos=this.state.legendPos||{x:72,y:4},bx=Math.max(0,Math.min(W-boxW,W*(+pos.x||0)/100)),by=Math.max(0,Math.min(H-boxH,H*(+pos.y||0)/100));
+      ctx.fillStyle=cp.legendBg;ctx.strokeStyle=cp.legendBorder;ctx.lineWidth=1;ctx.fillRect(bx,by,boxW,boxH);ctx.strokeRect(bx,by,boxW,boxH);
+      ctx.fillStyle=cp.legendText;ctx.font="600 9px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(this._T().legendControl.toUpperCase(),bx+9,by+10);
+      if(!this._forceLight){ctx.font="600 14px 'IBM Plex Sans'";ctx.textAlign='center';ctx.fillText('×',bx+boxW-10,by+10);}
+      legend.forEach((l,i)=>{
+        const yy=by+25+i*18,x0=bx+9,x1=bx+37,xm=(x0+x1)/2;
+        if(l.st){const c=ink(l.st.color);ctx.save();ctx.strokeStyle=c;ctx.lineWidth=Math.min(3,Math.max(1,l.st.width));const d=this._dashArr({dash:l.st.dash,width:Math.min(3,l.st.width)});ctx.setLineDash(d);if(d.some((v)=>v<1))ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x0,yy);ctx.lineTo(x1,yy);ctx.stroke();ctx.restore();drawMarker(xm,yy,l.st.symbol,c,3.2,true);}
+        else{const c=ink(l.point.color);if(l.trail){ctx.strokeStyle=this._hexA(l.point.color,0.65);ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(x0,yy);ctx.lineTo(x1,yy);ctx.stroke();}drawMarker(xm,yy,l.point.symbol,c,4.2,false);}
+        ctx.fillStyle=cp.legendText;ctx.font="500 10px 'IBM Plex Sans'";ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(l.label,bx+43,yy,boxW-50);
+      });
+      this._legendBox={x:bx,y:by,w:boxW,h:boxH,close:{x:bx+boxW-22,y:by,w:22,h:22}};
+    }
 
     // user text boxes, also included in PNG export
     this._annotationBoxes=[];
@@ -1363,8 +1809,18 @@ class Component extends DCLogic {
   // ---------- handlers ----------
   _setF(patch){ this.setState(patch); }
   _defaultMode(){ return this.state.method==='tolerance' ? 'tolerance' : 'conf95'; }
+  _blank(m){
+    return { method:m, refKeys:[], refModes:{}, refStyles:{}, activeKey:null, ellipses:[], editingId:null, editDraft:null, editError:false, cmpA:'', cmpB:'', comparisonMode:'independent', pairedView:'linked', paired:{sdRh:'',sdXc:'',r:'',n:'',referenceKey:''}, indiv:{participant:'P1',time:'T1',rh:'',xc:'',color:'#e0662a',symbol:'circle'}, indivShown:false, measurements:[], editingMeasurementId:null,measurementDraft:null,measurementError:false,bivaMode:'classic', importStatus:{scope:'',type:'',text:''}, tolMode:'classic', bounds:null, showNew:false, showAxisWin:false, showText:false, showStyleWin:false, showAddRef:false, showPhase:false, annotations:[],legendVisible:true,legendPos:{x:72,y:4},axisMode:'auto', axisManual:{xMin:'',xMax:'',xStep:'',yMin:'',yMax:'',yStep:''}, axisNames:{x:'R/H',y:'Xc/H'}, axisUnits:{x:'Ω/m',y:'Ω/m'}, onlySelected:false, listLimit:60, confirmReset:false, inboxNote:'' };
+  }
   _enterMethod(m){
-    this.setState({ screen:'app', method:m, refKeys:[], refModes:{}, activeKey:null, ellipses:[], editingId:null, editDraft:null, editError:false, cmpA:'', cmpB:'', comparisonMode:'independent', pairedView:'linked', paired:{sdRh:'',sdXc:'',r:'',n:'',referenceKey:''}, indiv:{participant:'P1',time:'T1',rh:'',xc:'',color:'#e0662a',symbol:'circle'}, indivShown:false, measurements:[], editingMeasurementId:null,measurementDraft:null,measurementError:false,bivaMode:'classic', importStatus:{scope:'',type:'',text:''}, tolMode:'classic', bounds:null, showNew:false, showAxisWin:false, showText:false, showAddRef:false, annotations:[],legendVisible:true,legendPos:{x:72,y:4},axisMode:'auto', axisNames:{x:'R/H',y:'Xc/H'}, axisUnits:{x:'Ω/m',y:'Ω/m'} });
+    // same technique with work in progress: resume instead of wiping it
+    if(this.state.method===m && this._hasWork()){ this.setState({screen:'app'}); return; }
+    this.setState({ screen:'app', ...this._blank(m) });
+  }
+  _newAnalysis(){
+    if(!this._hasWork()) return;
+    if(!this.state.confirmReset){ this.setState({confirmReset:true}); clearTimeout(this._confirmTimer); this._confirmTimer=setTimeout(()=>this.setState({confirmReset:false}),3500); return; }
+    clearTimeout(this._confirmTimer); this.setState(this._blank(this.state.method));
   }
   _migrateToCombined(){
     // preserve current selections; freeze each ref's current effective mode
@@ -1379,13 +1835,13 @@ class Component extends DCLogic {
   _setBivaMode(mode){
     const specific=mode==='specific';
     const axes=this._metricAxes(mode),nonClassic=mode!=='classic';
-    this.setState({bivaMode:mode,newSource:this.state.newSource,axisMode:'auto',axisNames:{x:axes.x,y:axes.y},axisUnits:{x:axes.ux,y:axes.uy},tolMode:nonClassic?'classic':this.state.tolMode,refKeys:[],refModes:{},activeKey:null,cmpA:'',cmpB:'',showPhase:false,bounds:null,importStatus:{scope:'',type:'',text:''}});
+    this.setState({bivaMode:mode,newSource:this.state.newSource,listLimit:60,fEquip:'',fCountry:'',fAge:'',fStudy:'',axisMode:'auto',axisNames:{x:axes.x,y:axes.y},axisUnits:{x:axes.ux,y:axes.uy},tolMode:nonClassic?'classic':this.state.tolMode,refKeys:[],refModes:{},activeKey:null,cmpA:'',cmpB:'',showPhase:false,bounds:null,importStatus:{scope:'',type:'',text:''}});
   }
   _headerKey(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');}
   _batchValue(row,aliases){const keys=Object.keys(row);for(const alias of aliases){const key=keys.find((k)=>this._headerKey(k)===alias);if(key!==undefined&&row[key]!==''&&row[key]!=null)return row[key];}return '';}
   _batchNumber(value){if(typeof value==='number')return value;const normalized=String(value??'').trim().replace(/\s/g,'').replace(',','.');return normalized===''?NaN:Number(normalized);}
   _safeColor(value,fallback){const color=String(value||'').trim();return /^#[0-9a-f]{6}$/i.test(color)?color:fallback;}
-  _safeSymbol(value){const symbol=String(value||'').trim().toLowerCase();return ['circle','square','diamond','triangle'].includes(symbol)?symbol:'circle';}
+  _safeSymbol(value){const symbol=String(value||'').trim().toLowerCase();return this.SYMBOLS.includes(symbol)?symbol:'circle';}
   _sampleStats(rows){
     const n=rows.length,mx=rows.reduce((s,r)=>s+r.x,0)/n,my=rows.reduce((s,r)=>s+r.y,0)/n;let vx=0,vy=0,cov=0;
     rows.forEach((r)=>{const dx=r.x-mx,dy=r.y-my;vx+=dx*dx;vy+=dy*dy;cov+=dx*dy;});
@@ -1436,9 +1892,11 @@ class Component extends DCLogic {
     const pop=this._byKey(key);if(!pop||(pop.metric||'classic')!==this.state.bivaMode)return;
     const s=this.state; const has=s.refKeys.includes(key);
     const refKeys=has?s.refKeys.filter((k)=>k!==key):[...s.refKeys,key];
-    const refModes={...s.refModes};
+    const refModes={...s.refModes}, refStyles={...s.refStyles};
     if(!has && !refModes[key]) refModes[key]='conf95';
-    this.setState({refKeys, refModes, activeKey:has?(refKeys[refKeys.length-1]||null):key, bounds:null});
+    // colour is fixed when the reference is added, so removing another one never reshuffles the palette
+    if(has) delete refStyles[key]; else refStyles[key]={color:this._nextColor([...this.REF_COLORS,...this.CONF_COLORS])};
+    this.setState({refKeys, refModes, refStyles, activeKey:has?(refKeys[refKeys.length-1]||null):key, bounds:null});
   }
   _setAxisMode(m){ this.setState({axisMode:m}); }
   _setAxisManual(field,v){ this.setState({axisManual:{...this.state.axisManual,[field]:v}}); }
@@ -1472,18 +1930,21 @@ class Component extends DCLogic {
   _startAnnotationDrag(ev){const p=this._annotationPointer(ev),lb=this._legendBox;if(lb&&p.x>=lb.x&&p.x<=lb.x+lb.w&&p.y>=lb.y&&p.y<=lb.y+lb.h){ev.preventDefault&&ev.preventDefault();const c=lb.close;if(c&&p.x>=c.x&&p.x<=c.x+c.w&&p.y>=c.y&&p.y<=c.y+c.h){this.setState({legendVisible:false});return;}this._dragLegend={dx:p.x-lb.x,dy:p.y-lb.y,w:lb.w,h:lb.h};if(ev.currentTarget){ev.currentTarget.style.cursor='grabbing';ev.currentTarget.setPointerCapture&&ev.currentTarget.setPointerCapture(ev.pointerId);}return;}const hit=(this._annotationBoxes||[]).slice().reverse().find((b)=>p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h);if(hit){ev.preventDefault&&ev.preventDefault();this._dragAnnotation={id:hit.id,dx:p.x-hit.x,dy:p.y-hit.y};if(ev.currentTarget){ev.currentTarget.style.cursor='grabbing';ev.currentTarget.setPointerCapture&&ev.currentTarget.setPointerCapture(ev.pointerId);}}}
   _moveAnnotationDrag(ev){if(this._dragLegend){ev.preventDefault&&ev.preventDefault();const p=this._annotationPointer(ev),d=this._dragLegend,maxX=Math.max(0,p.w-d.w),maxY=Math.max(0,p.h-d.h),x=Math.max(0,Math.min(maxX,p.x-d.dx))/p.w*100,y=Math.max(0,Math.min(maxY,p.y-d.dy))/p.h*100;this.setState({legendPos:{x,y}});return;}if(!this._dragAnnotation)return;ev.preventDefault&&ev.preventDefault();const p=this._annotationPointer(ev),d=this._dragAnnotation,box=(this._annotationBoxes||[]).find((b)=>b.id===d.id),maxX=Math.max(0,p.w-(box?box.w:0)),maxY=Math.max(0,p.h-(box?box.h:0)),x=Math.max(0,Math.min(maxX,(p.x-d.dx)))/p.w*100,y=Math.max(0,Math.min(maxY,(p.y-d.dy)))/p.h*100;this.setState({annotations:this.state.annotations.map((a)=>a.id===d.id?{...a,x,y}:a)});}
   _endAnnotationDrag(ev){if(ev&&ev.currentTarget)ev.currentTarget.style.cursor='grab';this._dragAnnotation=null;this._dragLegend=null;}
-  _setNewRef(field,v){ this.setState({newRef:{...this.state.newRef,[field]:v}}); }
+  _setNewRef(field,v){ this.setState({newRef:{...this.state.newRef,[field]:v},refError:false}); }
   _addRef(){
     const v=this.state.newRef;
     const rec={ n:+v.n, r_h_mean:+v.rhMean, r_h_sd:+v.rhSd, xc_h_mean:+v.xcHMean, xc_h_sd:+v.xcHSd, correlation:+v.r,
-      legend:(v.name||'Referência').trim()+(v.country?(' '+v.country):''), sex:v.sex, source:'custom' };
+      legend:(v.name||'Referência').trim(), sex:v.sex, source:'custom', country:(v.country||'').trim(), equipment:(v.equip||'').trim(), age:(v.age||'').trim(), reference:(v.reference||'').trim(), population:v.type||'Other' };
     const idx=this.state.pops.length+this.state.customRefs.length;
     const norm=this._normalize(rec, idx);
     norm.key='custom:'+Date.now(); norm.custom=true; norm.metric=this.state.bivaMode;
-    if(v.type) norm.type=v.type;
-    if(!this._keep(norm)) return;
-    this.setState({ customRefs:[...this.state.customRefs, norm], showAddRef:false,
-      newRef:{ name:'', sex:'M', type:'Healthy', country:'', n:'', rhMean:'', rhSd:'', xcHMean:'', xcHSd:'', r:'' } });
+    if(!this._keep(norm) || !Number.isFinite(+v.r) || v.r==='' || Math.abs(+v.r)>=1){ this.setState({refError:true}); return; }
+    this.setState({ customRefs:[norm, ...this.state.customRefs], showAddRef:false, refError:false,
+      newRef:{ name:'', sex:'M', type:'Healthy', country:'', equip:'', age:'', reference:'', n:'', rhMean:'', rhSd:'', xcHMean:'', xcHSd:'', r:'' } });
+  }
+  _removeCustomRef(key){
+    const s=this.state, refKeys=s.refKeys.filter((k)=>k!==key), refStyles={...s.refStyles}, refModes={...s.refModes}; delete refStyles[key]; delete refModes[key];
+    this.setState({customRefs:s.customRefs.filter((p)=>p.key!==key),refKeys,refStyles,refModes,activeKey:s.activeKey===key?(refKeys[refKeys.length-1]||null):s.activeKey,cmpA:s.cmpA==='pop:'+key?'':s.cmpA,cmpB:s.cmpB==='pop:'+key?'':s.cmpB,bounds:null});
   }
   _setRefMode(key,mode){ this.setState({refModes:{...this.state.refModes,[key]:mode}, bounds:null}); }
   _newVal(field,v){ this.setState({newVals:{...this.state.newVals,[field]:v}}); }
@@ -1492,7 +1953,7 @@ class Component extends DCLogic {
     if(s.newSource==='active'){ const p=this._byKey(s.activeKey); if(!p) return; src={rhMean:p.rhMean,rhSd:p.rhSd,xcHMean:p.xcHMean,xcHSd:p.xcHSd,r:p.r,n:p.n}; }
     else { const v=s.newVals; src={rhMean:+v.rhMean,rhSd:+v.rhSd,xcHMean:+v.xcHMean,xcHSd:+v.xcHSd,r:Math.max(-0.999,Math.min(0.999,+v.r||0)),n:+v.n}; if(!(src.rhSd>0&&src.xcHSd>0&&src.n>2&&Number.isFinite(src.rhMean)&&Number.isFinite(src.xcHMean))) return; }
     const id='e'+Date.now();
-    const color=this.CONF_COLORS[s.ellipses.length%this.CONF_COLORS.length];
+    const color=this._nextColor();
     const name=s.newName.trim()||('Elipse '+(s.ellipses.length+1));
     const e={id,name,color,stroke:'solid',width:2,visible:true,metric:s.bivaMode,...src};
     this.setState({ellipses:[...s.ellipses,e],showNew:false,newName:'',newVals:{rhMean:'',rhSd:'',xcHMean:'',xcHSd:'',r:'',n:''},bounds:null});
@@ -1530,8 +1991,11 @@ class Component extends DCLogic {
 
   _exportPNG(){
     const cv=this._canvas; if(!cv) return;
+    // always export with the light palette on a white background, whatever the on-screen theme
+    this._forceLight=true; this._draw();
     const tmp=document.createElement('canvas'); tmp.width=cv.width; tmp.height=cv.height;
     const c=tmp.getContext('2d'); c.fillStyle='#fff'; c.fillRect(0,0,tmp.width,tmp.height); c.drawImage(cv,0,0);
+    this._forceLight=false; this._draw();
     const a=document.createElement('a'); a.download='biva-nomograma.png'; a.href=tmp.toDataURL('image/png'); a.click();
   }
   _xmlEsc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');}
@@ -1542,10 +2006,10 @@ class Component extends DCLogic {
   }
   _exportExcel(){
     const entities=[];
-    this.state.refKeys.forEach((k)=>{const p=this._byKey(k);if(p&&(p.metric||'classic')===this.state.bivaMode)entities.push({...p,_label:p.legend,_source:'referência selecionada'});});
-    this.state.ellipses.filter((e)=>(e.metric||'classic')===this.state.bivaMode).forEach((e)=>entities.push({...e,_label:e.name,_source:'elipse adicionada'}));
+    this.state.refKeys.forEach((k)=>{const p=this._byKey(k);if(p&&(p.metric||'classic')===this.state.bivaMode)entities.push({...p,_label:p.legend,_source:'referência selecionada',_st:this._refStyle(k)});});
+    this.state.ellipses.filter((e)=>(e.metric||'classic')===this.state.bivaMode).forEach((e)=>entities.push({...e,_label:e.name,_source:'elipse adicionada',_st:this._ellStyle(e)}));
     const metricAxes=this._metricAxes(this.state.bivaMode),xName=metricAxes.x,yName=metricAxes.y;
-    const ellipseRows=[['Nome','Origem','Métrica',xName+' média',xName+' DP',yName+' média',yName+' DP','Correlação','N','Cor','Traço','Espessura'],...entities.map((e)=>[e._label,e._source,this.state.bivaMode,e.rhMean,e.rhSd,e.xcHMean,e.xcHSd,e.r,e.n,e.color||'',e.stroke||'',e.width||''])];
+    const ellipseRows=[['Nome','Origem','Métrica',xName+' média',xName+' DP',yName+' média',yName+' DP','Correlação','N','Cor','Traço','Espessura','Símbolo','Preenchimento','País','Aparelho','Idade','Referência','DOI'],...entities.map((e)=>[e._label,e._source,this.state.bivaMode,e.rhMean,e.rhSd,e.xcHMean,e.xcHSd,e.r,e.n,e._st.color,e._st.dash,e._st.width,e._st.symbol,e._st.fill,e.countryRaw||'',e.equip||'',e.age||'',e.referenceLabel||'',e.referenceDoi||''])];
     const pairRows=[['Elipse A','Elipse B','N A','N B','D de Mahalanobis','D²','Hotelling T²','F','gl1','gl2','p-valor','Status']];
     for(let i=0;i<entities.length;i++)for(let j=i+1;j<entities.length;j++){const A=entities[i],B=entities[j],r=this._hotelling(A,B);pairRows.push(r.error?[A._label,B._label,A.n,B.n,'','','','','','','',r.error]:[A._label,B._label,A.n,B.n,r.d,r.d2,r.t2,r.fValue,r.df1,r.df2,r.pValue,r.pValue<0.05?'significativo':'não significativo']);}
     const sheets=[{name:'Elipses',rows:ellipseRows},{name:'Comparações em pares',rows:pairRows}];
@@ -1560,7 +2024,9 @@ class Component extends DCLogic {
   renderVals(){
     const s=this.state;
     const t=this._T();
-    const filtered=this._filtered();
+    const baseRefs=this._baseRefs();
+    const filtered=this._filtered(baseRefs);
+    const toks=this._searchTokens();
     const specific=s.bivaMode==='specific',h2=s.bivaMode==='h2',metricAxes=this._metricAxes(s.bivaMode),axisX=metricAxes.x,axisY=metricAxes.y;
     const currentEllipses=s.ellipses.filter((e)=>(e.metric||'classic')===s.bivaMode);
     const currentMeasurements=s.measurements.filter((m)=>(m.metric||'classic')===s.bivaMode);
@@ -1569,53 +2035,130 @@ class Component extends DCLogic {
     // filter buttons
     const segBase='flex:1;font:500 11.5px \'IBM Plex Sans\';padding:6px 4px;border-radius:8px;cursor:pointer;transition:.12s;';
     const seg=(active)=>segBase+(active?'background:var(--strong-bg);color:var(--strong-text);border:1px solid var(--strong-bg)':'background:var(--bg-panel);color:var(--text-6);border:1px solid var(--border-2)');
-    const sexFilters=[['',t.sexAll],['M',t.sexM],['F',t.sexF]].map(([v,label])=>({label,style:seg(s.fSex===v),onClick:()=>this._setF({fSex:v})}));
+    const sexFilters=[['',t.sexAll],['M',t.sexM],['F',t.sexF],['B',t.sexB]].map(([v,label])=>({label,style:seg(s.fSex===v),onClick:()=>this._setF({fSex:v,listLimit:60})}));
     const chipBase='font:500 11px \'IBM Plex Sans\';padding:5px 11px;border-radius:20px;cursor:pointer;transition:.12s;';
     const chip=(active)=>chipBase+(active?'background:#2f4fd6;color:#fff;border:1px solid #2f4fd6':'background:var(--bg-panel);color:var(--text-6);border:1px solid var(--border-2)');
-    const typeFilters=[['',t.tAll],['Healthy',t.tHealthy],['Sport',t.tSport],['Clinical',t.tClinical]].map(([v,label])=>({label,style:chip(s.fType===v),onClick:()=>this._setF({fType:v})}));
+    const typeFilters=[['',t.tAll],['Healthy',t.tHealthy],['Sport',t.tSport],['Clinical',t.tClinical],['Other',t.tOther]].map(([v,label])=>({label,style:chip(s.fType===v),onClick:()=>this._setF({fType:v,listLimit:60})}));
+    const typeName={Healthy:t.tHealthy,Sport:t.tSport,Clinical:t.tClinical,Other:t.tOther};
+    const ageName={infant:t.ageInfant,child:t.ageChild,adolescent:t.ageAdolescent,adult:t.ageAdult,older:t.ageOlder,unknown:t.ageUnknown};
+    const nd=(v)=>(!v||v==='—')?('— '+t.notInformed):v;
+    const facetStyle=(on)=>on?'background:var(--bg-info);color:var(--text-10);border:1.5px solid #2f4fd6;font-weight:600':'background:var(--bg-panel);color:var(--text-2);border:1px solid var(--border-2)';
+    const facetOpts=(skip,keyFn,labelFn,allLabel,current,order)=>{
+      const m=this._facetCounts(baseRefs,skip,keyFn); if(current&&!m.has(current)) m.set(current,0);
+      const keys=[...m.keys()].sort((a,b)=>order?(order.indexOf(a)-order.indexOf(b)):((a==='—'||!a)-(b==='—'||!b))||String(labelFn(a)).localeCompare(String(labelFn(b))));
+      return [{value:'',label:allLabel},...keys.map((k)=>({value:k,label:labelFn(k)+' ('+m.get(k)+')'}))];
+    };
+    const countryLabel=(k)=>nd(this._ptCountry(k));
+    const facetSelects=[
+      {title:t.fEquipTitle,value:s.fEquip,style:facetStyle(!!s.fEquip),options:facetOpts('equip',(p)=>p.brand,nd,t.fEquipAll,s.fEquip),onChange:(e)=>this._setF({fEquip:e.target.value,listLimit:60})},
+      {title:t.fCountryTitle,value:s.fCountry,style:facetStyle(!!s.fCountry),options:facetOpts('country',(p)=>p.countryRaw,countryLabel,t.fCountryAll,s.fCountry),onChange:(e)=>this._setF({fCountry:e.target.value,listLimit:60})},
+      {title:t.fAgeTitle,value:s.fAge,style:facetStyle(!!s.fAge),options:facetOpts('age',(p)=>p.ageGroup,(k)=>ageName[k]||k,t.fAgeAll,s.fAge,this.AGE_ORDER),onChange:(e)=>this._setF({fAge:e.target.value,listLimit:60})},
+      {title:t.fStudyTitle,value:s.fStudy,style:facetStyle(!!s.fStudy),options:facetOpts('study',(p)=>p.studyKey,nd,t.fStudyAll,s.fStudy),onChange:(e)=>this._setF({fStudy:e.target.value,listLimit:60})},
+      {title:t.sortTitle,value:s.sortBy,style:facetStyle(s.sortBy!=='default'),options:[['default',t.sortDefault],['country',t.sortCountry],['equip',t.sortEquip],['n',t.sortN],['year',t.sortYear]].map(([value,label])=>({value,label})),onChange:(e)=>this._setF({sortBy:e.target.value,listLimit:60})},
+      {title:t.groupTitle,value:s.groupBy,style:facetStyle(s.groupBy!=='none'),options:[['none',t.groupNone],['equip',t.groupEquip],['country',t.groupCountry],['age',t.groupAge],['study',t.groupStudy]].map(([value,label])=>({value,label})),onChange:(e)=>this._setF({groupBy:e.target.value,listLimit:60})},
+    ];
+    const activeFilterCount=[s.fSex,s.fType,s.fEquip,s.fCountry,s.fAge,s.fStudy,s.search.trim(),s.onlySelected?'1':''].filter(Boolean).length;
+    const groupLabel=(p)=>{ const k=this._groupKey(p); if(s.groupBy==='age') return ageName[k]||k; if(s.groupBy==='country') return countryLabel(k); return nd(k); };
+    const groupTotals=new Map(); if(s.groupBy!=='none') filtered.forEach((p)=>{ const k=this._groupKey(p); groupTotals.set(k,(groupTotals.get(k)||0)+1); });
+    const visible=filtered.slice(0,s.listLimit);
+    const chipCss=(on,extra)=>'font:500 10px \'IBM Plex Sans\';padding:2px 7px;border-radius:5px;cursor:pointer;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;'+extra+(on?';box-shadow:0 0 0 1.5px #2f4fd6':'');
 
     // population cards
     const typeColor={Sport:'#7b3ff2',Clinical:'#c0248f',Healthy:'#0f9d8f',Other:'#8a8676'};
-    const pops=filtered.map((p)=>{
+    const pops=visible.map((p,idx)=>{
       const sel=s.refKeys.includes(p.key);
       const col=this._refColor(p.key);
       const active=s.activeKey===p.key;
       const mode=this._effMode(p.key);
       const modeBtn=(on)=>'flex:1;font:500 10px \'IBM Plex Sans\';padding:5px 6px;border-radius:6px;cursor:pointer;'+(on?'background:'+(col||'#2f4fd6')+';color:#fff;border:1px solid transparent':'background:var(--bg-chip2);color:var(--text-6);border:1px solid var(--border-6)');
+      const stop=(fn)=>(ev)=>{ if(ev)ev.stopPropagation(); fn(); };
+      const tip=(on,what,val)=>(on?t.chipUnfilter:t.chipFilter)+' '+what+': '+val;
+      const chips=[];
+      if(p.countryRaw&&p.countryRaw!=='—') chips.push({icon:'◍',label:this._hl(p.country,toks),title:tip(s.fCountry===p.countryRaw,t.chipCountry,p.country),style:chipCss(s.fCountry===p.countryRaw,'color:var(--text-1);background:var(--bg-chip);border:1px solid var(--border-2);font-weight:600'),onClick:stop(()=>this._setF({fCountry:s.fCountry===p.countryRaw?'':p.countryRaw,listLimit:60}))});
+      if(p.brand&&p.brand!=='—') chips.push({icon:'⌁',label:this._hl(p.brand,toks),title:tip(s.fEquip===p.brand,t.chipEquip,p.brand),style:chipCss(s.fEquip===p.brand,'color:var(--text-10);background:var(--bg-info);border:1px solid var(--border-info2);font-weight:600'),onClick:stop(()=>this._setF({fEquip:s.fEquip===p.brand?'':p.brand,listLimit:60}))});
+      if(p.ageGroup!=='unknown'||(p.age&&p.age!=='—')) chips.push({icon:'◔',label:this._hl((p.age&&p.age!=='—')?p.age:ageName[p.ageGroup],toks),title:tip(s.fAge===p.ageGroup,t.chipAge,ageName[p.ageGroup]),style:chipCss(s.fAge===p.ageGroup,'color:var(--text-11);background:var(--bg-warn);border:1px solid var(--border-warn);font-weight:600'),onClick:stop(()=>this._setF({fAge:s.fAge===p.ageGroup?'':p.ageGroup,listLimit:60}))});
+      chips.push({icon:'',label:typeName[p.type]||p.type,title:tip(s.fType===p.type,t.chipType,typeName[p.type]||p.type),style:chipCss(s.fType===p.type,'color:#fff;background:'+(typeColor[p.type]||'#8a8676')+';border:1px solid transparent'),onClick:stop(()=>this._setF({fType:s.fType===p.type?'':p.type,listLimit:60}))});
+      const gk=this._groupKey(p), firstOfGroup=s.groupBy!=='none'&&(idx===0||this._groupKey(visible[idx-1])!==gk);
+      const equipDiffers=p.equip&&p.equip!=='—'&&this._norm(p.equip)!==this._norm(p.brand);
       return {
+        groupHeader:firstOfGroup?groupLabel(p):'', groupCount:firstOfGroup?String(groupTotals.get(gk)||''):'',
+        groupHeaderStyle:firstOfGroup?'display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text-6);padding:8px 4px 2px;border-bottom:1px solid var(--border-2);margin-top:'+(idx?'6px':'0'):'display:none',
         modeRow: (sel && s.method==='combined')?'margin-top:7px;display:flex;gap:5px':'display:none',
         confStyle:modeBtn(mode==='conf95'), tolStyle:modeBtn(mode==='tolerance'),
-        onConf:(ev)=>{ if(ev)ev.stopPropagation(); this._setRefMode(p.key,'conf95'); },
-        onTol:(ev)=>{ if(ev)ev.stopPropagation(); this._setRefMode(p.key,'tolerance'); },
-        key:p.key, legend:p.legend, cardTitle:[p.legend,p.referenceLabel,p.note,p.foundIn,p.ellipseUse].filter(Boolean).join('\n'), country:p.country, sex:p.sex, age:p.age, n:p.n, type:p.type,referenceLabel:p.referenceLabel,referenceAuthor:p.referenceAuthor,referenceYear:p.referenceYear,referenceDoi:p.referenceDoi,referenceHref:p.referenceDoi?('https://doi.org/'+p.referenceDoi):'#',onDoiClick:(ev)=>{if(ev)ev.stopPropagation();},
-        onToggle:(ev)=>{if(ev)ev.stopPropagation();this._toggleRef(p.key);},
+        onConf:stop(()=>this._setRefMode(p.key,'conf95')),
+        onTol:stop(()=>this._setRefMode(p.key,'tolerance')),
+        key:p.key, legend:p.legend, cardTitle:[p.legend,p.equip!=='—'?p.equip:'',p.referenceLabel||p.reference,p.note,p.foundIn,p.ellipseUse].filter(Boolean).join('\n'), n:p.n,
+        titleNode:this._hl(p.title||p.legend,toks), chips,
+        equipNode:this._hl(p.equip,toks), equipStyle:equipDiffers?'font-size:10px;color:var(--text-muted);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis':'display:none',
+        referenceNode:this._hl((p.referenceAuthor||p.reference||'')+(p.referenceYear?' ('+p.referenceYear+')':''),toks),referenceDoi:p.referenceDoi,referenceHref:p.referenceDoi?('https://doi.org/'+p.referenceDoi):'#',onDoiClick:(ev)=>{if(ev)ev.stopPropagation();},
+        onToggle:stop(()=>this._toggleRef(p.key)),
         selectTitle:sel?t.selectRemove:t.selectAdd,selectIcon:sel?'✓':'+',
-        selectStyle:'width:23px;height:23px;flex:none;border-radius:6px;cursor:pointer;font:700 13px \'IBM Plex Sans\';line-height:1;'+(sel?'color:#fff;background:'+(col||'#2f4fd6')+';border:1px solid transparent':'color:#2f4fd6;background:var(--bg-panel);border:1px solid var(--border-2)'),
-        sexLabel:p.sex, sexColor:p.sex==='F'?'#c0248f':(p.sex==='M'?'#2f4fd6':'#8a8676'),
-        subLine:p.equip+' · '+p.age,
-        referenceStyle:p.referenceLabel?'font-size:9.5px;line-height:1.35;color:var(--text-6);margin-bottom:6px;overflow-wrap:anywhere':'display:none',
+        selectStyle:'width:24px;height:24px;flex:none;border-radius:7px;cursor:pointer;font:700 13px \'IBM Plex Sans\';line-height:1;'+(sel?'color:#fff;background:'+(col||'#2f4fd6')+';border:1px solid transparent':'color:#2f4fd6;background:var(--bg-panel);border:1px solid var(--border-2)'),
+        onRemoveCustom:stop(()=>this._removeCustomRef(p.key)),
+        removeCustomStyle:p.custom?'width:24px;height:24px;flex:none;border-radius:7px;cursor:pointer;font-size:14px;line-height:1;color:#b9564a;background:var(--bg-danger);border:1px solid var(--border-danger)':'display:none',
+        sexLabel:p.sex==='B'?t.sexB:p.sex, sexColor:p.sex==='F'?'#c0248f':(p.sex==='M'?'#2f4fd6':(p.sex==='B'?'#0f9d8f':'#8a8676')),
+        referenceStyle:(p.referenceAuthor||p.reference)?'font-size:9.5px;line-height:1.35;color:var(--text-6);margin-bottom:2px;overflow-wrap:anywhere':'display:none',
         doiStyle:p.referenceDoi?'color:var(--text-10);text-decoration:underline;text-underline-offset:2px':'display:none',
         noteText:[p.note,p.foundIn?('Fonte: '+p.foundIn):'',p.ellipseUse?('Uso: '+p.ellipseUse):''].filter(Boolean).join(' · '),
-        noteStyle:(p.note||p.foundIn||p.ellipseUse)?'font-size:9px;line-height:1.35;color:var(--text-muted);margin:-1px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis':'display:none',
-        customTagStyle:p.custom?'font-size:9px;color:#fff;background:#e0662a;padding:1px 6px;border-radius:5px;font-weight:600':'display:none',
+        noteStyle:(p.note||p.foundIn||p.ellipseUse)?'font-size:9px;line-height:1.35;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis':'display:none',
+        customTagStyle:p.custom?'font-size:9px;color:#fff;background:#e0662a;padding:1px 6px;border-radius:5px;font-weight:600;white-space:nowrap':'display:none',
         accent: sel? (col||'#2f4fd6') : 'transparent',
-        thumbPath:this._thumbPath(p),
-        thumbFill: sel? this._hexA(col,0.14) : 'rgba(120,120,120,0.06)',
-        thumbStroke: sel? col : '#b9b3a2',
-        typeChip:'font-size:9.5px;color:#fff;background:'+(typeColor[p.type]||'#8a8676')+';padding:1px 6px;border-radius:5px;font-weight:500',
-        cardStyle:'display:flex;gap:10px;padding:9px;border-radius:12px;cursor:pointer;transition:.12s;align-items:stretch;'
+        thumb:React.createElement('svg',{viewBox:'0 0 60 44',style:{width:'44px',height:'33px',flex:'none',background:'var(--bg-thumb)',border:'1px solid var(--border-4)',borderRadius:'6px'}},React.createElement('path',{d:this._thumbPath(p),fill:sel?this._hexA(col,0.16):'rgba(120,120,120,0.07)',stroke:sel?col:'#b9b3a2',strokeWidth:1.6})),
+        cardStyle:'display:flex;gap:9px;padding:9px;border-radius:12px;cursor:pointer;transition:.12s;align-items:stretch;'
           +(sel?'background:var(--bg-panel);border:1.5px solid '+(active?'var(--strong-bg)':(col||'#2f4fd6'))+';box-shadow:0 1px 4px rgba(0,0,0,.05)':'background:var(--bg-card-alt);border:1px solid var(--border-3)'),
         axisX,axisY,rhText:this._fmt(p.rhMean,1)+' ±'+this._fmt(p.rhSd,1),
-        xcText:this._fmt(p.xcHMean,1)+' ±'+this._fmt(p.xcHSd,1),
-        statRow: sel?'margin-top:6px;padding-top:6px;border-top:1px dashed #e6e1d5;display:flex;gap:6px;align-items:center;font-size:10.5px;color:#5f5b4d':'display:none',
+        xcText:this._fmt(p.xcHMean,1)+' ±'+this._fmt(p.xcHSd,1), rText:this._fmt(p.r,2),
+        statRow: sel?'margin-top:6px;padding-top:6px;border-top:1px dashed var(--border-2);display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:10.5px;color:var(--text-6)':'display:none',
       };
     });
 
     // legend
     const legendItems=[];
-    s.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p){ const c=this._refColor(k); const md=this._effMode(k),phase=s.showPhase&&this._phaseAllowed()?(' · φ '+this._fmt(this._phaseAngle(p.rhMean,p.xcHMean),1)+'°'):''; legendItems.push({color:c,fill:this._hexA(c,0.12),label:p.legend,kind:(md==='tolerance'?t.tolTitleTol:t.tolTitle)+phase}); } });
-    currentEllipses.forEach((e)=>{ if(e.visible){const phase=s.showPhase&&this._phaseAllowed()?(' · φ '+this._fmt(this._phaseAngle(e.rhMean,e.xcHMean),1)+'°'):'';legendItems.push({color:e.color,fill:this._hexA(e.color,0.12),label:e.name,kind:t.kindConf+phase});} });
-    [...new Map(currentMeasurements.map((m)=>[m.participant,m])).values()].forEach((m)=>{const phase=s.showPhase&&this._phaseAllowed()?(' · φ '+this._fmt(this._phaseAngle(m.rh,m.xc),1)+'°'):'';legendItems.push({color:m.color,fill:this._hexA(m.color,0.12),label:m.participant,kind:'longitudinal'+phase});});
+    const cssBorder=(st)=>Math.min(2.5,Math.max(1.5,st.width))+'px '+({solid:'solid',dashed:'dashed',longdash:'dashed',dotted:'dotted',dashdot:'dashed'}[st.dash]||'solid')+' '+st.color;
+    const phaseTxt=(x,y)=>s.showPhase&&this._phaseAllowed()?(' · φ '+this._fmt(this._phaseAngle(x,y),1)+'°'):'';
+    s.refKeys.forEach((k)=>{ const p=this._byKey(k); if(p&&(p.metric||'classic')===s.bivaMode){ const st=this._refStyle(k), md=this._effMode(k); legendItems.push({color:st.color,border:cssBorder(st),fill:this._hexA(st.color,Math.max(0.04,st.fill)),label:p.title||p.legend,kind:(md==='tolerance'?t.tolTitleTol:t.tolTitle)+phaseTxt(p.rhMean,p.xcHMean),onClick:()=>this._openStyle('ref:'+k)}); } });
+    currentEllipses.forEach((e)=>{ if(e.visible){ const st=this._ellStyle(e); legendItems.push({color:st.color,border:cssBorder(st),fill:this._hexA(st.color,Math.max(0.04,st.fill)),label:e.name,kind:t.kindConf+phaseTxt(e.rhMean,e.xcHMean),onClick:()=>this._openStyle('ell:'+e.id)}); } });
+    [...new Map(currentMeasurements.map((m)=>[m.participant,m])).values()].forEach((m)=>{legendItems.push({color:m.color,border:'1.5px solid '+m.color,fill:this._hexA(m.color,0.12),label:m.participant,kind:'longitudinal'+phaseTxt(m.rh,m.xc),onClick:()=>this._startEditMeasurement(m)});});
+
+    // style window rows (references + ellipses share the same controls)
+    const symName={circle:t.symCircle,square:t.symSquare,diamond:t.symDiamond,triangle:t.symTriangle,cross:t.symCross,plus:t.symPlus,none:t.symNone};
+    const dashOptions=this.DASH_ORDER.map((d)=>({value:d,label:this.DASH_LABEL[d]}));
+    const centerSymbolOptions=[...this.SYMBOLS,'none'].map((v)=>({value:v,label:this.SYMBOL_ICON[v],title:symName[v]}));
+    const count=this._styleTargets().length;
+    const styleRows=this._styleTargets().map((tg)=>{
+      const isRef=tg.type==='ref', p=isRef?this._byKey(tg.key):null, e=isRef?null:s.ellipses.find((x)=>x.id===tg.key);
+      const st=isRef?this._refStyle(tg.key):this._ellStyle(e);
+      const set=(patch)=>isRef?this._setRefStyle(tg.key,patch):this._setEllStyle(tg.key,patch);
+      const focused=s.styleFocus===tg.id, open=focused||(!s.styleFocus&&count<=2);
+      return {
+        detailStyle:open?'':'display:none', moreIcon:open?'▴':'▾', onMore:()=>this.setState({styleFocus:open?'none':tg.id}),
+        id:tg.id, name:isRef?(p.title||p.legend):e.name, kind:isRef?(t.kindRef+' · '+(this._effMode(tg.key)==='tolerance'?t.tolTitleTol:t.tolTitle)):t.kindConf,
+        color:st.color, dash:st.dash, symbol:st.symbol, width:st.width, widthLabel:st.width.toFixed(1), fill:st.fill, fillLabel:Math.round(st.fill*100)+'%', label:st.label,
+        visible:isRef?true:e.visible, visibleStyle:isRef?'display:none':'display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--text-2);cursor:pointer',
+        boxStyle:'padding:9px 10px;border-radius:10px;background:var(--bg-sidebar);border:'+(focused?'1.5px solid '+st.color:'1px solid var(--border-4)'),
+        swatches:this.STYLE_SWATCHES.map((c)=>({color:c,style:'width:18px;height:18px;border-radius:5px;cursor:pointer;padding:0;background:'+c+';border:2px solid '+(String(st.color).toLowerCase()===c?'var(--strong-bg)':'transparent')+';box-shadow:0 0 0 1px var(--border-2)',onClick:()=>set({color:c})})),
+        onColor:(ev)=>set({color:ev.target.value}), onDash:(ev)=>set({dash:ev.target.value}), onSymbol:(ev)=>set({symbol:ev.target.value}),
+        onWidth:(ev)=>set({width:+ev.target.value}), onFill:(ev)=>set({fill:+ev.target.value}), onLabel:(ev)=>set({label:!!ev.target.checked}),
+        onVisible:(ev)=>{ if(!isRef) this._updEllipse(tg.key,{visible:!!ev.target.checked}); },
+        onReset:()=>set({dash:'solid',symbol:'circle',width:2,fill:0.10,label:true}),
+      };
+    });
+    const presetIcon=(colors,dashed)=>React.createElement('span',{style:{display:'inline-flex',gap:'2px',alignItems:'center'}},colors.map((c,i)=>React.createElement('span',{key:i,style:{width:'9px',height:dashed?'0':'9px',borderRadius:dashed?'0':'3px',background:dashed?'none':c,borderTop:dashed?('2px '+['solid','dashed','dotted'][i%3]+' '+c):'none'}})));
+    const stylePresets=[
+      {label:t.presetDefault,title:t.presetDefaultT,icon:presetIcon(['#2f4fd6','#e0662a','#0f9d8f']),onClick:()=>this._applyPreset('default')},
+      {label:t.presetCb,title:t.presetCbT,icon:presetIcon(['#0072B2','#D55E00','#009E73']),onClick:()=>this._applyPreset('cb')},
+      {label:t.presetMono,title:t.presetMonoT,icon:presetIcon(['#111','#111','#111'],true),onClick:()=>this._applyPreset('mono')},
+      {label:t.presetLines,title:t.presetLinesT,icon:'┄',onClick:()=>this._applyPreset('lines')},
+      {label:t.presetSymbols,title:t.presetSymbolsT,icon:'◆',onClick:()=>this._applyPreset('symbols')},
+    ];
+
+    // estimator inbox
+    const inboxItems=s.inbox.map((x)=>{
+      const full=this._inboxComplete(x), f=(v,d)=>Number.isFinite(+v)?(+v).toFixed(d):'—';
+      const btn=(on)=>'font:600 10.5px \'IBM Plex Sans\';padding:5px 9px;border-radius:7px;cursor:'+(on?'pointer':'not-allowed')+';opacity:'+(on?'1':'.45')+';background:#173f8a;color:#fff;border:1px solid #173f8a';
+      return { name:x.name||'Estimador', rText:f(x.r,3), sub:axisX+' '+f(x.xMean,1)+' ± '+f(x.xSd,1)+' · '+axisY+' '+f(x.yMean,1)+' ± '+f(x.ySd,1)+' · N='+(Number.isFinite(+x.n)&&+x.n>0?+x.n:'—'),
+        fullBtnStyle:btn(full), ellBtnStyle:btn(full), onAsRef:()=>this._inboxAsRef(x), onAsEllipse:()=>this._inboxAsEllipse(x), onUseR:()=>this._inboxUseR(x), onRemove:()=>this._writeInbox(s.inbox.filter((i)=>i.id!==x.id),'') };
+    });
 
     // ellipse list
     const ellipses=currentEllipses.map((e)=>{
@@ -1623,16 +2166,13 @@ class Component extends DCLogic {
       const draft=editing?(s.editDraft||{}):{};
       const editDefs=[['rhMean',axisX+' média','0.1'],['rhSd',axisX+' DP','0.1'],['xcHMean',axisY+' média','0.1'],['xcHSd',axisY+' DP','0.1'],['r',t.fR,'0.01'],['n',t.fN,'1']];
       return {
-        id:e.id, name:e.name, color:e.color, width:e.width, widthLabel:e.width.toFixed(1),
-        swatchFill:e.visible?this._hexA(e.color,0.25):'transparent',
+        id:e.id, name:e.name, color:e.color,
+        swatchFill:e.visible?this._hexA(e.color,0.25):'transparent', swatchBorder:cssBorder(this._ellStyle(e)), onStyle:()=>this._openStyle('ell:'+e.id),
         meta:axisX+' '+this._fmt(e.rhMean,1)+' · '+axisY+' '+this._fmt(e.xcHMean,1)+' · N='+e.n,
         eyeIcon:e.visible?'●':'○',
         eyeStyle:'font-size:13px;line-height:1;width:26px;height:26px;border-radius:7px;cursor:pointer;flex:none;'+(e.visible?'color:#2f4fd6;background:#eef1fc;border:1px solid #d6def7':'color:var(--text-muted);background:var(--bg-chip2);border:1px solid var(--border-6)'),
         editBtnStyle:'font-size:12px;line-height:1;width:26px;height:26px;border-radius:7px;cursor:pointer;'+(editing?'color:#fff;background:#e0662a;border:1px solid #e0662a':'color:var(--text-6);background:var(--bg-chip2);border:1px solid var(--border-6)'),
         editStyle:editing?'padding:12px;border-top:1px solid var(--border-5);background:var(--bg-drawer)':'display:none',
-        swatches:this.SWATCHES.map((c)=>({style:'width:24px;height:24px;border-radius:7px;cursor:pointer;background:'+c+';border:2px solid '+(e.color===c?'#1b1e26':'transparent'),onClick:()=>this._updEllipse(e.id,{color:c})})),
-        solidStyle:'font:600 11px \'IBM Plex Mono\';padding:4px 10px;border-radius:7px;cursor:pointer;'+(e.stroke==='solid'?'background:var(--strong-bg);color:var(--strong-text);border:1px solid var(--strong-bg)':'background:var(--bg-panel);color:var(--text-6);border:1px solid var(--border-2)'),
-        dashedStyle:'font:600 11px \'IBM Plex Mono\';padding:4px 10px;border-radius:7px;cursor:pointer;'+(e.stroke==='dashed'?'background:var(--strong-bg);color:var(--strong-text);border:1px solid var(--strong-bg)':'background:var(--bg-panel);color:var(--text-6);border:1px solid var(--border-2)'),
         onToggleVisible:()=>this._updEllipse(e.id,{visible:!e.visible}),
         onEdit:()=>this._startEditEllipse(e),
         editName:draft.name||'', onEditName:(ev)=>this._setEditEllipse('name',ev.target.value),
@@ -1640,9 +2180,6 @@ class Component extends DCLogic {
         editErrorStyle:(editing&&s.editError)?'font-size:10.5px;color:#b45309;background:var(--bg-warn3);border:1px solid var(--border-warn3);border-radius:7px;padding:7px 8px;margin-bottom:8px;line-height:1.35':'display:none',
         onSaveEdit:()=>this._saveEditEllipse(e.id), onCancelEdit:()=>this.setState({editingId:null,editDraft:null,editError:false}),
         onRemove:()=>this._removeEllipse(e.id),
-        onSolid:()=>this._updEllipse(e.id,{stroke:'solid'}),
-        onDashed:()=>this._updEllipse(e.id,{stroke:'dashed'}),
-        onWidth:(ev)=>this._updEllipse(e.id,{width:+ev.target.value}),
       };
     });
 
@@ -1708,9 +2245,9 @@ class Component extends DCLogic {
     const tolSvg='<ellipse cx="20" cy="15" rx="17" ry="11" fill="none" stroke="#fff" stroke-width="1.4" opacity=".55"/><ellipse cx="20" cy="15" rx="11.5" ry="7.5" fill="none" stroke="#fff" stroke-width="1.4" opacity=".8"/><ellipse cx="20" cy="15" rx="6" ry="4" fill="none" stroke="#fff" stroke-width="1.6"/>';
     const combSvg=tolSvg+'<circle cx="30" cy="7" r="2.4" fill="#fff"/>';
     const methodCards=[
-      {id:'tolerance',accent:'#2f4fd6',tint:'rgba(47,79,214,.18)',icon:svgEl(tolSvg),title:t.mTolTitle,desc:t.mTolDesc,features:t.mTolF,onClick:()=>this._enterMethod('tolerance')},
-      {id:'confidence',accent:'#e0662a',tint:'rgba(224,102,42,.18)',icon:svgEl(ellSvg),title:t.mConfTitle,desc:t.mConfDesc,features:t.mConfF,onClick:()=>this._enterMethod('confidence')},
-      {id:'combined',accent:'#0f9d8f',tint:'rgba(15,157,143,.18)',icon:svgEl(combSvg),title:t.mCombTitle,desc:t.mCombDesc,features:t.mCombF,onClick:()=>this._enterMethod('combined')},
+      {id:'tolerance',accent:'#2f4fd6',tint:'rgba(47,79,214,.18)',icon:svgEl(tolSvg),title:t.mTolTitle,desc:t.mTolDesc,features:t.mTolF,cta:(s.method==='tolerance'&&this._hasWork())?t.resume:t.open,onClick:()=>this._enterMethod('tolerance')},
+      {id:'confidence',accent:'#e0662a',tint:'rgba(224,102,42,.18)',icon:svgEl(ellSvg),title:t.mConfTitle,desc:t.mConfDesc,features:t.mConfF,cta:(s.method==='confidence'&&this._hasWork())?t.resume:t.open,onClick:()=>this._enterMethod('confidence')},
+      {id:'combined',accent:'#0f9d8f',tint:'rgba(15,157,143,.18)',icon:svgEl(combSvg),title:t.mCombTitle,desc:t.mCombDesc,features:t.mCombF,cta:(s.method==='combined'&&this._hasWork())?t.resume:t.open,onClick:()=>this._enterMethod('combined')},
     ];
     const methodName = s.method==='tolerance'?t.mTolTitle:(s.method==='confidence'?t.mConfTitle:t.mCombTitle);
     const showEllipsePanel = s.method==='confidence' || s.method==='combined';
@@ -1752,7 +2289,7 @@ class Component extends DCLogic {
     ];
     const pairedFields=[['sdRh','DP Δ'+axisX,'0.1'],['sdXc','DP Δ'+axisY,'0.1'],['r',t.pairedCorr,'0.01'],['n',t.pairedN,'1']].map(([f,label,step])=>({label,step,value:s.paired[f],onInput:(e)=>this._setPaired(f,e.target.value)}));
     const pairedReferenceOptions=s.bivaMode!=='classic'?[]:s.pairedRefs.map((p)=>({value:p.key,label:p.legend+' (N='+p.n+')'+(p.referenceLabel?' — '+p.referenceLabel:'')}));
-    const symbolOptions=[{value:'circle',label:'● Círculo'},{value:'square',label:'■ Quadrado'},{value:'diamond',label:'◆ Losango'},{value:'triangle',label:'▲ Triângulo'}];
+    const symbolOptions=this.SYMBOLS.map((v)=>({value:v,label:this.SYMBOL_ICON[v]+' '+symName[v]}));
     const measurements=currentMeasurements.map((m)=>{const editing=s.editingMeasurementId===m.id,d=editing?(s.measurementDraft||{}):{};return{label:m.participant+' · '+m.time,coords:axisX+' '+this._fmt(m.rh,1)+' · '+axisY+' '+this._fmt(m.xc,1),color:m.color,axisX,axisY,editStyle:editing?'padding:9px;border-top:1px solid var(--border-5);background:var(--bg-drawer)':'display:none',editParticipant:d.participant||'',editTime:d.time||'',editRh:d.rh??'',editXc:d.xc??'',editColor:d.color||m.color,editSymbol:d.symbol||m.symbol,symbolOptions,onEdit:()=>this._startEditMeasurement(m),onEditParticipant:(e)=>this._setMeasurementDraft('participant',e.target.value),onEditTime:(e)=>this._setMeasurementDraft('time',e.target.value),onEditRh:(e)=>this._setMeasurementDraft('rh',e.target.value),onEditXc:(e)=>this._setMeasurementDraft('xc',e.target.value),onEditColor:(e)=>this._setMeasurementDraft('color',e.target.value),onEditSymbol:(e)=>this._setMeasurementDraft('symbol',e.target.value),editErrorStyle:editing&&s.measurementError?'font-size:9.5px;color:#b45309;margin-bottom:7px':'display:none',onCancelEdit:()=>this.setState({editingMeasurementId:null,measurementDraft:null,measurementError:false}),onSaveEdit:()=>this._saveMeasurement(m.id),onRemove:()=>this._removeMeasurement(m.id)};});
     const annotations=s.annotations.map((a)=>({...a,onRemove:()=>this._removeAnnotation(a.id)}));
     const fontOptions=[{value:'IBM Plex Sans',label:'Plex Sans'},{value:'IBM Plex Mono',label:'Plex Mono'},{value:'Georgia',label:'Georgia'},{value:'Arial',label:'Arial'}];
@@ -1764,7 +2301,7 @@ class Component extends DCLogic {
     if(cls && !cls.noPop){
       indivResultStyle='';
       const bm=badgeMap[cls.level]; iBadge=bm[0]; iBadgeBg=bm[1]; iBadgeColor=bm[2]; iBadgeIcon=bm[3];
-      const L=s.lang, pop=cls.pop.country+' '+cls.pop.sex, dd=cls.d.toFixed(2);
+      const L=s.lang, pop='“'+(cls.pop.title||cls.pop.legend)+'”', dd=cls.d.toFixed(2);
       const inside=cls.level!=='out';
       if(L==='en') iInterp=inside?('This individual falls within the '+(cls.level==='in50'?'50%':cls.level==='in75'?'75%':'95%')+' tolerance ellipse of '+pop+' (Mahalanobis D = '+dd+'). Its RXc vector is typical for this reference group.'):('This individual falls OUTSIDE the 95% tolerance ellipse of '+pop+' (Mahalanobis D = '+dd+'), suggesting an atypical body composition/hydration relative to this reference group.');
       else if(L==='es') iInterp=inside?('Este individuo cae dentro de la elipse de tolerancia del '+(cls.level==='in50'?'50%':cls.level==='in75'?'75%':'95%')+' de '+pop+' (D de Mahalanobis = '+dd+'). Su vector RXc es típico de este grupo de referencia.'):('Este individuo cae FUERA de la elipse de tolerancia del 95% de '+pop+' (D de Mahalanobis = '+dd+'), lo que sugiere una composición/hidratación corporal atípica respecto a este grupo.');
@@ -1790,6 +2327,9 @@ class Component extends DCLogic {
       methodCards, methodName, onHome:()=>this._goHome(),
       migrateStyle: (s.method==='combined') ? 'display:none' : 'display:flex;align-items:center;gap:6px;font:600 12px \'IBM Plex Sans\';color:#0f9d8f;background:rgba(15,157,143,.14);border:1px solid rgba(15,157,143,.35);padding:6px 12px;border-radius:8px;cursor:pointer',
       onMigrate:()=>this._migrateToCombined(),
+      onNewAnalysis:()=>this._newAnalysis(),
+      newAnalysisLabel:s.confirmReset?t.confirmNew:('↺ '+t.newAnalysis),
+      newAnalysisStyle:!this._hasWork()?'display:none':'display:flex;align-items:center;gap:6px;font:600 12px \'IBM Plex Sans\';padding:6px 11px;border-radius:8px;cursor:pointer;white-space:nowrap;'+(s.confirmReset?'color:#fff;background:#b9382a;border:1px solid #b9382a':'color:#c8ccd6;background:transparent;border:1px solid #2b2e37'),
 
       // add-reference
       onToggleAddRef:()=>this.setState({showAddRef:!s.showAddRef}),
@@ -1797,13 +2337,31 @@ class Component extends DCLogic {
       addRefFormStyle:s.showAddRef?'margin-top:10px;padding:13px;background:var(--bg-warm);border:1px solid var(--border-warm);border-radius:12px;animation:popin .18s ease':'display:none',
       refName:nr.name, onRefName:(e)=>this._setNewRef('name',e.target.value),
       refCountry:nr.country, onRefCountry:(e)=>this._setNewRef('country',e.target.value),
+      refEquip:nr.equip||'', onRefEquip:(e)=>this._setNewRef('equip',e.target.value),
+      refAge:nr.age||'', onRefAge:(e)=>this._setNewRef('age',e.target.value),
+      refCitation:nr.reference||'', onRefCitation:(e)=>this._setNewRef('reference',e.target.value),
+      refErrorStyle:s.refError?'font-size:10.5px;color:#b45309;background:var(--bg-warn3);border:1px solid var(--border-warn3);border-radius:7px;padding:7px 8px;line-height:1.35':'display:none',
       refFields, refSexOpts, refTypeOpts,
-      onRefCancel:()=>this.setState({showAddRef:false}),
+      onRefCancel:()=>this.setState({showAddRef:false,refError:false}),
       onRefSave:()=>this._addRef(),
 
-      popTotalLabel:(s.ready?availableRefs.length:'…')+' '+(s.lang==='en'?'populations':(s.lang==='es'?'poblaciones':'populações')),
-      popCountLabel:filtered.length+' / '+(availableRefs.length||'—'),
-      onSearch:(ev)=>this._setF({search:ev.target.value}),
+      popTotalLabel:(s.ready?baseRefs.length:'…')+' '+(s.lang==='en'?'populations':(s.lang==='es'?'poblaciones':(s.lang==='it'?'popolazioni':'populações'))),
+      popCountLabel:filtered.length+' '+t.ofWord+' '+(baseRefs.length||'—'),
+      search:s.search, onSearch:(ev)=>this._setF({search:ev.target.value,listLimit:60}),
+      onClearSearch:()=>this._setF({search:'',listLimit:60}),
+      clearSearchStyle:s.search?'position:absolute;right:6px;top:50%;transform:translateY(-50%);width:22px;height:22px;border:none;border-radius:6px;background:var(--bg-chip);color:var(--text-6);font-size:14px;line-height:1;cursor:pointer':'display:none',
+      facetSelects, facetGridStyle:(s.showFilters&&!s.showAddRef)?'display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px':'display:none',
+      onToggleFilters:()=>this.setState({showFilters:!s.showFilters}),
+      filtersBtnLabel:s.showFilters?t.filtersHide:t.filtersShow,
+      filtersBtnStyle:'font:500 10.5px \'IBM Plex Sans\';padding:3px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;background:var(--bg-panel);color:var(--text-6);border:1px solid var(--border-2)',
+      onToggleOnlySelected:()=>this._setF({onlySelected:!s.onlySelected,listLimit:60}),
+      onlySelectedLabel:'✓ '+t.onlySel+' ('+s.refKeys.length+')',
+      onlySelectedStyle:(s.refKeys.length||s.onlySelected)?('font:600 10.5px \'IBM Plex Sans\';padding:3px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;'+(s.onlySelected?'background:#2f4fd6;color:#fff;border:1px solid #2f4fd6':'background:var(--bg-panel);color:#2f4fd6;border:1px solid var(--border-2)')):'display:none',
+      onClearFilters:()=>this._clearFilters(),
+      clearFiltersStyle:activeFilterCount?'font:600 10.5px \'IBM Plex Sans\';padding:3px 6px;border:none;background:none;color:#b9564a;cursor:pointer;white-space:nowrap;text-decoration:underline;text-underline-offset:2px':'display:none',
+      onShowMore:()=>this.setState({listLimit:s.listLimit+60}),
+      showMoreLabel:t.showMore+' ('+Math.max(0,filtered.length-visible.length)+' '+t.remaining+')',
+      showMoreStyle:filtered.length>visible.length?'flex:none;font:600 11.5px \'IBM Plex Sans\';padding:9px;border-radius:9px;cursor:pointer;background:var(--bg-panel);color:#2f4fd6;border:1px dashed var(--border-2)':'display:none',
       sexFilters, typeFilters, pops,
       emptyStyle:(s.ready&&!filtered.length)?'padding:24px 8px;text-align:center;font-size:12px;color:var(--text-muted)':'display:none',
 
@@ -1817,6 +2375,17 @@ class Component extends DCLogic {
       onExportExcel:()=>this._exportExcel(),
       onTogglePhase:()=>this._togglePhase(),
       phaseBtnStyle:'font:500 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:'+(this._phaseAllowed()?'pointer':'not-allowed')+';opacity:'+(this._phaseAllowed()?'1':'.45')+';'+(s.showPhase?'background:var(--strong-bg);color:var(--strong-text);border:1px solid var(--strong-bg)':'background:var(--bg-panel);color:var(--text-2);border:1px solid var(--border-2)'),
+      onToggleStyle:()=>{ if(s.showStyleWin) this.setState({showStyleWin:false}); else this._openStyle(''); },
+      styleBtnStyle:'font:500 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:pointer;'+(s.showStyleWin?'background:var(--strong-bg);color:var(--strong-text);border:1px solid var(--strong-bg)':'background:var(--bg-panel);color:var(--text-2);border:1px solid var(--border-2)'),
+      styleWinStyle:s.showStyleWin?'flex:none;background:var(--bg-panel);border-bottom:1px solid var(--border-1);animation:popin .16s ease':'display:none',
+      styleRows, stylePresets, dashOptions, centerSymbolOptions,
+      stylePresetBoxStyle:styleRows.length?'':'display:none',
+      styleEmptyStyle:styleRows.length?'display:none':'padding:18px 8px;text-align:center;font-size:11.5px;color:var(--text-muted);line-height:1.5',
+      inboxItems, inboxCount:s.inbox.length?('('+s.inbox.length+')'):'', inboxNote:s.inboxNote,
+      inboxStyle:(s.inbox.length||s.inboxNote)?'padding:12px 14px;background:var(--bg-info);border-bottom:1px solid var(--border-info)':'display:none',
+      inboxNoteStyle:s.inboxNote?'font-size:10.5px;color:var(--text-10);line-height:1.4;margin-top:'+(s.inbox.length?'8px':'0'):'display:none',
+      onInboxClear:()=>this._writeInbox([],''),
+      manualEstimatorLinkStyle:manual?'display:block;font-size:10.5px;font-weight:600;text-decoration:underline;text-underline-offset:2px':'display:none',
       onToggleLegend:()=>this.setState({legendVisible:!s.legendVisible}),
       legendBtnStyle:'font:500 12px \'IBM Plex Sans\';padding:6px 12px;border-radius:8px;cursor:pointer;'+(s.legendVisible?'background:var(--strong-bg);color:var(--strong-text);border:1px solid var(--strong-bg)':'background:var(--bg-panel);color:var(--text-2);border:1px solid var(--border-2)'),
       onChartPointerDown:(e)=>this._startAnnotationDrag(e),onChartPointerMove:(e)=>this._moveAnnotationDrag(e),onChartPointerUp:(e)=>this._endAnnotationDrag(e),

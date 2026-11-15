@@ -53,13 +53,35 @@ O BIVA2.0 é uma aplicação web para análise vetorial de bioimpedância. O apl
 
 ## Busca e seleção de referências
 
-- Pesquisa por texto em grupo, país, equipamento e referência bibliográfica.
-- Filtro por sexo.
-- Filtro por população saudável, esportiva ou clínica.
-- Seleção simultânea de várias populações.
-- Seleção da população ativa para classificação ou criação de elipse.
-- Visualização de N, média, desvio-padrão, equipamento, idade e artigo nos cartões.
-- Inclusão de uma referência personalizada durante a sessão.
+- Pesquisa por vários termos ao mesmo tempo (ex.: `akern soccer 2020`), sem distinção de maiúsculas ou acentos, em grupo, país, aparelho, idade, tipo, artigo, DOI e notas; o trecho encontrado fica destacado no cartão.
+- Filtro por sexo: masculino, feminino e amostras mistas (M+F).
+- Filtro por população saudável, esportiva, clínica ou outras.
+- Filtros por **aparelho** (fabricante), **país**, **faixa etária** e **estudo** (autor e ano), cada opção com a contagem de referências disponíveis considerando os demais filtros.
+- Ordenação por ordem do banco, país, aparelho, maior N ou estudo mais recente.
+- Agrupamento da lista por aparelho, país, idade ou estudo, com cabeçalho e contagem por grupo.
+- Cartões com o nome descritivo do grupo e etiquetas de país, aparelho, idade e tipo; clicar numa etiqueta filtra por aquele valor.
+- Botão **Selecionadas** para ver só o que já está no gráfico e **Limpar filtros** para voltar à lista inteira.
+- A lista mostra 60 cartões por vez (**Mostrar mais**), o que mantém a interface rápida com o banco completo.
+- Seleção simultânea de várias populações; a cor de cada uma é fixada ao entrar no gráfico.
+- Miniatura com a forma real da elipse de tolerância de 95%.
+- Inclusão de referências próprias com nome, país, aparelho, idade, artigo, sexo e tipo. Elas ficam salvas no navegador, entram nos mesmos filtros e podem ser excluídas.
+- Faixa etária, fabricante e país ausentes são deduzidos do texto do grupo apenas para busca e filtro; os valores auditados do banco não são alterados.
+
+## Aparência das elipses
+
+- Botão **Estilo** na barra do gráfico (ou clique num item de "No gráfico") abre o painel de aparência, encaixado ao lado do gráfico.
+- Mesmos controles para populações de referência e elipses de confiança: cor (seletor livre e paleta rápida), tipo de linha (contínua, tracejada, pontilhada, traço-ponto, traço longo), símbolo do centro (círculo, quadrado, losango, triângulo, xis, cruz ou nenhum), espessura, preenchimento e rótulo.
+- **Aplicar a todas**: cores padrão, paleta segura para daltonismo (Okabe-Ito), preto e branco para publicação, variar linhas e variar símbolos.
+- A legenda dentro da figura reproduz linha e símbolo de cada elipse.
+- Estilos entram na exportação Excel e são preservados na sessão.
+
+## Sessão e integração entre páginas
+
+- A análise em andamento (método, populações, elipses, pontos, estilos, eixos, anotações e filtros) é salva no navegador e restaurada ao reabrir ou recarregar a página.
+- Na página inicial, o cartão da técnica em uso mostra **Continuar**; **Nova análise** limpa tudo após confirmação.
+- O botão **Estimador** abre o estimador de correlação em nova aba.
+- Elipses enviadas pelo estimador chegam em **Recebido do Estimador** e podem virar referência própria, elipse de confiança ou apenas preencher o campo de correlação dos formulários.
+- Tema claro/escuro compartilhado entre a Workspace e o estimador.
 
 ## Análise de tolerância
 
@@ -138,7 +160,7 @@ O BIVA2.0 é uma aplicação web para análise vetorial de bioimpedância. O apl
 - Legenda interna móvel, fechável e reativável.
 - Nomes das referências, elipses e participantes dentro da figura.
 - Caixas de texto móveis com fonte, cor, tamanho e posição configuráveis.
-- Cores, símbolos, traços e espessuras editáveis.
+- Cores, símbolos, tipos de linha, espessuras e preenchimentos editáveis no painel Estilo.
 - Redimensionamento responsivo do gráfico.
 
 ## Importação por Excel
@@ -159,11 +181,11 @@ O BIVA2.0 é uma aplicação web para análise vetorial de bioimpedância. O apl
 
 - Exporta o nomograma completo.
 - Inclui elipses, pontos, trajetórias, nomes, ângulos, legenda e caixas de texto.
-- Usa fundo branco para manter a figura consistente fora do aplicativo.
+- Usa fundo branco e paleta clara, mesmo com o tema escuro ativo.
 
 ### Excel
 
-- Aba de elipses e parâmetros.
+- Aba de elipses e parâmetros, com estilo, país, aparelho, idade, referência e DOI.
 - Aba de comparações independentes em pares.
 - Aba de análise pareada quando utilizada.
 - Aba de dados longitudinais de tolerância.
@@ -172,14 +194,20 @@ O BIVA2.0 é uma aplicação web para análise vetorial de bioimpedância. O apl
 
 ## Estimador de correlação de Pearson
 
-- Abre uma imagem de uma elipse publicada.
-- Calibra os eixos X e Y usando pontos conhecidos.
-- Ajusta a elipse por contorno ou pontos extremos.
-- Permite ajuste fino de centro, semieixos e rotação.
+- Abre a imagem de uma elipse publicada por arquivo, arrastar-e-soltar ou colagem (`Ctrl+V`).
+- Calibra os eixos X e Y com dois pontos conhecidos em cada um; `Enter` percorre os campos e as linhas de calibração podem ser arrastadas.
+- Lupa com mira e coordenadas enquanto se marca um ponto.
+- Ajusta a elipse por contorno (5 ou mais pontos, arrastáveis) ou pelas 4 pontas dos eixos.
+- Ajuste fino de centro, semieixos e rotação por alças, teclado ou valores.
+- Funciona com mouse, toque e caneta; pinça para zoom.
+- Desfazer com `Ctrl+Z` e sessão salva no navegador.
 - Estima a correlação de Pearson pela geometria da elipse.
-- Calcula desvios-padrão conforme tipo e cobertura da elipse.
+- Tipo de elipse, cobertura e n são guardados por elipse; calcula médias (centro) e desvios-padrão.
+- Tipos: tolerância populacional (χ²), tolerância de Piccoli (n finito), confiança da média (F de Hotelling) e confiança da média (χ², como a Workspace desenha).
+- Com duas ou mais elipses do mesmo grupo, mostra o r médio e a amplitude como verificação da marcação.
+- **Enviar para o BIVA2**: leva nome, médias, DPs, r e N para a Workspace.
 - Possui calculadora direta para semieixos e ângulo conhecidos.
-- Copia tabela e exporta os resultados em JSON.
+- Copia tabela (médias, DPs, r, n) e exporta os resultados em JSON.
 
 ## Regras e limitações metodológicas
 
@@ -202,5 +230,6 @@ O BIVA2.0 é uma aplicação web para análise vetorial de bioimpedância. O apl
 - `BIVA2-modelo-importacao.xlsx`: modelo de importação em lote.
 - `estimador-pearson.html`: estimador complementar de correlação.
 - `tools/import_reference_populations.py`: importador reproduzível do banco de referências.
+- `vendor/`: React e ReactDOM locais, para abrir a Workspace sem internet.
 
-**Atualização:** outubro de 2026
+**Atualização:** novembro de 2026

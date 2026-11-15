@@ -7,8 +7,10 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 - **index.html** - Entrada principal com redirecionamento para a Workspace
 - **BIVA2.html** - Workspace integrada para tolerância, confiança e análise mista
 - **BIVA2.dc.html** - Fonte editável do design atual da Workspace
-- **estimador-pearson.html** - Ferramenta complementar para estimar a correlação de Pearson pela geometria de elipses publicadas
+- **estimador-pearson.html** - Estimador de correlação de Pearson pela geometria de elipses publicadas; devolve também médias e desvios-padrão e envia a elipse direto para a Workspace
+- **estimator-i18n.js** - Traduções PT-BR, EN, ES e IT do estimador, compartilhando a preferência de idioma com o BIVA2
 - **support.js** - Runtime local utilizado pela Workspace avançada
+- **vendor/** - React e ReactDOM 18.3.1 empacotados localmente (a Workspace abre sem internet)
 - **reference_populations_final.json** - Base revisada com 523 populações clássicas, específicas e H²/Z
 - **paired_reference_populations.json** - Oito conjuntos de referência para análise pareada
 - **biva2-data.js** - Base JSON empacotada para uso direto no navegador
@@ -22,16 +24,17 @@ Ferramenta web para análise de Bioimpedância Vetorial (BIVA) em uma Workspace 
 1. Extraia os arquivos do ZIP
 2. Abra **index.html** ou **BIVA2.html** em um navegador web
 3. Escolha o método de análise na Workspace (Tolerância, Confiança ou Mista)
-4. Selecione a população de referência usando os filtros ou importe o modelo Excel preenchido
-5. Em tolerância, escolha a elipse tradicional ou a padronização por z-score
-6. Adicione medidas com participante e tempo; medidas do mesmo participante serão conectadas
-7. Em confiança, crie e nomeie duas ou mais elipses por média, DP, correlação e N
-8. Para dados pareados, selecione T1 e T2 e informe os deltas ou escolha uma referência pareada publicada
-9. Alterne entre a visualização T1/T2 conectada e a elipse dos deltas centrada no zero
-10. Use "Texto" para acrescentar anotações com fonte, cor, tamanho e posição editáveis
-11. Ajuste manualmente os eixos, se precisar padronizar a escala dos gráficos
-12. Exporte a figura completa em PNG ou as elipses e estatísticas em Excel
-13. Use "Migrar para Mista" para levar tolerância/confiança para a análise mista já carregada
+4. Encontre a população de referência pela busca (país, aparelho, idade, autor, ano) ou pelos filtros de aparelho, país, faixa etária e estudo; clique nas etiquetas de um cartão para filtrar por aquele valor
+5. Use **Estilo** para trocar cor, tipo de linha, símbolo, espessura e preenchimento de qualquer elipse, ou aplique um conjunto pronto (cores, daltônico, P&B)
+6. Em tolerância, escolha a elipse tradicional ou a padronização por z-score
+7. Adicione medidas com participante e tempo; medidas do mesmo participante serão conectadas
+8. Em confiança, crie e nomeie duas ou mais elipses por média, DP, correlação e N
+9. Para dados pareados, selecione T1 e T2 e informe os deltas ou escolha uma referência pareada publicada
+10. Alterne entre a visualização T1/T2 conectada e a elipse dos deltas centrada no zero
+11. Use "Texto" para acrescentar anotações com fonte, cor, tamanho e posição editáveis
+12. Ajuste manualmente os eixos, se precisar padronizar a escala dos gráficos
+13. Exporte a figura completa em PNG ou as elipses e estatísticas em Excel
+14. Use "Migrar para Mista" para levar tolerância/confiança para a análise mista já carregada
 
 ## 🎯 Métodos Disponíveis
 
@@ -109,7 +112,18 @@ Cada população contém:
 ✅ Multi-idioma (PT-BR, EN, ES, IT)
 ✅ Interface responsiva
 ✅ Workspace única com banco visual e eixos customizáveis
-✅ Estimador complementar de correlação de Pearson a partir da geometria de elipses publicadas
+✅ Estimador complementar de correlação de Pearson a partir da geometria de elipses publicadas, em PT-BR, EN, ES e IT
+✅ Busca de referências por vários termos, sem distinção de acentos, com destaque do trecho encontrado
+✅ Filtros por aparelho, país, faixa etária e estudo, com contagem; ordenação e agrupamento da lista
+✅ Etiquetas clicáveis de país, aparelho, idade e tipo em cada cartão
+✅ Referências próprias com aparelho, idade e artigo, salvas no navegador e excluíveis
+✅ Painel Estilo: cor livre, cinco tipos de linha, sete símbolos de centro, espessura, preenchimento e rótulo por elipse (referências e elipses de confiança)
+✅ Conjuntos prontos de estilo: cores padrão, paleta para daltonismo, preto e branco para publicação, variar linhas, variar símbolos
+✅ Legenda da figura com o tipo de linha e o símbolo de cada elipse
+✅ PNG sempre exportado com paleta clara, mesmo no tema escuro
+✅ Sessão salva automaticamente: recarregar a página ou ir ao estimador não apaga a análise
+✅ Estimador envia médias, DPs, r e N para a Workspace (caixa "Recebido do Estimador")
+✅ Estimador com lupa, toque/pinça, pontos arrastáveis, desfazer (Ctrl+Z), arrastar-e-soltar da imagem e tema compartilhado
 
 ## 🧪 Análise de Confiança
 
@@ -128,7 +142,8 @@ Cada população contém:
 
 ## 📝 Notas
 
-- Os dados são armazenados localmente no navegador
+- Os dados são armazenados localmente no navegador (`localStorage`): sessão da Workspace, referências próprias e sessão do estimador
+- **Nova análise** (Workspace) e **Nova sessão** (estimador) apagam o que foi salvo
 - Não há envio de dados para servidores externos
 - Compatível com desktop, tablet e mobile
 
@@ -141,6 +156,6 @@ Cada população contém:
 
 ---
 
-**Versão:** 10.0
-**Data:** Outubro 2026
+**Versão:** 11.0
+**Data:** Novembro 2026
 **Desenvolvido com:** HTML5, CSS3, JavaScript e Canvas
